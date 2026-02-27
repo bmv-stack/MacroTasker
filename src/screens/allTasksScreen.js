@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useTasks } from "../context/taskContext";
 import AppBar from '../components/appBar';
 import SwitchTabs from "../components/tabPills";
+import { PieChart } from "react-native-gifted-charts";
 
 const AllTasksScreen = () => {
     const navigation = useNavigation();
@@ -27,6 +28,16 @@ const AllTasksScreen = () => {
         Normal: { bg: '#D1E9FF', text: '#1E40AF' },
         Low: { bg: '#D1FFD7', text: '#15803d' },
     }
+
+    const completedCount = tasks.filter(t => t.completed).length;
+    const ongoingCount = tasks.filter(t => !t.completed).length;
+    const overdueCount = tasks.filter(t => t.priority === 'High' && !t.completed).length;
+
+    const chartData = [
+        { value: ongoingCount, color: '#007BFF', label: 'Ongoing' },
+        { value: completedCount, color: '#51d761', label: 'Completed' },
+        { value: overdueCount, color: '#e6552d', label: 'Overdue' },
+    ]
     return (
         <View style={styles.container}>
             <AppBar title="TODO APP"
@@ -56,6 +67,29 @@ const AllTasksScreen = () => {
                             </View>
                         ))}
                     </ScrollView>
+                    <View style={styles.chartConatiner}>
+                        <PieChart
+                            donut
+                            focusOnPress
+                            shadow
+                            radius={70}
+                            innerRadius={50}
+                            data={chartData}
+                            centerLabelComponent={() => (
+                                <View style={{ alignItems: 'center' }}>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 22, color: '#1C1C1E' }}>{tasks.length}</Text>
+                                </View>
+                            )}>
+                        </PieChart>
+                        <View style={styles.dotContainer}>
+                            {chartData.map((item, index) => (
+                                <View key={index} style={styles.chartItem}>
+                                    <View style={[styles.dot, { backgroundColor: item.color }]}></View>
+                                    <Text style={styles.dotText}>{item.label}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
                 </View>
                 <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
                     {filteredTasks.length > 0 ? (
@@ -115,10 +149,11 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFF',
         paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+        paddingHorizontal: 20
     },
     content: {
         flex: 1,
-        paddingHorizontal: 15,
+        paddingHorizontal: 17,
     },
     tabRow: {
         flexDirection: 'row',
@@ -248,7 +283,36 @@ const styles = StyleSheet.create({
     checkIcon: {
         color: '#C7C7CC',
         fontSize: 12
-    }
+    },
+    chartConatiner: {
+        backgroundColor: '#F9F9F9',
+        borderRadius: 25,
+        padding: 20,
+        alignItems: 'center',
+        marginVertical: 15,
+        flexDirection: '',
+        justifyContent: 'space-around'
+    },
+    dotContainer: {
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 60
+    },
+    chartItem: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    dotText: {
+        fontSize: 12,
+        color: '#444',
+        fontWeight: '500'
+    },
+    dot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        marginRight: 8
+    },
 });
 
 export default AllTasksScreen;

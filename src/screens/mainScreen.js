@@ -16,7 +16,8 @@ const MainScreen = () => {
     return (
         <View style={styles.safeArea}>
             <View style={styles.content}>
-                <AppBar title='TODO APP' onIconPress={() => navigation.navigate('CreateTask')}></AppBar>
+                <AppBar title='TODO APP' onIconPress={() => navigation.navigate('CreateTask')}>
+                </AppBar>
                 <SwitchTabs
                     activeTab={activeTab}
                     onTabChange={(value) => {

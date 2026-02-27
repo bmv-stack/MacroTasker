@@ -7,7 +7,7 @@ const AppBar = ({ title = "APP NAME", onIconPress }) => {
     return (
         <View style={styles.container}>
             <View style={styles.left}>
-                <View style={styles.diamond}>
+                <View style={styles.blackBox}>
                     <Text style={styles.textLogo}>TA</Text>
                 </View>
                 <Text style={styles.textBrand}>{title}</Text>
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
-    diamond: {
+    blackBox: {
         width: 32,
         height: 32,
         backgroundColor: '#1A1A1A',
