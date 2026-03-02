@@ -8,6 +8,10 @@ const SwitchTabs = ({ activeTab, onTabChange }) => {
                 onPress={() => onTabChange('Focus')}>
                 <Text style={[styles.tabText, activeTab === 'Focus' && styles.activeText]}>Today's Focus</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={[styles.tabPill, activeTab === 'Gmail' && styles.activeTab]}
+                onPress={() => onTabChange('Gmail')}>
+                <Text style={[styles.tabText, activeTab === 'Gmail' && styles.activeText]}>Gmail Tasks</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={[styles.tabPill, activeTab === 'All' && styles.activeTab]}
                 onPress={() => onTabChange('All')}>
                 <Text style={[styles.tabText, activeTab === 'All' && styles.activeText]}>All Tasks</Text>
@@ -19,13 +23,18 @@ const SwitchTabs = ({ activeTab, onTabChange }) => {
 const styles = StyleSheet.create({
     tabRow: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
-        gap: 10,
-        marginVertical: 15
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 1,
+        marginHorizontal: 10,
+        borderRadius: 12,
+        padding: 4,
     },
     tabPill: {
         paddingHorizontal: 20,
         paddingVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
         borderRadius: 25,
         backgroundColor: '#8e8b8b',
         marginRight: 10,
