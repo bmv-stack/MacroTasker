@@ -285,22 +285,23 @@ const styles = StyleSheet.create({
         fontSize: 12
     },
     chartConatiner: {
-        backgroundColor: '#F9F9F9',
         borderRadius: 25,
         padding: 20,
         alignItems: 'center',
         marginVertical: 15,
-        flexDirection: '',
-        justifyContent: 'space-around'
+        flexDirection: 'column',
+        justifyContent: 'space-around',
     },
     dotContainer: {
-        justifyContent: 'center',
+        justifyContent: 'space-evenly',
         flexDirection: 'row',
-        gap: 60
+        gap: 50,
+        padding: 20
     },
     chartItem: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
     dotText: {
         fontSize: 12,

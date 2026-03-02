@@ -11,8 +11,7 @@ const MainScreen = () => {
     const { tasks } = useTasks();
     const [activeTab, setActiveTab] = useState(route.params?.openScreen || 'Focus');
     console.log("Curent Active Tab:", activeTab);
-    const filteredTasks = activeTab === 'Focus' ? tasks.filter(t => !t.completed)
-        : tasks;
+    const filteredTasks = tasks;
     return (
         <View style={styles.safeArea}>
             <View style={styles.content}>

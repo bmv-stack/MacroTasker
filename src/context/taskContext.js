@@ -4,7 +4,7 @@ const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
     const [tasks, setTasks] = useState([
-        { id: '1', title: 'Sample Task', date: '25/06/26', time: '10:00 AM', priority: 'Normal', color: '#87CEEB', completed: false }
+        { id: '1', title: 'Sample Task', date: '25/06/26', time: '10:00 AM', priority: 'Normal', color: '#87CEEB', completed: true }
     ]);
 
     const addNewTask = (task) => {
