@@ -11,7 +11,8 @@ const FormInput = ({ label, value, onChangeText, placeholder, error, ...props })
                 placeholder={placeholder}
                 placeholderTextColor="#C7C7CD"
                 {...props}
-            ></TextInput>
+            >
+            </TextInput>
         </View>
     );
 }
