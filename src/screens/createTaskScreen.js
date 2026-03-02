@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: '#c5d0c057',
+        backgroundColor: '#000',
         justifyContent: 'center',
         alignItems: 'center',
         opacity: 0.5

@@ -12,7 +12,7 @@ const AppBar = ({ title = "APP NAME", onIconPress }) => {
                 </View>
                 <Text style={styles.textBrand}>{title}</Text>
             </View>
-            <TouchableOpacity style={styles.circle} onPress={onIconPress}>
+            <TouchableOpacity onPress={onIconPress}>
                 <View style={styles.gridBox}>
                     <Text style={styles.gridSymbol}>+</Text>
                 </View>
@@ -52,16 +52,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#000'
 
-    },
-    circle: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: 'light-blue',
-        borderWidth: 15,
-        borderColor: '#C7D2FE',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     gridBox: {
         height: 22,
