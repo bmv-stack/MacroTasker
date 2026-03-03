@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     },
     userGreetings: {
         fontSize: 16,
-        marginBottom: 15,
+        marginBottom: 2,
         color: '#8E8E93',
         fontWeight: '500',
     },
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     },
     taskText: {
         fontWeight: 'bold',
-        marginBottom: 15,
+        marginBottom: 10,
         fontSize: 28,
         color: 'black',
         marginTop: 4,

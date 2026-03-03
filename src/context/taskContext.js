@@ -21,7 +21,7 @@ export const TaskProvider = ({ children }) => {
     }, []);
 
     const addNewTask = async (task) => {
-        const colors = ['#C1E1C1', '#FDFD96', '#E6B3E6', '#AEC6CF', '#FFB7B2'];
+        const colors = ['#C1E1C1', '#FDFD96', '#E6B3E6', '#AEC6CF', '#F9BBB7', '#DE97F7', '#8cCF7D7'];
         const taskWithColor = {
             ...task,
             color: task.color || colors[Math.floor(Math.random() * colors.length)],
