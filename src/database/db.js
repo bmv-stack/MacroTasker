@@ -29,7 +29,7 @@ export const createTable = async (db) => {
 };
 
 export const saveTask = async (db, task) => {
-    const insertQuery = `INSERT INTO Tasks (id, title, date, time, end_date, end_time, priority, notes, completed)
+    const insertQuery = `INSERT OR REPLACE INTO Tasks (id, title, date, time, end_date, end_time, priority, notes, completed)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
     const values = [task.id, task.title, task.date, task.time, task.end_date, task.end_time, task.priority, task.notes, task.completed ? 1 : 0];
 
@@ -39,12 +39,15 @@ export const saveTask = async (db, task) => {
 export const getTaskDB = async (db) => {
     try {
         const tasks = [];
-        const results = await db.executeSql("SELECT * FROM Tasks ORDER BY completed ASEC");
-        results.forEach(result => {
-            for (let index = 0; index < result.rows.length; index++) {
-                tasks.push(result.rows.item(index));
-            };
-        });
+        const [results] = await db.executeSql("SELECT * FROM Tasks ORDER BY completed ASC");
+
+        for (let index = 0; index < results.rows.length; index++) {
+            const item = results.rows.item(index)
+            tasks.push({
+                ...item,
+                completed: item.completed === 1
+            });
+        };
         return tasks;
     } catch (error) {
         console.error(error);
@@ -59,5 +62,5 @@ export const deleteTaskDB = async (db, id) => {
 
 export const updateTasksDB = async (db, id, completed) => {
     const query = `UPDATE Tasks SET completed = ? WHERE id = ?`;
-    await db.executeSql(query, [id, completed]);
+    await db.executeSql(query, [completed, id]);
 }
