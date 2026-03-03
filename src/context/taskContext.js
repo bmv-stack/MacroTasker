@@ -1,28 +1,63 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { getDBConnection, getTask, saveTask, deleteTask as deleteTaskFromDB, createTable, updateTaskStatus } from '../database/db';
 
 const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
-    const [tasks, setTasks] = useState([
-        { id: '1', title: 'Sample Task', date: '25/06/26', time: '10:00 AM', priority: 'Normal', color: '#87CEEB', completed: false }
-    ]);
+    const [tasks, setTasks] = useState([]);
 
-    const addNewTask = (task) => {
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const db = await getDBConnection();
+                await createTable(db);
+                const storedTasks = await getTask(db);
+                setTasks(storedTasks);
+            } catch (error) {
+                console.error("Initialization error", error)
+            };
+        };
+        loadData();
+    }, []);
+
+    const addNewTask = async (task) => {
         const colors = ['#C1E1C1', '#FDFD96', '#E6B3E6', '#AEC6CF', '#FFB7B2'];
         const taskWithColor = {
             ...task,
-            color: task.color || colors[Math.floor(Math.random() * colors.length)]
-        }
-        setTasks([taskWithColor, ...tasks]);
+            color: task.color || colors[Math.floor(Math.random() * colors.length)],
+            completed: task.completed ? 1 : 0
+        };
+        const db = await getDBConnection();
+        await saveTask(db, taskWithColor);
+        const updatedTask = await getTask(db);
+        setTasks(updatedTask);
+    };
+
+    const deleteTask = async (id) => {
+        const db = await getDBConnection();
+        await deleteTaskFromDB(db, id);
+        setTasks(prev => prev.filter(t => t.id !== id));
+    };
+
+    const completeTask = async (id) => {
+        const taskToUpdate = tasks.find(t => t.id === id);
+        if (!taskToUpdate) return;
+
+        const newStatus = taskToUpdate.completed ? 0 : 1;
+        const db = await getDBConnection();
+
+        await updateTaskStatus(db, id, newStatus);
+
+        const updatedTasks = await getTask(db);
+        setTasks(updatedTasks);
+    };
+
+    const updateTask = async (updatedTask) => {
+        const db = await getDBConnection();
+        await saveTask(db, updatedTask);
+        const storedTasks = await getTask(db);
+        setTasks(storedTasks);
     }
-
-    const deleteTask = (id) => setTasks(tasks.filter(t => t.id !== id));
-
-    const completeTask = (id) => setTasks(prevTasks => prevTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-
-    const updateTask = (updatedTask) => setTasks(tasks.map(t =>
-        t.id === updatedTask.id ? updatedTask : t
-    ));
 
     return (
         <TaskContext.Provider value={{ tasks, addNewTask, deleteTask, completeTask, updateTask }}>
