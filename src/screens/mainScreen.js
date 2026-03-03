@@ -34,24 +34,28 @@ const MainScreen = () => {
                 <View>
                     <View style={styles.whiteContainer}>
                         <ScrollView contentContainerStyle={styles.scrollContainer}>
-                            {filteredTasks.map((item) => {
-                                return (
-                                    <View key={item.id} style={[styles.taskRow, { backgroundColor: item.color || '#F2F2F7' }]}>
-                                        <View style={styles.taskHeaderRow}>
-                                            <Text style={[styles.taskTitle, item.completed && {
-                                                textDecorationLine: 'line-through',
-                                                color: '#a39f9f',
-                                                opacity: 0.6
-                                            }]}>{item.title}</Text>
-                                            <Text style={[styles.taskTime, item.completed && {
-                                                textDecorationLine: 'line-through',
-                                                color: '#a39f9f',
-                                                opacity: 0.6
-                                            }]}>{item.time}</Text>
+                            {filteredTasks.length > 0 ? (
+                                filteredTasks.map((item) => {
+                                    return (
+                                        <View key={item.id} style={[styles.taskRow, { backgroundColor: item.color || '#F2F2F7' }]}>
+                                            <View style={styles.taskHeaderRow}>
+                                                <Text style={[styles.taskTitle, item.completed && {
+                                                    textDecorationLine: 'line-through',
+                                                    color: '#a39f9f',
+                                                    opacity: 0.6
+                                                }]}>{item.title}</Text>
+                                                <Text style={[styles.taskTime, item.completed && {
+                                                    textDecorationLine: 'line-through',
+                                                    color: '#a39f9f',
+                                                    opacity: 0.6
+                                                }]}>{item.time}</Text>
+                                            </View>
                                         </View>
-                                    </View>
-                                )
-                            }
+                                    );
+                                })) : (
+                                <View style={styles.emptyTaskContainer}>
+                                    <Text style={styles.emptyTaskText}>No Tasks available!</Text>
+                                </View>
                             )
                             }
                         </ScrollView>
@@ -167,5 +171,16 @@ const styles = StyleSheet.create({
         padding: 20,
 
     },
+    emptyTaskContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        paddingVertical: 10
+    },
+    emptyTaskText: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        color: '#8E8E93'
+    }
 });
 export default MainScreen;

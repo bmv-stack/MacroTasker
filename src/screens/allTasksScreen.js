@@ -8,15 +8,15 @@ import { PieChart } from "react-native-gifted-charts";
 
 const AllTasksScreen = () => {
     const navigation = useNavigation();
-    const { tasks, deleteTask, completeTask, updateTask } = useTasks();
+    const { tasks, deleteTask, completeTask } = useTasks();
     const [activeTab, setActiveTab] = useState('All');
     console.log("Curent Active Tab:", activeTab);
 
     const days = [
         { day: 'THU', date: '21' },
-        { day: 'FRI', date: '22', active: true },
+        { day: 'FRI', date: '22' },
         { day: 'SAT', date: '23' },
-        { day: 'SUN', date: '24' },
+        { day: 'SUN', date: '24', active: true },
         { day: 'MON', date: '25' },
         { day: 'TUE', date: '26' },
         { day: 'WED', date: '27' },
@@ -24,9 +24,9 @@ const AllTasksScreen = () => {
     const filteredTasks = activeTab === 'Focus' ? tasks.filter(task => !task.completed) : tasks;
 
     const priorityStyles = {
-        High: { bg: '#FFD1D1', text: '#C00' },
-        Normal: { bg: '#D1E9FF', text: '#1E40AF' },
-        Low: { bg: '#D1FFD7', text: '#15803d' },
+        High: { bg: '#FFD1D1', text: 'red' },
+        Normal: { bg: '#D1E9FF', text: 'blue' },
+        Low: { bg: '#D1FFD7', text: 'green' },
     }
 
     const completedCount = tasks.filter(t => t.completed).length;
@@ -57,7 +57,6 @@ const AllTasksScreen = () => {
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>All Tasks</Text>
                 </View>
-
                 <View style={{ marginBottom: 10 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {days.map((item, index) => (
@@ -84,7 +83,8 @@ const AllTasksScreen = () => {
                         <View style={styles.dotContainer}>
                             {chartData.map((item, index) => (
                                 <View key={index} style={styles.chartItem}>
-                                    <View style={[styles.dot, { backgroundColor: item.color }]}></View>
+                                    <View style={[styles.dot, { backgroundColor: item.color }]}>
+                                    </View>
                                     <Text style={styles.dotText}>{item.label}</Text>
                                 </View>
                             ))}
@@ -93,7 +93,6 @@ const AllTasksScreen = () => {
                 </View>
                 <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
                     {filteredTasks.length > 0 ? (
-
                         filteredTasks.map((task) => {
                             const stylePriority = priorityStyles[task.priority] || priorityStyles.Normal;
                             return (
