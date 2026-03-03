@@ -54,7 +54,7 @@ const MainScreen = () => {
                                     );
                                 })) : (
                                 <View style={styles.emptyTaskContainer}>
-                                    <Text style={styles.emptyTaskText}>No Tasks available!</Text>
+                                    <Text style={styles.emptyTaskText}>No Tasks available</Text>
                                 </View>
                             )
                             }

@@ -53,8 +53,14 @@ export const TaskProvider = ({ children }) => {
     };
 
     const updateTask = async (updatedTask) => {
+        const existingTask = tasks.find(t => t.id === updatedTask.id);
+        const taskToSave = {
+            ...existingTask,
+            ...updatedTask,
+
+        }
         const db = await getDBConnection();
-        await saveTask(db, updatedTask);
+        await saveTask(db, taskToSave);
         const storedTasks = await getTask(db);
         setTasks(storedTasks);
     }
