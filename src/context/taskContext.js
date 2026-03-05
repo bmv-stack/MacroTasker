@@ -25,7 +25,6 @@ export const TaskProvider = ({ children }) => {
         const taskWithColor = {
             ...task,
             color: task.color || colors[Math.floor(Math.random() * colors.length)],
-            completed: task.completed ? 1 : 0
         };
         const db = await getDBConnection();
         await saveTask(db, taskWithColor);

@@ -11,7 +11,6 @@ const MainScreen = () => {
     const { tasks } = useTasks();
     const [activeTab, setActiveTab] = useState(route.params?.openScreen || 'Focus');
     console.log("Curent Active Tab:", activeTab);
-    const filteredTasks = tasks;
     return (
         <View style={styles.safeArea}>
             <View style={styles.content}>
@@ -29,13 +28,13 @@ const MainScreen = () => {
                 </SwitchTabs>
                 <View>
                     <Text style={styles.userGreetings}>Hello User,</Text>
-                    <Text style={styles.taskText}>{filteredTasks.length} Task(s) Today</Text>
+                    <Text style={styles.taskText}>{tasks.length} Task(s) Today</Text>
                 </View>
                 <View>
                     <View style={styles.whiteContainer}>
                         <ScrollView contentContainerStyle={styles.scrollContainer}>
-                            {filteredTasks.length > 0 ? (
-                                filteredTasks.map((item) => {
+                            {tasks.length > 0 ? (
+                                tasks.map((item) => {
                                     return (
                                         <View key={item.id} style={[styles.taskRow, { backgroundColor: item.color || '#F2F2F7' }]}>
                                             <View style={styles.taskHeaderRow}>
