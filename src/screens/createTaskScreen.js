@@ -17,7 +17,7 @@ const CreateTaskScreen = () => {
         time: existingTask?.time || '',
         endDate: existingTask?.endDate || '',
         endTime: existingTask?.endTime || '',
-        note: existingTask?.note || '',
+        notes: existingTask?.notes || '',
         priority: existingTask?.priority || 'Normal'
     });
     const [picker, setPicker] = useState({
@@ -122,8 +122,8 @@ const CreateTaskScreen = () => {
                 <FormInput
                     label="Notes"
                     placeholder="Add a note..."
-                    value={form.note}
-                    onChangeText={(val) => handleInputChange('note', val)}>
+                    value={form.notes}
+                    onChangeText={(val) => handleInputChange('notes', val)}>
                 </FormInput>
                 <View>
                     <TouchableOpacity style={[styles.submitButton, isFormValid ? styles.activeButton : styles.disableButton]}

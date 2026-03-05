@@ -21,7 +21,6 @@ const AllTasksScreen = () => {
         { day: 'TUE', date: '26' },
         { day: 'WED', date: '27' },
     ];
-    const filteredTasks = activeTab === 'Focus' ? tasks.filter(task => !task.completed) : tasks;
 
     const priorityStyles = {
         High: { bg: '#FFD1D1', text: 'red' },
@@ -92,8 +91,8 @@ const AllTasksScreen = () => {
                     </View>
                 </View>
                 <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
-                    {filteredTasks.length > 0 ? (
-                        filteredTasks.map((task) => {
+                    {tasks.length > 0 ? (
+                        tasks.map((task) => {
                             const stylePriority = priorityStyles[task.priority] || priorityStyles.Normal;
                             return (
                                 <View key={task.id} style={[styles.taskCard, task.completed && { opacity: 0.5 }]}>

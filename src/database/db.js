@@ -46,6 +46,7 @@ export const getTask = async (db) => {
             const item = results.rows.item(index);
             tasks.push({
                 ...item,
+                notes: item.notes,
                 completed: item.completed === 1 ? true : false
             });
         };

@@ -11,6 +11,8 @@ const MainScreen = () => {
     const { tasks } = useTasks();
     const [activeTab, setActiveTab] = useState(route.params?.openScreen || 'Focus');
     console.log("Curent Active Tab:", activeTab);
+
+    const activeTasks = tasks.filter(t => !t.completed).length;
     return (
         <View style={styles.safeArea}>
             <View style={styles.content}>
@@ -28,7 +30,7 @@ const MainScreen = () => {
                 </SwitchTabs>
                 <View>
                     <Text style={styles.userGreetings}>Hello User,</Text>
-                    <Text style={styles.taskText}>{tasks.length} Task(s) Today</Text>
+                    <Text style={styles.taskText}>{activeTasks} task(s) Today</Text>
                 </View>
                 <View>
                     <View style={styles.whiteContainer}>
@@ -42,7 +44,7 @@ const MainScreen = () => {
                                                     textDecorationLine: 'line-through',
                                                     color: '#a39f9f',
                                                     opacity: 0.6
-                                                }]}>{item.title}</Text>
+                                                }]} numberOfLines={1}>{item.title}</Text>
                                                 <Text style={[styles.taskTime, item.completed && {
                                                     textDecorationLine: 'line-through',
                                                     color: '#a39f9f',
@@ -77,10 +79,9 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         padding: 20,
         marginVertical: 10,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 20,
+        shadowOpacity: 0.1,
         elevation: 2,
+        shadowRadius: 20,
         height: 260,
     },
     container: {
