@@ -65,7 +65,7 @@ const AllTasksScreen = () => {
                             </View>
                         ))}
                     </ScrollView>
-                    <View style={styles.chartConatiner}>
+                    <View style={styles.chartContainer}>
                         <PieChart
                             donut
                             focusOnPress
@@ -149,9 +149,11 @@ const styles = StyleSheet.create({
         paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
         paddingHorizontal: 20
     },
+    list: {
+        marginHorizontal: 10
+    },
     content: {
         flex: 1,
-        paddingHorizontal: 17,
     },
     tabRow: {
         flexDirection: 'row',
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
     taskCard: {
         paddingVertical: 15,
         borderBottomWidth: 1,
-        borderBottomColor: '#F2F2F7'
+        borderBottomColor: '#bfbfc54d'
     },
     cardTopRow: {
         flexDirection: 'row',
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
         color: '#C7C7CC',
         fontSize: 12
     },
-    chartConatiner: {
+    chartContainer: {
         borderRadius: 25,
         padding: 20,
         alignItems: 'center',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, Text, ScrollView, StatusBar, Platform } from 'react-native';
 import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { useTasks } from '../context/taskContext';
@@ -11,7 +11,6 @@ const MainScreen = () => {
     const { tasks } = useTasks();
     const [activeTab, setActiveTab] = useState(route.params?.openScreen || 'Focus');
     console.log("Curent Active Tab:", activeTab);
-
     const activeTasks = tasks.filter(t => !t.completed).length;
     return (
         <View style={styles.safeArea}>
@@ -29,8 +28,8 @@ const MainScreen = () => {
                     }}>
                 </SwitchTabs>
                 <View>
-                    <Text style={styles.userGreetings}>Hello User,</Text>
-                    <Text style={styles.taskText}>{activeTasks} task(s) Today</Text>
+                    <Text style={styles.userGreetings}>Welcome User,</Text>
+                    <Text style={styles.taskText}>{activeTasks} task(s) today</Text>
                 </View>
                 <View>
                     <View style={styles.whiteContainer}>
@@ -43,12 +42,12 @@ const MainScreen = () => {
                                                 <Text style={[styles.taskTitle, item.completed && {
                                                     textDecorationLine: 'line-through',
                                                     color: '#a39f9f',
-                                                    opacity: 0.6
+                                                    opacity: 0.5
                                                 }]} numberOfLines={1}>{item.title}</Text>
                                                 <Text style={[styles.taskTime, item.completed && {
                                                     textDecorationLine: 'line-through',
                                                     color: '#a39f9f',
-                                                    opacity: 0.6
+                                                    opacity: 0.5
                                                 }]}>{item.time}</Text>
                                             </View>
                                         </View>
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
     taskText: {
         fontWeight: 'bold',
         marginBottom: 10,
-        fontSize: 28,
+        fontSize: 20,
         color: 'black',
         marginTop: 4,
     },

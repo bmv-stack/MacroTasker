@@ -10,15 +10,26 @@ const RootStack = createNativeStackNavigator({
   screens: {
     Main: {
       screen: MainScreen,
-      options: { headerShown: false }
+      options: {
+        headerShown: false,
+        animation: 'none',
+
+      }
     },
     CreateTask: {
       screen: CreateTaskScreen,
-      options: { headerShown: false }
+      options: {
+        headerShown: false,
+        animation: 'fade'
+      }
+
     },
     AllTasks: {
       screen: AllTasksScreen,
-      options: { headerShown: false }
+      options: {
+        headerShown: false,
+        animation: 'none'
+      }
     }
   }
 });

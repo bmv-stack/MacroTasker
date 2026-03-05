@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         backgroundColor: 'transparent',
+        marginBottom: 15
     },
     left: {
         flexDirection: 'row',
