@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, StatusBar, Platform } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    Text,
+    ScrollView,
+    StatusBar,
+    Platform,
+} from 'react-native';
 import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { useTasks } from '../context/taskContext';
@@ -9,24 +16,27 @@ const MainScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { tasks } = useTasks();
-    const [activeTab, setActiveTab] = useState(route.params?.openScreen || 'Focus');
-    console.log("Curent Active Tab:", activeTab);
+    const [activeTab, setActiveTab] = useState(
+        route.params?.openScreen || 'Focus',
+    );
     const activeTasks = tasks.filter(t => !t.completed).length;
     return (
         <View style={styles.safeArea}>
             <View style={styles.content}>
-                <AppBar title='TODO APP' onIconPress={() => navigation.navigate('CreateTask')}>
-                </AppBar>
+                <AppBar
+                    title="TODO APP"
+                    onIconPress={() => navigation.navigate('CreateTask')}
+                ></AppBar>
                 <SwitchTabs
                     activeTab={activeTab}
-                    onTabChange={(value) => {
+                    onTabChange={value => {
                         if (value === 'All') {
-                            navigation.navigate('AllTasks')
+                            navigation.navigate('AllTasks');
                         } else {
                             setActiveTab(value);
                         }
-                    }}>
-                </SwitchTabs>
+                    }}
+                ></SwitchTabs>
                 <View>
                     <Text style={styles.userGreetings}>Welcome User,</Text>
                     <Text style={styles.taskText}>{activeTasks} task(s) today</Text>
@@ -35,42 +45,62 @@ const MainScreen = () => {
                     <View style={styles.whiteContainer}>
                         <ScrollView contentContainerStyle={styles.scrollContainer}>
                             {tasks.length > 0 ? (
-                                tasks.map((item) => {
+                                tasks.map(item => {
                                     return (
-                                        <View key={item.id} style={[styles.taskRow, { backgroundColor: item.color || '#F2F2F7' }]}>
+                                        <View
+                                            key={item.id}
+                                            style={[
+                                                styles.taskRow,
+                                                { backgroundColor: item.color || '#F2F2F7' },
+                                            ]}
+                                        >
                                             <View style={styles.taskHeaderRow}>
-                                                <Text style={[styles.taskTitle, item.completed && {
-                                                    textDecorationLine: 'line-through',
-                                                    color: '#a39f9f',
-                                                    opacity: 0.5
-                                                }]} numberOfLines={1}>{item.title}</Text>
-                                                <Text style={[styles.taskTime, item.completed && {
-                                                    textDecorationLine: 'line-through',
-                                                    color: '#a39f9f',
-                                                    opacity: 0.5
-                                                }]}>{item.time}</Text>
+                                                <Text
+                                                    style={[
+                                                        styles.taskTitle,
+                                                        item.completed && {
+                                                            textDecorationLine: 'line-through',
+                                                            color: '#a39f9f',
+                                                            opacity: 0.5,
+                                                        },
+                                                    ]}
+                                                    numberOfLines={1}
+                                                >
+                                                    {item.title}
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        styles.taskTime,
+                                                        item.completed && {
+                                                            textDecorationLine: 'line-through',
+                                                            color: '#a39f9f',
+                                                            opacity: 0.5,
+                                                        },
+                                                    ]}
+                                                >
+                                                    {item.time}
+                                                </Text>
                                             </View>
                                         </View>
                                     );
-                                })) : (
+                                })
+                            ) : (
                                 <View style={styles.emptyTaskContainer}>
                                     <Text style={styles.emptyTaskText}>No Tasks available!</Text>
                                 </View>
-                            )
-                            }
+                            )}
                         </ScrollView>
                     </View>
                 </View>
             </View>
         </View>
     );
-}
+};
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FFF',
         paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
-
     },
     whiteContainer: {
         flexDirection: 'column',
@@ -85,14 +115,14 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: '#FFF'
+        backgroundColor: '#FFF',
     },
     content: {
         paddingHorizontal: 20,
     },
     greetingContainer: {
         marginTop: 20,
-        marginBottom: 20
+        marginBottom: 20,
     },
     userGreetings: {
         fontSize: 16,
@@ -111,14 +141,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     taskTitle: {
         fontSize: 14,
         fontWeight: '600',
         color: 'black',
         flex: 1,
-        marginRight: 10
+        marginRight: 10,
     },
     taskTime: {
         fontSize: 12,
@@ -139,7 +169,7 @@ const styles = StyleSheet.create({
         paddingRight: 20,
         justifyContent: 'space-between',
         fontSize: 15,
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
     pill: {
         paddingHorizontal: 20,
@@ -158,7 +188,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     activePillText: {
-        color: 'white'
+        color: 'white',
     },
     taskListContainer: {
         flex: 1,
@@ -168,18 +198,17 @@ const styles = StyleSheet.create({
     taskListCard: {
         borderRadius: 30,
         padding: 20,
-
     },
     emptyTaskContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
-        paddingVertical: 10
+        paddingVertical: 10,
     },
     emptyTaskText: {
         fontWeight: 'bold',
         fontSize: 16,
-        color: '#8E8E93'
-    }
+        color: '#8E8E93',
+    },
 });
 export default MainScreen;

@@ -13,25 +13,23 @@ const RootStack = createNativeStackNavigator({
       options: {
         headerShown: false,
         animation: 'none',
-
-      }
+      },
     },
     CreateTask: {
       screen: CreateTaskScreen,
       options: {
         headerShown: false,
-        animation: 'fade'
-      }
-
+        animation: 'fade',
+      },
     },
     AllTasks: {
       screen: AllTasksScreen,
       options: {
         headerShown: false,
-        animation: 'none'
-      }
-    }
-  }
+        animation: 'none',
+      },
+    },
+  },
 });
 const Navigation = createStaticNavigation(RootStack);
 
@@ -40,5 +38,5 @@ export default function App() {
     <TaskProvider>
       <Navigation></Navigation>
     </TaskProvider>
-  )
+  );
 }
