@@ -41,7 +41,8 @@ const AllTasksScreen = () => {
   const completedCount = tasks.filter(t => t.completed).length;
   const overdueCount = tasks.filter(t => {
     if (t.completed) return false;
-    const taskDate = parseDate(t.date);
+    if (!t.endDate) return false;
+    const taskDate = parseDate(t.endDate);
     return taskDate && taskDate < now;
   }).length;
   const ongoingCount = tasks.length - completedCount - overdueCount;
@@ -134,8 +135,9 @@ const AllTasksScreen = () => {
         <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
           {tasks.length > 0 ? (
             tasks.map(task => {
-              const taskDate = parseDate(task.date);
-              const isOverdue = !task.completed && taskDate < now;
+              const isEndDate = task.endDate ? true : false;
+              const taskDate = isEndDate ? parseDate(task.endDate) : null;
+              const isOverdue = !task.completed && isEndDate && taskDate < now;
               const stylePriority =
                 priorityStyles[task.priority] || priorityStyles.Normal;
               return (

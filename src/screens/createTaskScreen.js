@@ -61,14 +61,18 @@ const CreateTaskScreen = () => {
     };
     const [showSuccess, setShowSuccess] = useState(false);
 
+    const now = new Date();
+    now.setHours(0, 0, 0, 0)
     const startDate = parseDate(form.date);
     const endDate = parseDate(form.endDate);
+    const isStartDateValid = existingTask ? true : (startDate >= now);
     const isDateValid = !endDate || (startDate && endDate >= startDate);
     const isFormValid =
         form.title.length > 0 &&
         form.date.length > 0 &&
         form.time.length > 0 &&
-        isDateValid;
+        isDateValid &&
+        isStartDateValid;
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -108,18 +112,31 @@ const CreateTaskScreen = () => {
                 <TouchableOpacity onPress={() => showPicker('date', 'date')}>
                     <View pointerEvents="none">
                         <FormInput
-                            label="Date"
-                            placeholder="Select Date"
+                            label=" Start Date"
+                            placeholder="Select Start Date"
                             value={form.date}
                             editable={false}
                         ></FormInput>
                     </View>
                 </TouchableOpacity>
+                {form.date.length > 0 && !isStartDateValid && (
+                    <Text
+                        style={{
+                            color: 'red',
+                            fontSize: 12,
+                            marginBottom: 13,
+                            marginTop: -17,
+                        }}
+                    >
+                        Start date cannot be before current date
+                    </Text>
+                )}
+
                 <TouchableOpacity onPress={() => showPicker('time', 'time')}>
                     <View pointerEvents="none">
                         <FormInput
-                            label="Time"
-                            placeholder="Select Time"
+                            label="Start Time"
+                            placeholder="Select Start Time"
                             value={form.time}
                             editable={false}
                         ></FormInput>

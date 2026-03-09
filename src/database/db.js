@@ -17,8 +17,8 @@ export const createTable = async db => {
     title TEXT NOT NULL,
     date TEXT NOT NULL,
     time TEXT NOT NULL,
-    end_date TEXT,
-    end_time TEXT,
+    endDate TEXT,
+    endTime TEXT,
     priority TEXT,
     notes TEXT,
     color TEXT,
@@ -28,15 +28,15 @@ export const createTable = async db => {
 };
 
 export const saveTask = async (db, task) => {
-  const insertQuery = `INSERT OR REPLACE INTO Tasks (id, title, date, time, end_date, end_time, priority, notes, color, completed)
+  const insertQuery = `INSERT OR REPLACE INTO Tasks (id, title, date, time, endDate, endTime, priority, notes, color, completed)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const values = [
     task.id,
     task.title,
     task.date,
     task.time,
-    task.end_date || null,
-    task.end_time || null,
+    task.endDate || null,
+    task.endTime || null,
     task.priority,
     task.notes || '',
     task.color,

@@ -36,6 +36,9 @@ export const TaskProvider = ({ children }) => {
       '#F9BBB7',
       '#DE97F7',
       '#8CF7D7',
+      '#7DECFF',
+      '#F3E65E',
+      '#ffae62'
     ];
     const taskWithColor = {
       ...task,
