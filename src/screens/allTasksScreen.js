@@ -346,7 +346,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   deleteIcon: {
-    color: '#FF3B30',
     fontSize: 14,
   },
   cardBottomRow: {

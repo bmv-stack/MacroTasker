@@ -7,7 +7,6 @@ import {
     Modal,
     StatusBar,
     Platform,
-    ScrollView,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTasks } from '../context/taskContext';
