@@ -31,31 +31,33 @@ const SwitchTabs = ({ activeTab, onTabChange }) => {
 const styles = StyleSheet.create({
   tabRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: 1,
-    borderRadius: 12,
-    padding: 4,
+    marginVertical: 15,
   },
   tabPill: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    borderRadius: 25,
-    backgroundColor: '#8e8b8b',
-    marginRight: 10,
-    marginBottom: 15,
+    justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: '#F3F3F3',
+    marginRight: 12,
+    width: 135,
+    height: 42,
   },
   activeTab: {
     backgroundColor: 'black',
     color: 'white',
   },
   tabText: {
-    color: '#FFF',
+    color: '#00000098',
     fontWeight: '600',
+    fontSize: 13,
+    textAlign: 'center',
+    letterSpacing: -0.4,
   },
   activeText: {
     color: '#FFF',
+    fontWeight: '700',
   },
 });
 export default SwitchTabs;

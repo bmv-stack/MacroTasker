@@ -17,7 +17,7 @@ const FormInput = ({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#C7C7CD"
+        placeholderTextColor="#BCBCBC"
         {...props}
       ></TextInput>
     </View>
@@ -29,23 +29,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '100%',
   },
-  title: {
-    fontSize: 14,
-    color: '#000',
-    fontWeight: 'black',
-    marginBottom: 5,
-    marginTop: 8,
-  },
   input: {
     fontSize: 14,
     color: '#000',
-    paddingVertical: 8,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
+    paddingLeft: 2,
+    marginTop: 10,
   },
   label: {
     fontSize: 14,
-    color: '#000',
+    color: '#00000099',
     marginBottom: 8,
     fontWeight: '500%',
+    marginTop: 5,
   },
 });
 

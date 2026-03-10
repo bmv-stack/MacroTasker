@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Platform,
   StatusBar,
+  FlatList,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTasks } from '../context/taskContext';
@@ -14,27 +15,63 @@ import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { PieChart } from 'react-native-gifted-charts';
 import { parseDate } from './createTaskScreen';
+import { updateTaskStatus } from '../database/db';
 
 const AllTasksScreen = () => {
   const navigation = useNavigation();
   const { tasks, deleteTask, completeTask } = useTasks();
   const [activeTab, setActiveTab] = useState('All');
+  const [selectedData, setSelectedData] = useState({
+    label: 'Total',
+    value: tasks.length,
+    color: '#1C1C1E',
+  });
 
-  const days = [
-    { day: 'THU', date: '21' },
-    { day: 'FRI', date: '22', active: true },
-    { day: 'SAT', date: '23' },
-    { day: 'SUN', date: '24' },
-    { day: 'MON', date: '25' },
-    { day: 'TUE', date: '26' },
-    { day: 'WED', date: '27' },
-  ];
+  useEffect(() => {
+    if (selectedData.label === 'Total') {
+      setSelectedData(prev => ({
+        ...prev,
+        value: tasks.length,
+      }));
+    }
+  }, [tasks.length]);
+
+  const resetTotal = () => {
+    setSelectedData({
+      label: 'Total',
+      value: tasks.length,
+      color: '#1C1C1E',
+    });
+  };
+
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toLocaleDateString('en-GB'),
+  );
+  const generatedDates = () => {
+    const dates = [];
+    for (let i = -30; i < 30; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      dates.push({
+        fullDate: d.toLocaleDateString('en-GB'),
+        dayNumber: d.getDate().toString(),
+        dayName: d
+          .toLocaleDateString('en-US', { weekday: 'short' })
+          .toUpperCase(),
+        rawDate: d,
+      });
+    }
+    return dates;
+  };
+  const dateList = generatedDates();
+  const filteredTasks = tasks.filter(task => task.date === selectedDate);
 
   const priorityStyles = {
     High: { bg: '#FFD1D1', text: 'red' },
     Normal: { bg: '#D1E9FF', text: 'blue' },
     Low: { bg: '#D1FFD7', text: 'green' },
   };
+
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
@@ -50,17 +87,58 @@ const AllTasksScreen = () => {
   const chartData =
     tasks.length > 0
       ? [
-        { value: ongoingCount, color: '#007BFF', label: 'Ongoing' },
-        { value: completedCount, color: '#51d761', label: 'Completed' },
-        { value: overdueCount, color: '#e6552d', label: 'Overdue' },
+        {
+          value: ongoingCount,
+          color: '#007BFF',
+          label: 'Ongoing Tasks',
+          onPress: () =>
+            setSelectedData({
+              label: 'Ongoing Tasks',
+              value: ongoingCount,
+              color: '#007BFF',
+            }),
+        },
+        {
+          value: overdueCount,
+          color: '#e6552d',
+          label: 'Overdue Tasks',
+          onPress: () =>
+            setSelectedData({
+              label: 'Overdue Tasks',
+              value: overdueCount,
+              color: '#e6552d',
+            }),
+        },
+        {
+          value: completedCount,
+          color: '#51d761',
+          label: 'Completed Tasks',
+          onPress: () =>
+            setSelectedData({
+              label: 'Completed Tasks',
+              value: completedCount,
+              color: '#51d761',
+            }),
+        },
       ]
       : [{ value: 1, color: '#f2f2f7', label: 'No Tasks' }];
+
+  const [priorityModal, setPriorityModal] = useState({ visible: false, taskId: null });
+
+  const handlePriorityChange = (taskId, newPriority) => {
+    const taskToUpdate = tasks.find(t => t.id === taskId);
+    if (taskToUpdate) {
+      updateTaskStatus({ ...taskToUpdate, priority: newPriority });
+    }
+    setPriorityModal({ visible: false, taskId: null })
+  }
+
   return (
     <View style={styles.container}>
       <AppBar
         title="TODO APP"
         onIconPress={() => navigation.navigate('CreateTask')}
-      ></AppBar>
+      />
       <View style={styles.content}>
         <SwitchTabs
           activeTab={activeTab}
@@ -71,86 +149,120 @@ const AllTasksScreen = () => {
               setActiveTab(value);
             }
           }}
-        ></SwitchTabs>
+        />
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All Tasks</Text>
         </View>
+
         <View style={{ marginBottom: 10 }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {days.map((item, index) => (
-              <View
-                key={index}
-                style={[styles.dateCard, item.active && styles.activeDateCard]}
-              >
-                <Text
-                  style={[
-                    styles.dateNumber,
-                    item.active && styles.activeDateText,
-                  ]}
+          <FlatList
+            horizontal
+            data={dateList}
+            keyExtractor={item => item.fullDate}
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={30}
+            getItemLayout={(data, index) => ({
+              length: 55,
+              offset: 55 * index,
+              index,
+            })}
+            renderItem={({ item }) => {
+              const isSelected = item.fullDate === selectedDate;
+              return (
+                <TouchableOpacity
+                  onPress={() => setSelectedDate(item.fullDate)}
+                  style={[styles.dateCard, isSelected && styles.activeDateCard]}
                 >
-                  {item.date}
-                </Text>
-                <Text
-                  style={[styles.dateDay, item.active && styles.activeDateText]}
-                >
-                  {item.day}
-                </Text>
-              </View>
-            ))}
-          </ScrollView>
-          <View style={styles.chartContainer}>
-            <PieChart
-              donut
-              focusOnPress
-              shadow
-              radius={70}
-              innerRadius={50}
-              data={chartData}
-              centerLabelComponent={() => (
-                <View style={{ alignItems: 'center' }}>
                   <Text
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: 22,
-                      color: '#1C1C1E',
-                    }}
+                    style={[
+                      styles.dateNumber,
+                      isSelected && styles.activeDateText,
+                    ]}
                   >
-                    {tasks.length}
+                    {item.dayNumber}
                   </Text>
-                </View>
-              )}
-            ></PieChart>
+                  <Text
+                    style={[
+                      styles.dateDay,
+                      isSelected && styles.activeDateText,
+                    ]}
+                  >
+                    {item.dayName}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          ></FlatList>
+
+          <View style={styles.chartContainer}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={resetTotal}
+              style={{ alignItems: 'center', justifyContent: 'center' }}
+            >
+              <PieChart
+                donut
+                focusOnPress
+                sectionAutoFocus
+                shadow
+                radius={70}
+                innerRadius={50}
+                data={chartData}
+                centerLabelComponent={() => (
+                  <View
+                    style={{ alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: 22,
+                        color: selectedData.color,
+                      }}
+                    >
+                      {selectedData.value}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: '#8E8E93',
+                        fontWeight: '600',
+                      }}
+                    >
+                      {selectedData.label}
+                    </Text>
+                  </View>
+                )}
+              />
+            </TouchableOpacity>
+
             <View style={styles.dotContainer}>
               {chartData.map((item, index) => (
                 <View key={index} style={styles.chartItem}>
-                  <View
-                    style={[styles.dot, { backgroundColor: item.color }]}
-                  ></View>
+                  <View style={[styles.dot, { backgroundColor: item.color }]} />
                   <Text style={styles.dotText}>{item.label}</Text>
                 </View>
               ))}
             </View>
           </View>
         </View>
+
         <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
-          {tasks.length > 0 ? (
-            tasks.map(task => {
-              const isEndDate = task.endDate ? true : false;
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map(task => {
+              const isEndDate = !!task.endDate;
               const taskDate = isEndDate ? parseDate(task.endDate) : null;
               const isOverdue = !task.completed && isEndDate && taskDate < now;
               const stylePriority =
                 priorityStyles[task.priority] || priorityStyles.Normal;
+
               return (
                 <View
                   key={task.id}
                   style={[
                     styles.taskCard,
                     task.completed && { opacity: 0.5 },
-                    isOverdue && {
-                      borderLeftWidth: 3,
-                      borderLeftColor: 'red',
-                      paddingLeft: 5,
-                    },
+                    isOverdue && styles.overdueCard,
                   ]}
                 >
                   <View style={{ flexDirection: 'row' }}>
@@ -194,6 +306,7 @@ const AllTasksScreen = () => {
                       </TouchableOpacity>
                     </View>
                   </View>
+
                   <View style={styles.cardBottomRow}>
                     <View style={styles.timeInfo}>
                       <Text style={styles.dateTimeText}>
@@ -215,13 +328,11 @@ const AllTasksScreen = () => {
                         </Text>
                       </View>
                     </View>
+
                     <TouchableOpacity
                       style={[
                         styles.checkCircle,
-                        task.completed && {
-                          backgroundColor: '#dddedd',
-                          borderColor: '#51d761',
-                        },
+                        task.completed && styles.checkedCircle,
                       ]}
                       onPress={() => completeTask(task.id)}
                     >
@@ -240,7 +351,7 @@ const AllTasksScreen = () => {
             })
           ) : (
             <View style={{ alignItems: 'center', marginTop: 50 }}>
-              <Text style={{ color: '#8E8E93' }}>No tasks created yet.</Text>
+              <Text style={{ color: '#8E8E93' }}>No tasks for this day.</Text>
             </View>
           )}
         </ScrollView>
@@ -248,6 +359,7 @@ const AllTasksScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -257,29 +369,10 @@ const styles = StyleSheet.create({
   },
   list: {
     marginHorizontal: 10,
-    marginBottom: 15
+    marginBottom: 15,
   },
   content: {
     flex: 1,
-  },
-  tabRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 15,
-  },
-  tabPill: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#f2f2f7',
-  },
-  activeTab: {
-    backgroundColor: '#1C1C1E',
-  },
-  tabText: {
-    color: '#8E8E93',
-    fontWeight: 'bold',
-    fontSize: 12,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -290,9 +383,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  activeTabText: {
-    color: '#FFF',
   },
   dateCard: {
     width: 45,
@@ -323,6 +413,11 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#bfbfc54d',
+  },
+  overdueCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: 'red',
+    paddingLeft: 8,
   },
   taskTitle: {
     fontSize: 15,
@@ -381,6 +476,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  checkedCircle: {
+    backgroundColor: '#dddedd',
+    borderColor: '#51d761',
+  },
   checkIcon: {
     color: '#C7C7CC',
     fontSize: 12,
@@ -390,19 +489,16 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     marginVertical: 15,
-    flexDirection: 'column',
-    justifyContent: 'space-around',
   },
   dotContainer: {
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     flexDirection: 'row',
-    gap: 50,
-    padding: 20,
+    gap: 20,
+    paddingTop: 20,
   },
   chartItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   dotText: {
     fontSize: 12,
@@ -413,7 +509,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    marginRight: 8,
+    marginRight: 6,
   },
 });
 

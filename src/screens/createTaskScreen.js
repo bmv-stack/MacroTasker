@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DatePicker from 'react-native-date-picker';
 import {
     View,
     TouchableOpacity,
@@ -7,11 +8,11 @@ import {
     Modal,
     StatusBar,
     Platform,
+    ScrollView,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTasks } from '../context/taskContext';
 import FormInput from '../components/formInput';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 const CreateTaskScreen = () => {
     const navigation = useNavigation();
@@ -29,42 +30,37 @@ const CreateTaskScreen = () => {
         priority: existingTask?.priority || 'Normal',
     });
     const [picker, setPicker] = useState({
-        show: false,
+        open: false,
         mode: 'date',
         field: null,
     });
 
     const showPicker = (mode, field) => {
-        setPicker({ show: true, mode, field });
+        setPicker({ open: true, mode, field });
     };
 
-    const onPickerChange = (event, selectedVal) => {
-        setPicker(prev => ({ ...prev, show: false }));
+    const onPickerChange = selectedVal => {
+        setPicker(prev => ({ ...prev, open: false }));
 
-        if (event.type === 'dismissed') {
-            return;
+        let formattedValue = '';
+        if (picker.mode === 'date') {
+            formattedValue = selectedVal.toLocaleDateString('en-GB');
+        } else {
+            formattedValue = selectedVal.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            });
         }
-
-        if (selectedVal) {
-            let formattedValue = '';
-            if (picker.mode === 'date') {
-                formattedValue = selectedVal.toLocaleDateString('en-GB');
-            } else {
-                formattedValue = selectedVal.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                });
-            }
-            handleInputChange(picker.field, formattedValue);
-        }
+        handleInputChange(picker.field, formattedValue);
     };
     const [showSuccess, setShowSuccess] = useState(false);
 
     const now = new Date();
-    now.setHours(0, 0, 0, 0)
+    now.setHours(0, 0, 0, 0);
     const startDate = parseDate(form.date);
     const endDate = parseDate(form.endDate);
-    const isStartDateValid = existingTask ? true : (startDate >= now);
+    const isStartDateValid = existingTask ? true : startDate >= now;
     const isDateValid = !endDate || (startDate && endDate >= startDate);
     const isFormValid =
         form.title.length > 0 &&
@@ -94,145 +90,143 @@ const CreateTaskScreen = () => {
     };
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text style={styles.backArrow}>←</Text>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Create Task</Text>
-                <View style={{ width: 30 }}></View>
-            </View>
-            <View style={{ marginLeft: 15 }}>
-                <FormInput
-                    label="Title"
-                    placeholder="Add Task Title"
-                    value={form.title}
-                    onChangeText={val => handleInputChange('title', val)}
-                ></FormInput>
-                <TouchableOpacity onPress={() => showPicker('date', 'date')}>
-                    <View pointerEvents="none">
-                        <FormInput
-                            label=" Start Date"
-                            placeholder="Select Start Date"
-                            value={form.date}
-                            editable={false}
-                        ></FormInput>
-                    </View>
-                </TouchableOpacity>
-                {form.date.length > 0 && !isStartDateValid && (
-                    <Text
-                        style={{
-                            color: 'red',
-                            fontSize: 12,
-                            marginBottom: 13,
-                            marginTop: -17,
-                        }}
-                    >
-                        Start date cannot be before current date
-                    </Text>
-                )}
-
-                <TouchableOpacity onPress={() => showPicker('time', 'time')}>
-                    <View pointerEvents="none">
-                        <FormInput
-                            label="Start Time"
-                            placeholder="Select Start Time"
-                            value={form.time}
-                            editable={false}
-                        ></FormInput>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => showPicker('date', 'endDate')}>
-                    <View pointerEvents="none">
-                        <FormInput
-                            label="End Date"
-                            placeholder="Select Date"
-                            value={form.endDate}
-                            editable={false}
-                        ></FormInput>
-                    </View>
-                </TouchableOpacity>
-                {!isDateValid && (
-                    <Text
-                        style={{
-                            color: 'red',
-                            fontSize: 12,
-                            marginBottom: 13,
-                            marginTop: -17,
-                        }}
-                    >
-                        End date cannot be before 'Date'
-                    </Text>
-                )}
-                <TouchableOpacity onPress={() => showPicker('time', 'endTime')}>
-                    <View pointerEvents="none">
-                        <FormInput
-                            label="End Time"
-                            placeholder="Select Time"
-                            value={form.endTime}
-                            editable={false}
-                        ></FormInput>
-                    </View>
-                </TouchableOpacity>
-                <Text style={styles.label}>Priority</Text>
-                <View style={styles.priorityRow}>
-                    {['Low', 'Normal', 'High'].map(level => (
-                        <TouchableOpacity
-                            key={level}
-                            style={[
-                                styles.priorityPill,
-                                form.priority === level && styles.activePriorityPill,
-                            ]}
-                            onPress={() => setForm({ ...form, priority: level })}
-                        >
-                            <Text
-                                style={[
-                                    styles.priorityPillText,
-                                    form.priority === level && styles.activePriorityText,
-                                ]}
-                            >
-                                {level}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-                <FormInput
-                    label="Notes"
-                    placeholder="Add a note..."
-                    value={form.notes}
-                    onChangeText={val => handleInputChange('notes', val)}
-                ></FormInput>
-                <View>
-                    <TouchableOpacity
-                        style={[
-                            styles.submitButton,
-                            isFormValid ? styles.activeButton : styles.disableButton,
-                        ]}
-                        onPress={handleFinalSubmit}
-                        disabled={!isFormValid}
-                    >
-                        <Text style={styles.submitText}>Submit</Text>
-                        <Text style={{ color: '#FFF', fontWeight: 'bold', marginLeft: 5 }}>
-                            →
-                        </Text>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollView}
+            >
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Text style={styles.backArrow}>←</Text>
                     </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Create Task</Text>
+                    <View style={{ width: 30 }}></View>
                 </View>
-            </View>
-            {picker.show && (
-                <DateTimePicker
-                    value={new Date()}
-                    mode={picker.mode}
-                    is24Hour={false}
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    onChange={onPickerChange}
-                ></DateTimePicker>
-            )}
-            <Modal transparent visible={showSuccess} animationType="fade">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalText}>Task Created Successfully</Text>
+                <View style={{ marginLeft: 15, marginTop: 20 }}>
+                    <FormInput
+                        label="Title"
+                        placeholder="Add Title"
+                        value={form.title}
+                        onChangeText={val => handleInputChange('title', val)}
+                    ></FormInput>
+                    <TouchableOpacity onPress={() => showPicker('date', 'date')}>
+                        <View pointerEvents="none">
+                            <FormInput
+                                label="Date"
+                                placeholder="Add Date"
+                                value={form.date}
+                                editable={false}
+                            ></FormInput>
+                        </View>
+                    </TouchableOpacity>
+                    {form.date.length > 0 && !isStartDateValid && (
+                        <Text
+                            style={{
+                                color: 'red',
+                                fontSize: 12,
+                                marginBottom: 13,
+                                marginTop: -17,
+                            }}
+                        >
+                            Start date cannot be before current date
+                        </Text>
+                    )}
+                    <TouchableOpacity onPress={() => showPicker('time', 'time')}>
+                        <View pointerEvents="none">
+                            <FormInput
+                                label="Time"
+                                placeholder="Add Time"
+                                value={form.time}
+                                editable={false}
+                            ></FormInput>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => showPicker('date', 'endDate')}>
+                        <View pointerEvents="none">
+                            <FormInput
+                                label="End Date"
+                                placeholder="Add end date"
+                                value={form.endDate}
+                                editable={false}
+                            ></FormInput>
+                        </View>
+                    </TouchableOpacity>
+                    {!isDateValid && (
+                        <Text
+                            style={{
+                                color: 'red',
+                                fontSize: 12,
+                                marginBottom: 13,
+                                marginTop: -17,
+                            }}
+                        >
+                            End date cannot be before 'Date'
+                        </Text>
+                    )}
+                    <TouchableOpacity onPress={() => showPicker('time', 'endTime')}>
+                        <View pointerEvents="none">
+                            <FormInput
+                                label="End Time"
+                                placeholder="Add end time"
+                                value={form.endTime}
+                                editable={false}
+                            ></FormInput>
+                        </View>
+                    </TouchableOpacity>
+                    <FormInput
+                        label="Note"
+                        placeholder="Add note"
+                        value={form.notes}
+                        onChangeText={val => handleInputChange('notes', val)}
+                    ></FormInput>
+                </View>
+                {picker.open && (
+                    <DatePicker
+                        modal
+                        open={picker.open}
+                        date={new Date()}
+                        mode={picker.mode}
+                        theme="light"
+                        display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                        onConfirm={onPickerChange}
+                        onCancel={() => {
+                            setPicker(prev => ({ ...prev, open: false }));
+                        }}
+                        confirmText="Select"
+                        cancelText="Cancel"
+                        title={picker.mode === 'date' ? 'Select Date' : 'Set Time'}
+                    ></DatePicker>
+                )}
+                <Modal transparent visible={showSuccess} animationType="fade">
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalText}>Task Created Successfully</Text>
+                        </View>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
+            </ScrollView>
+            <View
+                style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 22,
+                }}
+            >
+                <TouchableOpacity
+                    style={[
+                        styles.submitButton,
+                        isFormValid ? styles.activeButton : styles.disableButton,
+                    ]}
+                    onPress={handleFinalSubmit}
+                    disabled={!isFormValid}
+                >
+                    <Text style={styles.submitText}>Submit</Text>
+                    <View style={styles.arrowContainer}>
+                        <Text style={{ color: '#FFF', fontWeight: 'bold', marginLeft: 5 }}>
+                            ➜
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -241,14 +235,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FFF',
-        paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+        paddingTop: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
+    },
+    scrollView: {
+        paddingHorizontal: 2,
+        paddingBottom: 40,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        marginBottom: 10,
+    },
+    arrowContainer: {
+        position: 'absolute',
+        right: 20,
     },
     backArrow: {
         color: 'black',
@@ -265,16 +266,17 @@ const styles = StyleSheet.create({
     submitButton: {
         flexDirection: 'row',
         paddingVertical: 16,
-        borderRadius: 35,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%',
+        width: '70%',
+        height: 58,
     },
     activeButton: {
         backgroundColor: 'black',
     },
     disableButton: {
-        backgroundColor: 'gray',
+        backgroundColor: '#D1D1D6',
     },
     submitText: {
         color: '#FFF',
