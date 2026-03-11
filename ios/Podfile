@@ -17,6 +17,7 @@ end
 target 'todoApp' do
   config = use_native_modules!
 
+
   use_react_native!(
     :path => config[:reactNativePath],
     :new_arch_enabled => false,

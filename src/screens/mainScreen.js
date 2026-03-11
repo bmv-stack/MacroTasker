@@ -19,7 +19,8 @@ const MainScreen = () => {
     const [activeTab, setActiveTab] = useState(
         route.params?.openScreen || 'Focus',
     );
-    const activeTasks = tasks.filter(t => !t.completed);
+    const today = new Date().toLocaleDateString('en-GB')
+    const activeTasks = tasks.filter(t => !t.completed && t.date === today);
     const activeTaskCount = activeTasks.length;
     const [expanded, setExpanded] = useState(false);
     const displyedTasks = expanded ? activeTasks : activeTasks.slice(0, 4);
@@ -34,7 +35,7 @@ const MainScreen = () => {
                     activeTab={activeTab}
                     onTabChange={value => {
                         if (value === 'All') {
-                            navigation.navigate('AllTasks');
+                            navigation.navigate('All');
                         } else {
                             setActiveTab(value);
                         }
