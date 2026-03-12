@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTasks } from '../context/taskContext';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
+import TimePicker from '../components/timePicker';
 
 const CreateTaskScreen = () => {
     const navigation = useNavigation();
@@ -39,6 +40,8 @@ const CreateTaskScreen = () => {
         setCurrentField(field);
         setIsCalendarVisible(true);
     }
+
+    const [timeModalVisible, setTimeModalVisible] = useState(false);
 
     const [picker, setPicker] = useState({
         open: false,
@@ -147,7 +150,7 @@ const CreateTaskScreen = () => {
                             Start date cannot be before current date
                         </Text>
                     )}
-                    <TouchableOpacity onPress={() => showPicker('time', 'time')}>
+                    <TouchableOpacity onPress={() => setTimeModalVisible(true)}>
                         <View pointerEvents="none">
                             <FormInput
                                 label="Time"
@@ -157,6 +160,11 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
+                    <TimePicker
+                        visible={timeModalVisible}
+                        initialTime={new Date()}
+                        onClose={() => setTimeModalVisible(false)}
+                        onSelect={(formattedTime) => handleInputChange('time', formattedTime)}></TimePicker>
                     <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
                         <View pointerEvents="none">
                             <FormInput
@@ -202,13 +210,10 @@ const CreateTaskScreen = () => {
                     onClose={() => setIsCalendarVisible(false)}
                     onSelect={(day) => {
                         if (day && day.dateString) {
-                            console.log('Day received:', day)
                             const [y, m, d] = day.dateString.split('-');
                             const formattedDate = `${d}/${m}/${y}`;
                             handleInputChange(currentField, formattedDate);
                             setIsCalendarVisible(false);
-                        } else {
-                            console.warn('Skipping invalid selection (possibly a synthetic event)');
                         }
                     }}></CalendarComponent>
 

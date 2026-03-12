@@ -18,11 +18,15 @@ const PlaceholderScreen = ({ route }) => (
 const Tab = createBottomTabNavigator({
   screens: {
     Dashboard: {
-      screen: MainScreen
+      screen: MainScreen,
+      options: {
+        animation: 'fade'
+      }
     },
     All: {
       screen: AllTasksScreen,
       options: {
+        animation: 'fade',
         tabBarButton: () => null,
         tabBarItemStyle: { display: 'none' }
       }

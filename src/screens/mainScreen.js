@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
     },
     content: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
     },
     greetingContainer: {
         marginTop: 20,
