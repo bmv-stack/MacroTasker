@@ -13,12 +13,14 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTasks } from '../context/taskContext';
 import FormInput from '../components/formInput';
+import CalendarComponent from '../components/calendarComponent';
 
 const CreateTaskScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { addNewTask, updateTask } = useTasks();
     const { existingTask } = route.params || {};
+    const [isCalendarVisible, setIsCalendarVisible] = useState(false);
 
     const [form, setForm] = useState({
         title: existingTask?.title || '',
@@ -29,6 +31,15 @@ const CreateTaskScreen = () => {
         notes: existingTask?.notes || '',
         priority: existingTask?.priority || 'Normal',
     });
+
+    const [currentField, setCurrentField] = useState(null);
+
+    const handleOpenCalendar = (field) => {
+        console.log("Opening calendar for field:", field);
+        setCurrentField(field);
+        setIsCalendarVisible(true);
+    }
+
     const [picker, setPicker] = useState({
         open: false,
         mode: 'date',
@@ -60,7 +71,7 @@ const CreateTaskScreen = () => {
     now.setHours(0, 0, 0, 0);
     const startDate = parseDate(form.date);
     const endDate = parseDate(form.endDate);
-    const isStartDateValid = existingTask ? true : startDate >= now;
+    const isStartDateValid = !startDate || (existingTask ? true : startDate >= now);
     const isDateValid = !endDate || (startDate && endDate >= startDate);
     const isFormValid =
         form.title.length > 0 &&
@@ -88,6 +99,12 @@ const CreateTaskScreen = () => {
             navigation.goBack();
         }, 1500);
     };
+
+    const getInitialDate = () => {
+        const dateToParse = currentField === 'date' ? form.date : form.endDate;
+        const parsed = parseDate(dateToParse);
+        return parsed ? parsed.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    }
     return (
         <View style={styles.container}>
             <ScrollView
@@ -108,7 +125,7 @@ const CreateTaskScreen = () => {
                         value={form.title}
                         onChangeText={val => handleInputChange('title', val)}
                     ></FormInput>
-                    <TouchableOpacity onPress={() => showPicker('date', 'date')}>
+                    <TouchableOpacity onPress={() => handleOpenCalendar('date')}>
                         <View pointerEvents="none">
                             <FormInput
                                 label="Date"
@@ -140,7 +157,7 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => showPicker('date', 'endDate')}>
+                    <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
                         <View pointerEvents="none">
                             <FormInput
                                 label="End Date"
@@ -179,6 +196,22 @@ const CreateTaskScreen = () => {
                         onChangeText={val => handleInputChange('notes', val)}
                     ></FormInput>
                 </View>
+                <CalendarComponent
+                    visible={isCalendarVisible}
+                    initialDate={getInitialDate()}
+                    onClose={() => setIsCalendarVisible(false)}
+                    onSelect={(day) => {
+                        if (day && day.dateString) {
+                            console.log('Day received:', day)
+                            const [y, m, d] = day.dateString.split('-');
+                            const formattedDate = `${d}/${m}/${y}`;
+                            handleInputChange(currentField, formattedDate);
+                            setIsCalendarVisible(false);
+                        } else {
+                            console.warn('Skipping invalid selection (possibly a synthetic event)');
+                        }
+                    }}></CalendarComponent>
+
                 {picker.open && (
                     <DatePicker
                         modal
@@ -186,15 +219,12 @@ const CreateTaskScreen = () => {
                         date={new Date()}
                         mode={picker.mode}
                         theme="light"
-                        display={Platform.OS === 'ios' ? 'inline' : 'default'}
                         onConfirm={onPickerChange}
-                        onCancel={() => {
-                            setPicker(prev => ({ ...prev, open: false }));
-                        }}
+                        onCancel={() => setPicker(prev => ({ ...prev, open: false }))}
                         confirmText="Select"
                         cancelText="Cancel"
-                        title={picker.mode === 'date' ? 'Select Date' : 'Set Time'}
-                    ></DatePicker>
+                        title="Set Time"
+                    />
                 )}
                 <Modal transparent visible={showSuccess} animationType="fade">
                     <View style={styles.modalOverlay}>

@@ -16,6 +16,8 @@ import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { PieChart } from 'react-native-gifted-charts';
 import { parseDate } from './createTaskScreen';
+import Icon from 'react-native-vector-icons/Ionicons';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 const generateDateList = () => {
   const dates = [];
@@ -272,16 +274,27 @@ const AllTasksScreen = () => {
                     </Text>
                     <View style={styles.actionButtons}>
                       <TouchableOpacity
+                        style={styles.iconCircle}
                         onPress={() =>
                           navigation.navigate('CreateTask', {
                             existingTask: task,
                           })
                         }
                       >
-                        <Text style={styles.editIcon}>✎</Text>
+                        <FeatherIcon
+                          name="edit-3"
+                          size={18}
+                          color="#34C759"
+                        ></FeatherIcon>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => deleteTask(task.id)}>
-                        <Text style={styles.deleteIcon}>🗑</Text>
+                      <TouchableOpacity
+                        style={styles.iconCircle}
+                        onPress={() => deleteTask(task.id)}>
+                        <Icon
+                          name="trash-outline"
+                          size={18}
+                          color="#FF3B30"
+                        ></Icon>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -297,14 +310,12 @@ const AllTasksScreen = () => {
                         }
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                       >
-                        <Text
-                          style={[
-                            styles.medalIcon,
-                            { color: stylePriority.iconColor },
-                          ]}
-                        >
-                          🎖
-                        </Text>
+                        <Icon
+                          name="bookmark"
+                          size={20}
+                          color={stylePriority.iconColor}
+                          style={{ marginLeft: 8 }}
+                        ></Icon>
                       </TouchableOpacity>
                     </View>
 
@@ -321,14 +332,12 @@ const AllTasksScreen = () => {
                         ]}
                         onPress={() => completeTask(task.id)}
                       >
-                        <Text
-                          style={[
-                            styles.checkIcon,
-                            { color: task.completed ? '#FFF' : '#F2F2F7' },
-                          ]}
-                        >
-                          ✔
-                        </Text>
+                        <Icon
+                          name="checkmark-sharp"
+                          size={18}
+                          color={task.completed ? '#FFF' : '#161617'}
+                          style={{ fontWeight: 'bold' }}
+                        ></Icon>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -385,7 +394,12 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   list: { marginTop: 10 },
   sectionHeader: { marginVertical: 10 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#1C1C1E' },
+  sectionTitle:
+  {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1C1C1E'
+  },
   topSection: { marginBottom: 15 },
 
   dateCard: {
@@ -399,15 +413,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5EA',
   },
-  activeDateCard: { backgroundColor: '#1C1C1E', borderColor: '#1C1C1E' },
-  dateNumber: { fontSize: 16, fontWeight: 'bold', color: '#1C1C1E' },
-  dateDay: { fontSize: 10, color: '#8E8E93', marginTop: 2 },
-  activeDateText: { color: '#FFF' },
-
+  activeDateCard: {
+    backgroundColor: '#1C1C1E',
+    borderColor: '#1C1C1E',
+  },
+  dateNumber: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1C1C1E',
+  },
+  dateDay: {
+    fontSize: 10,
+    color: '#8E8E93',
+    marginTop: 2,
+  },
+  activeDateText: {
+    color: '#FFF',
+  },
   taskCard: {
     backgroundColor: '#f8f9fa',
     borderRadius: 20,
     padding: 16,
+
   },
   overdueIndicator: {
     position: 'absolute',
@@ -423,40 +450,98 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  taskTitle: { fontSize: 16, fontWeight: '600', color: '#1C1C1E', flex: 1 },
-  actionButtons: { flexDirection: 'row', gap: 15 },
-  editIcon: { color: '#34C759', fontSize: 18 },
-  deleteIcon: { color: '#FF3B30', fontSize: 18 },
-
+  taskTitle:
+  {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1C1C1E',
+    flex: 1
+  },
+  actionButtons:
+  {
+    flexDirection: 'row',
+    gap: 15
+  },
+  editIcon:
+  {
+    color: '#34C759',
+    fontSize: 18
+  },
+  deleteIcon:
+  {
+    color: '#FF3B30',
+    fontSize: 18
+  },
   cardBottomRow: {
+    marginTop: -10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  leftInfoGroup: { flexDirection: 'row', alignItems: 'center' },
-  medalIcon: { fontSize: 22, marginRight: 8 },
-  dateTimeText: { fontSize: 12, color: '#8E8E93', fontWeight: '500' },
-
-  rightActionsGroup: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  leftInfoGroup:
+  {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  medalIcon:
+  {
+    fontSize: 22,
+    marginRight: 8
+  },
+  dateTimeText:
+  {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '500'
+  },
+  rightActionsGroup:
+  {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
+  },
   textPriorityBadge: {
     backgroundColor: '#f9f3e1',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 10,
   },
-  badgeText: { fontSize: 12, fontWeight: 'bold', color: '#b9a665' },
-
+  badgeText:
+  {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#b9a665'
+  },
   checkCircle: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderWidth: 2,
     borderColor: '#E5E5EA',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 16,
+    height: 32,
+    width: 32,
   },
-  checkedCircle: { borderColor: '#34C759' },
-  checkIcon: { fontSize: 14, fontWeight: 'bold' },
+  checkedCircle: {
+    backgroundColor: '#34C759',
+    borderColor: '#34C759',
+  },
+  checkIcon: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  iconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
 
   chartContainer: {
     alignItems: 'center',
@@ -471,9 +556,24 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 20,
   },
-  chartItem: { flexDirection: 'row', alignItems: 'center' },
-  dotText: { fontSize: 11, color: '#444', fontWeight: '500' },
-  dot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
+  chartItem:
+  {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  dotText:
+  {
+    fontSize: 11,
+    color: '#444',
+    fontWeight: '500'
+  },
+  dot:
+  {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6
+  },
 
   modalOverlay: {
     flex: 1,

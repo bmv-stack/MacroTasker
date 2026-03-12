@@ -7,6 +7,7 @@ import MainScreen from './src/screens/mainScreen';
 import CreateTaskScreen from './src/screens/createTaskScreen';
 import { TaskProvider } from './src/context/taskContext';
 import { View, Text, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 
 const PlaceholderScreen = ({ route }) => (
@@ -46,19 +47,27 @@ const Tab = createBottomTabNavigator({
     tabBarActiveTintColor: '#1c1c1e',
     tabBarInactiveTintColor: '#8e8e93',
     tabBarLabelStyle: styles.tabLabel,
-    tabBarIcon: ({ focused, color }) => (
-      <View style={styles.iconContainer}>
-        {focused && <View style={styles.activeIndicatorDot} />}
-        <Text style={{ fontSize: 20, color }}>
-          {
-            route.name === 'Dashboard' ? '⊞' :
-              route.name === 'Bills' ? '⇄' :
-                route.name === 'AiTasks' ? '✦' :
-                  route.name === 'SmartHome' ? '⌂' : '☰'
-          }
-        </Text>
-      </View>
-    )
+    tabBarIcon: ({ focused, color }) => {
+      let iconName;
+
+      if (route.name === 'Dashboard') {
+        iconName = focused ? 'home' : 'home-outline';
+      } else if (route.name === 'Bills') {
+        iconName = focused ? 'receipt' : 'receipt-outline';
+      } else if (route.name === 'AiTasks') {
+        iconName = focused ? 'sparkles' : 'sparkles-outline';
+      } else if (route.name === 'SmartHome') {
+        iconName = focused ? 'id-card' : 'id-card-outline';
+      } else if (route.name === 'Menu') {
+        iconName = focused ? 'list' : 'list-outline';
+      }
+      return (
+        <View style={styles.iconContainer}>
+          {focused && <View style={styles.activeIndicatorDot} />}
+          <Icon name={iconName} size={22} color={color}></Icon>
+        </View>
+      )
+    }
   })
 })
 
@@ -106,7 +115,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1.5,
     borderTopColor: '#000',
     paddingBottom: Platform.OS === 'ios' ? 25 : 10,
-    paddingTop: 10
+    paddingTop: 10,
+    paddingHorizontal: 20
   },
   tabLabel: {
     fontSize: 10,

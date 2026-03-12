@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     emptyTaskContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        flex: 1,
+        minHeight: 40,
         paddingVertical: 10,
     },
     emptyTaskText: {
