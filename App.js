@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     height: 6.5,
     borderRadius: 4,
     backgroundColor: '#000',
-    marginHorizontal: 6
   },
   iconContainer: {
     alignItems: 'center',

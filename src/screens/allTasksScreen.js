@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -53,16 +53,13 @@ const AllTasksScreen = () => {
     color: Colors.blackSecondary,
   });
 
-  const priorityStyles = useMemo(
-    () => ({
-      High: { iconColor: Colors.high },
-      Normal: { iconColor: Colors.normal },
-      Low: { iconColor: Colors.low },
-    }),
-    [],
-  );
+  const priorityStyles = {
+    High: { iconColor: Colors.high },
+    Normal: { iconColor: Colors.normal },
+    Low: { iconColor: Colors.low },
+  };
 
-  const dateList = useMemo(() => generateDateList(), []);
+  const dateList = generateDateList();
   const filteredTasks = tasks.filter(task => task.date === selectedDate);
 
   useEffect(() => {
@@ -278,9 +275,8 @@ const AllTasksScreen = () => {
                     </Text>
                     <View style={styles.actionButtons}>
                       <TouchableOpacity
-                        style={[
-                          styles.iconCircle,
-                          task.completed && styles.checkedCircle,
+                        style={[styles.iconCircle,
+                        task.completed && styles.checkedCircle
                         ]}
                         disabled={task.completed}
                         onPress={() =>
@@ -296,9 +292,8 @@ const AllTasksScreen = () => {
                         ></FeatherIcon>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={[
-                          styles.iconCircle,
-                          task.completed && styles.checkedCircle,
+                        style={[styles.iconCircle,
+                        task.completed && styles.checkedCircle
                         ]}
                         onPress={() => deleteTask(task.id)}
                       >
@@ -359,9 +354,7 @@ const AllTasksScreen = () => {
             })
           ) : (
             <View style={{ alignItems: 'center', marginTop: 50 }}>
-              <Text style={{ color: Colors.textMuted }}>
-                No tasks for this day.
-              </Text>
+              <Text style={{ color: Colors.textMuted }}>No tasks for this day.</Text>
             </View>
           )}
         </ScrollView>
@@ -408,10 +401,11 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   list: { marginTop: 10 },
   sectionHeader: { marginVertical: 10 },
-  sectionTitle: {
+  sectionTitle:
+  {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.textPrimary,
+    color: Colors.textPrimary
   },
   topSection: { marginBottom: 15 },
 
@@ -447,6 +441,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderRadius: 20,
     padding: 16,
+
   },
   overdueIndicator: {
     position: 'absolute',
@@ -462,15 +457,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  taskTitle: {
+  taskTitle:
+  {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.blackSecondary,
-    flex: 1,
+    flex: 1
   },
-  actionButtons: {
+  actionButtons:
+  {
     flexDirection: 'row',
-    gap: 15,
+    gap: 15
   },
   cardBottomRow: {
     marginTop: -10,
@@ -478,23 +475,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  leftInfoGroup: {
+  leftInfoGroup:
+  {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
-  medalIcon: {
+  medalIcon:
+  {
     fontSize: 22,
-    marginRight: 8,
+    marginRight: 8
   },
-  dateTimeText: {
+  dateTimeText:
+  {
     fontSize: 12,
     color: Colors.textMuted,
-    fontWeight: '500',
+    fontWeight: '500'
   },
-  rightActionsGroup: {
+  rightActionsGroup:
+  {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 12
   },
   textPriorityBadge: {
     backgroundColor: Colors.badgeBackground,
@@ -502,10 +503,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 10,
   },
-  badgeText: {
+  badgeText:
+  {
     fontSize: 12,
     fontWeight: 'bold',
-    color: Colors.textBadge,
+    color: Colors.textBadge
   },
   checkCircle: {
     borderColor: '#E5E5EA',
@@ -520,7 +522,7 @@ const styles = StyleSheet.create({
   checkedCircle: {
     backgroundColor: Colors.completedBg,
     borderColor: Colors.completedBg,
-    opacity: 0.5,
+    opacity: 0.5
   },
   checkIcon: {
     fontSize: 14,
@@ -552,20 +554,23 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 20,
   },
-  chartItem: {
+  chartItem:
+  {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
-  dotText: {
+  dotText:
+  {
     fontSize: 11,
     color: Colors.textChartLabel,
-    fontWeight: '500',
+    fontWeight: '500'
   },
-  dot: {
+  dot:
+  {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginRight: 6,
+    marginRight: 6
   },
 
   modalOverlay: {
