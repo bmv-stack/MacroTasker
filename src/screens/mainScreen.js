@@ -6,11 +6,24 @@ import {
     StatusBar,
     Platform,
     TouchableOpacity,
+    ScrollView,
 } from 'react-native';
 import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { useTasks } from '../context/taskContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Colors } from '../themes/color';
+
+const formatTime = timeString => {
+    if (!timeString || !timeString.includes(':')) return timeString;
+
+    const [hours24, m] = timeString.split(':');
+    let hours = parseInt(hours24, 10);
+    const meridiem = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+    return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
+};
 
 const MainScreen = () => {
     const navigation = useNavigation();
@@ -19,7 +32,7 @@ const MainScreen = () => {
     const [activeTab, setActiveTab] = useState(
         route.params?.openScreen || 'Focus',
     );
-    const today = new Date().toLocaleDateString('en-GB')
+    const today = new Date().toLocaleDateString('en-GB');
     const activeTasks = tasks.filter(t => !t.completed && t.date === today);
     const activeTaskCount = activeTasks.length;
     const [expanded, setExpanded] = useState(false);
@@ -58,8 +71,11 @@ const MainScreen = () => {
                         </TouchableOpacity>
                     )}
                 </View>
-                <View>
-                    <View style={styles.whiteContainer}>
+                <View style={[styles.whiteContainer, expanded && { flex: 1 }]}>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ padding: 15 }}
+                    >
                         {displyedTasks.length > 0 ? (
                             displyedTasks.map(item => {
                                 return (
@@ -67,7 +83,7 @@ const MainScreen = () => {
                                         key={item.id}
                                         style={[
                                             styles.taskRow,
-                                            { backgroundColor: item.color || '#F2F2F7' },
+                                            { backgroundColor: item.color || Colors.taskDefaultBg },
                                         ]}
                                     >
                                         <View style={styles.taskHeaderRow}>
@@ -94,7 +110,7 @@ const MainScreen = () => {
                                                     },
                                                 ]}
                                             >
-                                                {item.time}
+                                                {formatTime(item.time)}
                                             </Text>
                                         </View>
                                     </View>
@@ -105,7 +121,7 @@ const MainScreen = () => {
                                 <Text style={styles.emptyTaskText}>No Tasks available!</Text>
                             </View>
                         )}
-                    </View>
+                    </ScrollView>
                 </View>
             </View>
         </View>
@@ -114,14 +130,14 @@ const MainScreen = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.background,
         paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
     },
     whiteContainer: {
         flexDirection: 'column',
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.surface,
         borderRadius: 30,
-        padding: 15,
+        padding: 1,
         marginVertical: 10,
         shadowOpacity: 0.1,
         elevation: 2,
@@ -129,9 +145,10 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.surface,
     },
     content: {
+        flex: 1,
         paddingHorizontal: 16,
     },
     greetingContainer: {
@@ -140,11 +157,11 @@ const styles = StyleSheet.create({
     },
     userGreetings: {
         fontSize: 14,
-        color: '#BCBCBC',
+        color: Colors.textTertiary,
         fontWeight: '500',
     },
     viewallText: {
-        color: '#007AFF',
+        color: Colors.accent,
         fontWeight: '600',
         fontSize: 14,
     },
@@ -164,21 +181,21 @@ const styles = StyleSheet.create({
     taskTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: 'black',
+        color: Colors.textPrimary,
         flex: 1,
         marginRight: 15,
     },
     taskTime: {
         fontSize: 12,
         fontWeight: '400',
-        color: '#333',
+        color: Colors.textSecondary,
         textAlign: 'right',
     },
     taskText: {
         fontWeight: '700',
         marginBottom: 10,
         fontSize: 22,
-        color: 'black',
+        color: Colors.textPrimary,
         marginTop: 4,
         marginBottom: 15,
     },
@@ -189,20 +206,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 25,
-        backgroundColor: '#8e8b8b',
+        backgroundColor: Colors.inactivePill,
         marginRight: 10,
         marginBottom: 15,
     },
     activePill: {
-        backgroundColor: 'black',
-        color: 'white',
+        backgroundColor: Colors.primary,
+        color: Colors.white,
     },
     pillText: {
-        color: '#dedee6',
+        color: Colors.textPlaceholder,
         fontWeight: '600',
     },
     activePillText: {
-        color: 'white',
+        color: Colors.white,
     },
     taskListContainer: {
         flex: 1,
@@ -222,7 +239,7 @@ const styles = StyleSheet.create({
     emptyTaskText: {
         fontWeight: 'bold',
         fontSize: 16,
-        color: '#8E8E93',
+        color: Colors.textMuted,
     },
 });
 export default MainScreen;

@@ -7,6 +7,7 @@ import {
   createTable,
   updateTaskStatus,
 } from '../database/db';
+import { Colors } from '../themes/color';
 
 const TaskContext = createContext();
 
@@ -28,21 +29,9 @@ export const TaskProvider = ({ children }) => {
   }, []);
 
   const addNewTask = async task => {
-    const colors = [
-      '#C1E1C1',
-      '#FDFD96',
-      '#9192F3',
-      '#AEC6CF',
-      '#F9BBB7',
-      '#DE97F7',
-      '#8CF7D7',
-      '#7DECFF',
-      '#F3E65E',
-      '#ffae62'
-    ];
     const taskWithColor = {
       ...task,
-      color: task.color || colors[Math.floor(Math.random() * colors.length)],
+      color: task.color || Colors.taskCardPalette[Math.floor(Math.random() * Colors.taskCardPalette.length)],
     };
     const db = await getDBConnection();
     await saveTask(db, taskWithColor);

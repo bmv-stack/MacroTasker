@@ -1,33 +1,41 @@
 import { StyleSheet, Text, View, Modal, TouchableOpacity, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
+import { Colors } from '../themes/color';
 
 const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
     const [selectedHours, setSelectedHours] = useState('00');
     const [selectedMinutes, setSelectedMinutes] = useState('00');
     const [selectedSeconds, setSelectedSeconds] = useState('00');
+    const [selectedMeridiem, setSelectedMeridiem] = useState('AM');
 
-    const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-    const minuteSeconds = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+    const hours = Array.from({ length: 12 }, (notUSed, i) => (i + 1).toString().padStart(2, '0'));
+    const minuteSeconds = Array.from({ length: 60 }, (notUsed, i) => i.toString().padStart(2, '0'));
+    const meridiem = ['AM', 'PM'];
 
     useEffect(() => {
         if (visible && typeof initialTime === 'string' && initialTime.includes(':')) {
-            const parts = initialTime.split(':');
-            if (parts.length === 3) {
-                setSelectedHours(parts[0]);
-                setSelectedMinutes(parts[1]);
-                setSelectedSeconds(parts[2]);
-            } else if (visible) {
-                setSelectedHours('00');
-                setSelectedMinutes('00');
-                setSelectedSeconds('00')
+            const [hour24, m, s] = initialTime.split(':')
+            let hourValue = parseInt(hour24, 10);
 
-            }
+            const meridiem = hourValue >= 12 ? 'PM' : 'AM';
+            hourValue = hourValue % 12 || 12;
+            const parts = initialTime.split(':');
+
+            setSelectedHours(hourValue.toString().padStart(2, '0'));
+            setSelectedMinutes(m);
+            setSelectedSeconds(s);
+            setSelectedMeridiem(meridiem);
         }
     }, [visible, initialTime]);
 
     const handleConfirm = () => {
-        onSelect(`${selectedHours}:${selectedMinutes}:${selectedSeconds}`);
+        let hour24 = parseInt(selectedHours, 10);
+        if (selectedMeridiem === 'PM' && hour24 < 12) hour24 += 12;
+        if (selectedMeridiem === 'AM' && hour24 === 12) hour24 = 0;
+
+        const formattedTime = `${hour24.toString().padStart(2, '0')}:${selectedMinutes}:${selectedSeconds}`;
+        onSelect(formattedTime);
         onClose();
     }
     return (
@@ -45,7 +53,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
                             style={styles.pickerColumn}
                             selectedValue={selectedHours}
                             selectionColor='transparent'
-                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 22, fontWeight: '600' }}
+                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 16, fontWeight: '600' }}
                             onValueChange={(itemValue) => setSelectedHours(itemValue)}>
                             {hours.map((h) => <Picker.Item key={h} label={h} value={h} />)}
                         </Picker>
@@ -54,7 +62,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
                             style={styles.pickerColumn}
                             selectedValue={selectedMinutes}
                             selectionColor='transparent'
-                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 22, fontWeight: '600' }}
+                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 16, fontWeight: '600' }}
                             onValueChange={(itemValue) => setSelectedMinutes(itemValue)}>
                             {minuteSeconds.map((m) => <Picker.Item key={m} label={m} value={m} />)}
                         </Picker>
@@ -63,9 +71,16 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
                             style={styles.pickerColumn}
                             selectedValue={selectedSeconds}
                             selectionColor='transparent'
-                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 22, fontWeight: '600' }}
+                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 16, fontWeight: '600' }}
                             onValueChange={(itemValue) => setSelectedSeconds(itemValue)}>
                             {minuteSeconds.map((s) => <Picker.Item key={s} label={s} value={s} />)}
+                        </Picker>
+                        <Picker
+                            style={styles.pickerColumn}
+                            selectedValue={selectedMeridiem}
+                            onValueChange={(itemValue) => setSelectedMeridiem(itemValue)}
+                            itemStyle={{ backgroundColor: 'transparent', color: '#1C1C1E', fontSize: 16, fontWeight: '600' }}>
+                            {meridiem.map((p) => <Picker.Item key={p} label={p} value={p} />)}
                         </Picker>
                     </View>
                     <View style={styles.buttonRow}>
@@ -87,13 +102,13 @@ export default TimePicker
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: '#00000080',
+        backgroundColor: Colors.modalOverlay,
         justifyContent: 'center',
         alignItems: 'center'
     },
     modalContainer: {
         width: '93%',
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.surface,
         borderRadius: 24,
         padding: 20,
         justifyContent: 'space-between',
@@ -103,7 +118,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#1C1C1E',
+        color: Colors.textPrimary,
         marginBottom: 10,
     },
     buttonRow: {
@@ -121,35 +136,36 @@ const styles = StyleSheet.create({
     },
     cancelBtn: {
         width: 100,
-        backgroundColor: '#E5E5EA',
+        backgroundColor: Colors.buttonCancel,
         paddingVertical: 12,
         borderRadius: 12,
         alignItems: 'center',
     },
     saveBtn: {
         width: 100,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: Colors.buttonActive,
         paddingVertical: 12,
         borderRadius: 12,
         alignItems: 'center'
     },
     cancelText: {
         fontWeight: '600',
-        color: '#1C1C1E'
+        color: Colors.blackSecondary
     },
     saveText: {
         fontWeight: '600',
-        color: '#FFF'
+        color: Colors.white
     },
     pickerColumn: {
         flex: 1,
         backgroundColor: 'transparent',
-        textShadowColor: 'transparent'
+        textShadowColor: 'transparent',
+        marginHorizontal: -2
     },
     separator: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#1C1C1E',
+        color: Colors.blackSecondary,
     },
     selectionLinesContainer: {
         position: 'absolute',
@@ -164,22 +180,14 @@ const styles = StyleSheet.create({
     topLine: {
         width: '100%',
         height: 0.5,
-        backgroundColor: '#E5E5EA',
+        backgroundColor: Colors.pickerLine,
         position: 'absolute',
         top: 70,
-    },
-    middleMask: {
-        width: '100%',
-        height: 38,
-        backgroundColor: '#FFF',
-        position: 'absolute',
-        top: 81,
-        zIndex: -1,
     },
     bottomLine: {
         width: '100%',
         height: 1,
-        backgroundColor: '#E5E5EA',
+        backgroundColor: Colors.pickerLine,
         position: 'absolute',
         bottom: 70,
     },

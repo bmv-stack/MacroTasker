@@ -15,6 +15,18 @@ import { useTasks } from '../context/taskContext';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
+import { Colors } from '../themes/color';
+
+const formatTime = timeString => {
+    if (!timeString || !timeString.includes(':')) return timeString;
+
+    const [hours24, m] = timeString.split(':');
+    let hours = parseInt(hours24, 10);
+    const meridiem = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+    return `${hours.toString().padStart(2, '0')}:${m}`;
+};
 
 const CreateTaskScreen = () => {
     const navigation = useNavigation();
@@ -35,11 +47,11 @@ const CreateTaskScreen = () => {
 
     const [currentField, setCurrentField] = useState(null);
 
-    const handleOpenCalendar = (field) => {
-        console.log("Opening calendar for field:", field);
+    const handleOpenCalendar = field => {
+        console.log('Opening calendar for field:', field);
         setCurrentField(field);
         setIsCalendarVisible(true);
-    }
+    };
 
     const [timeModalVisible, setTimeModalVisible] = useState(false);
 
@@ -48,10 +60,6 @@ const CreateTaskScreen = () => {
         mode: 'date',
         field: null,
     });
-
-    const showPicker = (mode, field) => {
-        setPicker({ open: true, mode, field });
-    };
 
     const onPickerChange = selectedVal => {
         setPicker(prev => ({ ...prev, open: false }));
@@ -74,7 +82,8 @@ const CreateTaskScreen = () => {
     now.setHours(0, 0, 0, 0);
     const startDate = parseDate(form.date);
     const endDate = parseDate(form.endDate);
-    const isStartDateValid = !startDate || (existingTask ? true : startDate >= now);
+    const isStartDateValid =
+        !startDate || (existingTask ? true : startDate >= now);
     const isDateValid = !endDate || (startDate && endDate >= startDate);
     const isFormValid =
         form.title.length > 0 &&
@@ -106,8 +115,10 @@ const CreateTaskScreen = () => {
     const getInitialDate = () => {
         const dateToParse = currentField === 'date' ? form.date : form.endDate;
         const parsed = parseDate(dateToParse);
-        return parsed ? parsed.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-    }
+        return parsed
+            ? parsed.toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0];
+    };
     return (
         <View style={styles.container}>
             <ScrollView
@@ -141,7 +152,7 @@ const CreateTaskScreen = () => {
                     {form.date.length > 0 && !isStartDateValid && (
                         <Text
                             style={{
-                                color: 'red',
+                                color: Colors.textError,
                                 fontSize: 12,
                                 marginBottom: 13,
                                 marginTop: -17,
@@ -150,12 +161,17 @@ const CreateTaskScreen = () => {
                             Start date cannot be before current date
                         </Text>
                     )}
-                    <TouchableOpacity onPress={() => setTimeModalVisible(true)}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            setCurrentField('time');
+                            setTimeModalVisible(true);
+                        }}
+                    >
                         <View pointerEvents="none">
                             <FormInput
                                 label="Time"
                                 placeholder="Add Time"
-                                value={form.time}
+                                value={formatTime(form.time)}
                                 editable={false}
                             ></FormInput>
                         </View>
@@ -164,7 +180,10 @@ const CreateTaskScreen = () => {
                         visible={timeModalVisible}
                         initialTime={new Date()}
                         onClose={() => setTimeModalVisible(false)}
-                        onSelect={(formattedTime) => handleInputChange('time', formattedTime)}></TimePicker>
+                        onSelect={formattedTime =>
+                            handleInputChange(currentField, formattedTime)
+                        }
+                    ></TimePicker>
                     <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
                         <View pointerEvents="none">
                             <FormInput
@@ -178,7 +197,7 @@ const CreateTaskScreen = () => {
                     {!isDateValid && (
                         <Text
                             style={{
-                                color: 'red',
+                                color: Colors.textError,
                                 fontSize: 12,
                                 marginBottom: 13,
                                 marginTop: -17,
@@ -187,12 +206,17 @@ const CreateTaskScreen = () => {
                             End date cannot be before 'Date'
                         </Text>
                     )}
-                    <TouchableOpacity onPress={() => showPicker('time', 'endTime')}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            setCurrentField('endTime');
+                            setTimeModalVisible(true);
+                        }}
+                    >
                         <View pointerEvents="none">
                             <FormInput
                                 label="End Time"
                                 placeholder="Add end time"
-                                value={form.endTime}
+                                value={formatTime(form.endTime)}
                                 editable={false}
                             ></FormInput>
                         </View>
@@ -208,14 +232,15 @@ const CreateTaskScreen = () => {
                     visible={isCalendarVisible}
                     initialDate={getInitialDate()}
                     onClose={() => setIsCalendarVisible(false)}
-                    onSelect={(day) => {
+                    onSelect={day => {
                         if (day && day.dateString) {
                             const [y, m, d] = day.dateString.split('-');
                             const formattedDate = `${d}/${m}/${y}`;
                             handleInputChange(currentField, formattedDate);
                             setIsCalendarVisible(false);
                         }
-                    }}></CalendarComponent>
+                    }}
+                ></CalendarComponent>
 
                 {picker.open && (
                     <DatePicker
@@ -256,7 +281,9 @@ const CreateTaskScreen = () => {
                 >
                     <Text style={styles.submitText}>Submit</Text>
                     <View style={styles.arrowContainer}>
-                        <Text style={{ color: '#FFF', fontWeight: 'bold', marginLeft: 5 }}>
+                        <Text
+                            style={{ color: Colors.white, fontWeight: 'bold', marginLeft: 5 }}
+                        >
                             ➜
                         </Text>
                     </View>
@@ -269,7 +296,7 @@ const CreateTaskScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.background,
         paddingTop: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
     },
     scrollView: {
@@ -287,7 +314,7 @@ const styles = StyleSheet.create({
         right: 20,
     },
     backArrow: {
-        color: 'black',
+        color: Colors.textPrimary,
         fontSize: 30,
     },
     headerTitle: {
@@ -308,25 +335,25 @@ const styles = StyleSheet.create({
         height: 58,
     },
     activeButton: {
-        backgroundColor: 'black',
+        backgroundColor: Colors.buttonActive,
     },
     disableButton: {
-        backgroundColor: '#D1D1D6',
+        backgroundColor: Colors.buttonDisabled,
     },
     submitText: {
-        color: '#FFF',
+        color: Colors.textInverted,
         fontWeight: 'bold',
         fontSize: 16,
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: Colors.blackPure,
         justifyContent: 'center',
         alignItems: 'center',
         opacity: 0.5,
     },
     modalContent: {
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.surface,
         padding: 10,
         borderRadius: 20,
         alignItems: 'center',
@@ -347,25 +374,25 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#E5E5EA',
-        backgroundColor: '#FFF',
+        borderColor: Colors.borderLight,
+        backgroundColor: Colors.surface,
     },
     activePriorityPill: {
-        backgroundColor: '#000',
-        borderColor: '#000',
+        backgroundColor: Colors.primary,
+        borderColor: Colors.borderLight,
     },
     priorityPillText: {
-        color: '#8E8E93',
+        color: Colors.textMuted,
         fontWeight: '600',
     },
     activePriorityText: {
-        color: '#FFF',
+        color: Colors.textSecondary,
     },
     label: {
         fontSize: 14,
         fontWeight: 'bold',
         marginTop: 15,
-        color: '#333',
+        color: Colors.textLabel,
     },
 });
 

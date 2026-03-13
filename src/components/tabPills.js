@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Colors } from '../themes/color';
 
 const SwitchTabs = ({ activeTab, onTabChange }) => {
   return (
@@ -39,24 +40,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 22,
-    backgroundColor: '#F3F3F3',
+    backgroundColor: Colors.pillInactiveBg,
     marginRight: 12,
     width: 135,
     height: 42,
   },
   activeTab: {
-    backgroundColor: 'black',
+    backgroundColor: Colors.primary,
     color: 'white',
   },
   tabText: {
-    color: '#00000098',
+    color: Colors.textPillInactive,
     fontWeight: '600',
     fontSize: 13,
     textAlign: 'center',
     letterSpacing: -0.4,
   },
   activeText: {
-    color: '#FFF',
+    color: Colors.textInverted,
     fontWeight: '700',
   },
 });

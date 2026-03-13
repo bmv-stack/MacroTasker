@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Calendar } from 'react-native-calendars'
 import Icon from 'react-native-vector-icons/Entypo'
+import { Colors } from '../themes/color';
 
 const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
 
@@ -31,20 +32,20 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
                         markedDates={{
                             [tempSelectedDate]: {
                                 selected: true,
-                                selectedColor: '#1C1C1E',
-                                selectedTextColor: '#FFF'
+                                selectedColor: Colors.primary,
+                                selectedTextColor: Colors.white
                             }
                         }}
                         theme={{
-                            backgroundColor: '#FFF',
-                            calendarBackground: '#FFF',
-                            textSectionTitleColor: '#B6B1B1',
-                            selectedDayBackgroundColor: '#1C1C1E',
-                            selectedDayTextColor: '#FFF',
-                            todayTextColor: '#1C1C1E',
-                            dayTextColor: '#2D4150',
-                            textDisabledColor: '#D9E1E8',
-                            monthTextColor: '#1C1C1E',
+                            backgroundColor: Colors.surface,
+                            calendarBackground: Colors.surface,
+                            textSectionTitleColor: Colors.calendarHeader,
+                            selectedDayBackgroundColor: Colors.primary,
+                            selectedDayTextColor: Colors.white,
+                            todayTextColor: Colors.primary,
+                            dayTextColor: Colors.dayTextColor,
+                            textDisabledColor: Colors.calendarDisabled,
+                            monthTextColor: Colors.textPrimary,
                             textMonthFontWeight: 'bold',
                             textDayHeaderFontWeight: '600',
                             textDayFontSize: 14,
@@ -74,13 +75,13 @@ export default CalendarComponent
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: '#00000080',
+        backgroundColor: Colors.modalOverlay,
         justifyContent: 'center',
         alignItems: 'center'
     },
     modalContainer: {
         width: '95%',
-        backgroundColor: '#FFF',
+        backgroundColor: Colors.surface,
         borderRadius: 24,
         padding: 20,
         justifyContent: 'space-between',
@@ -94,24 +95,24 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         width: 120,
-        backgroundColor: '#E5E5EA',
+        backgroundColor: Colors.buttonCancel,
         paddingVertical: 12,
         borderRadius: 12,
         alignItems: 'center',
     },
     selectButton: {
         width: 120,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: Colors.buttonActive,
         paddingVertical: 12,
         borderRadius: 12,
         alignItems: 'center'
     },
     cancelText: {
         fontWeight: '600',
-        color: '#1C1C1E'
+        color: Colors.primary
     },
     selectText: {
         fontWeight: '600',
-        color: '#FFF'
+        color: Colors.white
     }
 })

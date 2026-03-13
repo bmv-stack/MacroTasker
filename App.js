@@ -8,6 +8,7 @@ import CreateTaskScreen from './src/screens/createTaskScreen';
 import { TaskProvider } from './src/context/taskContext';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 
 
 const PlaceholderScreen = ({ route }) => (
@@ -15,20 +16,32 @@ const PlaceholderScreen = ({ route }) => (
     <Text style={styles.devText}>{route.name} is under development!</Text>
   </View>
 );
-const Tab = createBottomTabNavigator({
+
+const DashboardStack = createNativeStackNavigator({
   screens: {
-    Dashboard: {
+    Main: {
       screen: MainScreen,
       options: {
-        animation: 'fade'
+        headerShown: false,
+        animation: 'none'
       }
     },
     All: {
       screen: AllTasksScreen,
       options: {
+        headerShown: false,
+        animation: 'none'
+      }
+    }
+  }
+})
+const Tab = createBottomTabNavigator({
+  screens: {
+    Dashboard: {
+      screen: DashboardStack,
+      options: {
         animation: 'fade',
-        tabBarButton: () => null,
-        tabBarItemStyle: { display: 'none' }
+        title: 'Dashboard'
       }
     },
     Bills: {
@@ -51,6 +64,16 @@ const Tab = createBottomTabNavigator({
     tabBarActiveTintColor: '#1c1c1e',
     tabBarInactiveTintColor: '#8e8e93',
     tabBarLabelStyle: styles.tabLabel,
+    tabBarLabel: ({ focused, color }) => {
+      return (
+        <Text style={[
+          styles.tabLabel,
+          { color }, focused && { fontWeight: '700', color: '#000' }
+        ]}>
+          {route.name === 'AiTasks' ? 'Ai Task' : route.name}
+        </Text>
+      )
+    },
     tabBarIcon: ({ focused, color }) => {
       let iconName;
 
@@ -67,8 +90,22 @@ const Tab = createBottomTabNavigator({
       }
       return (
         <View style={styles.iconContainer}>
-          {focused && <View style={styles.activeIndicatorDot} />}
-          <Icon name={iconName} size={22} color={color}></Icon>
+          {focused && (
+            <View style={styles.indicatorContainer}>
+              <LinearGradient
+                colors={['transparent', '#000']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.fadeLineLeft} />
+              <View style={styles.activeIndicatorDot}></View>
+              <LinearGradient
+                colors={['#000', 'transparent']}
+                start={{ x: 0, y: 1 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.fadeLineRight}></LinearGradient>
+            </View>
+          )}
+          <Icon name={iconName} size={22} color={focused ? '#000' : color}></Icon>
         </View>
       )
     }
@@ -114,29 +151,46 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   tabBar: {
-    height: 80,
+    height: 90,
     backgroundColor: '#fff',
     borderTopWidth: 1.5,
-    borderTopColor: '#000',
+    borderTopColor: '#E0E0E0',
     paddingBottom: Platform.OS === 'ios' ? 25 : 10,
     paddingTop: 10,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    elevation: 0
+
   },
   tabLabel: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '600',
     marginTop: 5
   },
   activeIndicatorDot: {
-    position: 'absolute',
-    top: -16,
-    width: 8,
-    height: 8,
+    width: 6.5,
+    height: 6.5,
     borderRadius: 4,
-    backgroundColor: '#000'
+    backgroundColor: '#000',
+    marginHorizontal: 6
   },
   iconContainer: {
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow: 'visible'
+  },
+  indicatorContainer: {
+    position: 'absolute',
+    top: -22,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  fadeLineLeft: {
+    height: 1,
+    width: 40,
+  },
+  fadeLineRight: {
+    height: 1,
+    width: 40
   }
 })
