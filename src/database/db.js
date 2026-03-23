@@ -28,29 +28,42 @@ export const createTable = async db => {
 };
 
 export const saveTask = async (db, task) => {
-  const insertQuery = `INSERT OR REPLACE INTO Tasks (id, title, date, time, endDate, endTime, priority, notes, color, completed)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
-  const values = [
-    task.id,
-    task.title,
-    task.date,
-    task.time,
-    task.endDate || null,
-    task.endTime || null,
-    task.priority,
-    task.notes || '',
-    task.color,
-    task.completed ? 1 : 0,
-  ];
+  const checkQuery = `SELECT id FROM Tasks WHERE id = ?`;
+  const [results] = await db.executeSql(checkQuery, [task.id]);
 
-  return db.executeSql(insertQuery, values);
+  if (results.rows.length > 0) {
+    const updateQuery = `UPDATE Tasks SET title = ?, date = ?, time = ?, endDate = ?, endTime = ?, priority = ?, notes = ?, color = ?, completed = ? WHERE id = ?`;
+    const values = [
+      task.title, task.date, task.time, task.endDate || null,
+      task.endTime || null, task.priority, task.notes || '',
+      task.color, task.completed ? 1 : 0, task.id
+    ];
+    return db.executeSql(updateQuery, values)
+  } else {
+    const insertQuery = `INSERT INTO Tasks (id, title, date, time, endDate, endTime, priority, notes, color, completed)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    const values = [
+      task.id,
+      task.title,
+      task.date,
+      task.time,
+      task.endDate || null,
+      task.endTime || null,
+      task.priority,
+      task.notes || '',
+      task.color,
+      task.completed ? 1 : 0,
+    ];
+
+    return db.executeSql(insertQuery, values);
+  }
 };
 
 export const getTask = async db => {
   try {
     const tasks = [];
     const [results] = await db.executeSql(
-      'SELECT * FROM Tasks ORDER BY completed ASC',
+      'SELECT * FROM Tasks ORDER BY completed ASC, rowid ASC',
     );
 
     for (let index = 0; index < results.rows.length; index++) {

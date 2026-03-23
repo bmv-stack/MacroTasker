@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Modal, TouchableOpacity, Platform } from 'react
 import React, { useEffect, useState } from 'react'
 import { Picker } from '@react-native-picker/picker'
 import { Colors } from '../themes/color';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
     const [selectedHours, setSelectedHours] = useState('00');
@@ -13,6 +14,28 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
     const minuteSeconds = Array.from({ length: 60 }, (notUsed, i) => i.toString().padStart(2, '0'));
     const meridiem = ['AM', 'PM'];
 
+    if (Platform.OS === 'android') {
+        if (!visible) return null;
+
+        const onAndroid = (event, selectedDate) => {
+            if (event.type === 'set' && selectedDate) {
+                const hours = selectedDate.getHours().toString().padStart(2, '0');
+                const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+                onSelect(`${hours}:${minutes}:00`);
+            }
+            onClose();
+        };
+        return (
+            <DateTimePicker
+                value={new Date()}
+                mode='time'
+                is24Hour={false}
+                display='default'
+                onChange={onAndroid} />
+        )
+
+    }
+
     useEffect(() => {
         if (visible && typeof initialTime === 'string' && initialTime.includes(':')) {
             const [hour24, m, s] = initialTime.split(':')
@@ -20,7 +43,6 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
 
             const meridiem = hourValue >= 12 ? 'PM' : 'AM';
             hourValue = hourValue % 12 || 12;
-            const parts = initialTime.split(':');
 
             setSelectedHours(hourValue.toString().padStart(2, '0'));
             setSelectedMinutes(m);
@@ -183,6 +205,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.pickerLine,
         position: 'absolute',
         top: 70,
+        marginBottom: 40
     },
     bottomLine: {
         width: '100%',

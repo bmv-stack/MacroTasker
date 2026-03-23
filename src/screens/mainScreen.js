@@ -66,7 +66,7 @@ const MainScreen = () => {
                             onPress={() => setExpanded(!expanded)}
                         >
                             <Text style={styles.viewallText}>
-                                {expanded ? 'Collapse' : 'View All'}
+                                {expanded ? 'View Less' : 'View All'}
                             </Text>
                         </TouchableOpacity>
                     )}

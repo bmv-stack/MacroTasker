@@ -137,6 +137,16 @@ const AllTasksScreen = () => {
     }
     setPriorityModal({ visible: false, taskId: null });
   };
+  const formatTime = timeString => {
+    if (!timeString || !timeString.includes(':')) return timeString;
+
+    const [hours24, m] = timeString.split(':');
+    let hours = parseInt(hours24, 10);
+    const meridiem = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+    return `${hours.toString().padStart(2, '0')}:${m}:${meridiem}`;
+  };
 
   return (
     <View style={styles.container}>
@@ -309,7 +319,7 @@ const AllTasksScreen = () => {
                   <View style={styles.cardBottomRow}>
                     <View style={styles.leftInfoGroup}>
                       <Text style={styles.dateTimeText}>
-                        {task.date} | {task.time}
+                        {task.date} | {formatTime(task.time)}
                       </Text>
                       <TouchableOpacity
                         onPress={() =>
@@ -334,7 +344,7 @@ const AllTasksScreen = () => {
                       </View>
                       <TouchableOpacity
                         style={[
-                          styles.checkCircle,
+                          styles.completeCheckCircle,
                           task.completed && styles.checkedCircle,
                         ]}
                         onPress={() => completeTask(task.id)}
@@ -343,7 +353,7 @@ const AllTasksScreen = () => {
                           name="checkmark-sharp"
                           size={18}
                           color={task.completed ? Colors.white : Colors.black}
-                          style={{ fontWeight: 'bold' }}
+                          opacity={0.5}
                         ></Icon>
                       </TouchableOpacity>
                     </View>
@@ -511,13 +521,24 @@ const styles = StyleSheet.create({
   },
   checkCircle: {
     borderColor: Colors.borderLight,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.whitePure,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: 16,
     height: 32,
     width: 32,
+  },
+  completeCheckCircle: {
+    borderColor: Colors.borderLight,
+    backgroundColor: Colors.checkButton,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 16,
+    height: 32,
+    width: 32,
+    marginTop: 5
   },
   checkedCircle: {
     backgroundColor: Colors.completedBg,

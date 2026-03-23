@@ -24,6 +24,7 @@ export const Colors = {
     buttonActive: 'black',
     buttonDisabled: '#D1D1D6',
     buttonCancel: '#E5E5EA',
+    checkButton: '#928d8d3c',
 
     textPrimary: 'black',
     textInput: '#000',
