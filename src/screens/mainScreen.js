@@ -58,7 +58,7 @@ const MainScreen = () => {
                     <Text style={styles.userGreetings}>Welcome User,</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={styles.taskText}>{activeTaskCount} task(s) today</Text>
+                    <Text style={styles.taskText}>{activeTaskCount} tasks today</Text>
 
                     {activeTasks.length > 4 && (
                         <TouchableOpacity
@@ -71,7 +71,7 @@ const MainScreen = () => {
                         </TouchableOpacity>
                     )}
                 </View>
-                <View style={[styles.whiteContainer, expanded && { flex: 1 }]}>
+                <View style={[styles.whiteContainer, expanded && styles.expandedContainer]}>
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ padding: 15 }}
@@ -143,6 +143,9 @@ const styles = StyleSheet.create({
         elevation: 2,
         shadowRadius: 20,
     },
+    expandedContainer: {
+        maxHeight: '70%'
+    },
     container: {
         flex: 1,
         backgroundColor: Colors.surface,
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
     },
     taskRow: {
         flexDirection: 'row',
-        paddingVertical: 8,
+        paddingVertical: 10,
         paddingHorizontal: 25,
         borderRadius: 50,
         marginBottom: 10,
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
     taskText: {
         fontWeight: '700',
         marginBottom: 10,
-        fontSize: 22,
+        fontSize: 20,
         color: Colors.textPrimary,
         marginTop: 4,
         marginBottom: 15,

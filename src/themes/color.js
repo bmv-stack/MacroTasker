@@ -71,7 +71,6 @@ export const Colors = {
         '#ffae62',
     ],
 
-    //Component Detail
     badgeBackground: '#f9f3e1',
     inactivePill: '#8e8b8b',
     borderLight: '#E5E5EA',

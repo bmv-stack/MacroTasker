@@ -262,7 +262,7 @@ const CreateTaskScreen = () => {
                         <TouchableOpacity style={styles.modalContent}
                             activeOpacity={1}
                             onPress={() => setShowSuccess(false)}>
-                            <Icon name='checkmark-circle'
+                            <Icon name='checkmark-done-circle'
                                 size={60}
                                 color={Colors.chartCompleted}
                                 style={styles.modalIcon}></Icon>
