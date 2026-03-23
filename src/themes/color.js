@@ -39,7 +39,7 @@ export const Colors = {
     textChartLabel: '#444',
     textBadge: '#b9a665',
 
-    //Status & Priority
+    //Status-Priority
     high: '#FF3B30',
     normal: '#007AFF',
     low: '#34C759',
@@ -51,7 +51,7 @@ export const Colors = {
     chartOverdue: '#e6552d',
     chartEmpty: '#f2f2f7',
 
-    //Calendar Specific
+    //Calendar
     calendarHeader: '#B6B1B1',
     calendarDayText: '#2D4150',
     calendarDisabled: '#D9E1E8',
@@ -81,4 +81,9 @@ export const Colors = {
 
     editIcon: '#34C759',
     deleteIcon: '#FF3B30',
+
+    activeTabBar: '#000',
+    inactiveTabBAr: '#8E8E93',
+
+    borderTop: '#E0E0E0'
 };

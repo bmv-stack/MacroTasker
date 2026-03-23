@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   },
   dateDay: {
     fontSize: 10,
-    color: '#8E8E93',
+    color: Colors.textMuted,
     marginTop: 2,
   },
   activeDateText: {
@@ -510,8 +510,8 @@ const styles = StyleSheet.create({
     color: Colors.textBadge
   },
   checkCircle: {
-    borderColor: '#E5E5EA',
-    backgroundColor: Colors.whitePure,
+    borderColor: Colors.borderLight,
+    backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,

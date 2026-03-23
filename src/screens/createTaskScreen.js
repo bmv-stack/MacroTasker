@@ -16,6 +16,7 @@ import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
 import { Colors } from '../themes/color';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const formatTime = timeString => {
     if (!timeString || !timeString.includes(':')) return timeString;
@@ -258,9 +259,15 @@ const CreateTaskScreen = () => {
                 )}
                 <Modal transparent visible={showSuccess} animationType="fade">
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalText}>Task Created Successfully</Text>
-                        </View>
+                        <TouchableOpacity style={styles.modalContent}
+                            activeOpacity={1}
+                            onPress={() => setShowSuccess(false)}>
+                            <Icon name='checkmark-circle'
+                                size={60}
+                                color={Colors.chartCompleted}
+                                style={styles.modalIcon}></Icon>
+                            <Text style={styles.modalText}>Task Created Successfully!</Text>
+                        </TouchableOpacity>
                     </View>
                 </Modal>
             </ScrollView>
@@ -268,7 +275,7 @@ const CreateTaskScreen = () => {
                 style={{
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginBottom: 22,
+                    marginBottom: Platform.OS === 'ios' ? 22 : 40,
                 }}
             >
                 <TouchableOpacity
@@ -350,19 +357,24 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.blackPure,
         justifyContent: 'center',
         alignItems: 'center',
-        opacity: 0.5,
+        opacity: 0.9,
     },
     modalContent: {
         backgroundColor: Colors.surface,
-        padding: 10,
-        borderRadius: 20,
+        padding: 30,
+        borderRadius: 35,
         alignItems: 'center',
-        width: '50%',
+        justifyContent: 'center',
+        width: '80%',
     },
     modalText: {
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
+        color: Colors.textPrimary,
+    },
+    modalIcon: {
+        marginBottom: 20
     },
     priorityRow: {
         flexDirection: 'row',

@@ -9,6 +9,7 @@ import { TaskProvider } from './src/context/taskContext';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import { Colors } from './src/themes/color';
 
 
 const PlaceholderScreen = ({ route }) => (
@@ -23,14 +24,14 @@ const DashboardStack = createNativeStackNavigator({
       screen: MainScreen,
       options: {
         headerShown: false,
-        animation: 'none'
+        animation: 'fade'
       }
     },
     All: {
       screen: AllTasksScreen,
       options: {
         headerShown: false,
-        animation: 'none'
+        animation: 'fade'
       }
     }
   }
@@ -61,14 +62,14 @@ const Tab = createBottomTabNavigator({
   screenOptions: ({ route }) => ({
     headerShown: false,
     tabBarStyle: styles.tabBar,
-    tabBarActiveTintColor: '#1c1c1e',
-    tabBarInactiveTintColor: '#8e8e93',
+    tabBarActiveTintColor: Colors.activeTabBar,
+    tabBarInactiveTintColor: Colors.inactiveTabBAr,
     tabBarLabelStyle: styles.tabLabel,
     tabBarLabel: ({ focused, color }) => {
       return (
         <Text style={[
           styles.tabLabel,
-          { color }, focused && { fontWeight: '700', color: '#000' }
+          { color }, focused && { fontWeight: '700', color: Colors.blackSecondary }
         ]}>
           {route.name === 'AiTasks' ? 'Ai Task' : route.name}
         </Text>
@@ -93,19 +94,19 @@ const Tab = createBottomTabNavigator({
           {focused && (
             <View style={styles.indicatorContainer}>
               <LinearGradient
-                colors={['transparent', '#000']}
+                colors={['transparent', Colors.blackSecondary]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.fadeLineLeft} />
               <View style={styles.activeIndicatorDot}></View>
               <LinearGradient
-                colors={['#000', 'transparent']}
+                colors={[Colors.blackSecondary, 'transparent']}
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.fadeLineRight}></LinearGradient>
             </View>
           )}
-          <Icon name={iconName} size={22} color={focused ? '#000' : color}></Icon>
+          <Icon name={iconName} size={22} color={focused ? Colors.blackSecondary : color}></Icon>
         </View>
       )
     }
@@ -143,22 +144,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff'
+    backgroundColor: Colors.surface
   },
   devText: {
     fontSize: 16,
-    color: '#8e8e93',
+    color: Colors.textMuted,
     fontWeight: '500'
   },
   tabBar: {
     height: 90,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1.5,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: Colors.borderTop,
     paddingBottom: Platform.OS === 'ios' ? 25 : 10,
     paddingTop: 10,
     paddingHorizontal: 20,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     elevation: 0
 
   },
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     width: 6.5,
     height: 6.5,
     borderRadius: 4,
-    backgroundColor: '#000',
+    backgroundColor: Colors.blackPure,
   },
   iconContainer: {
     alignItems: 'center',
