@@ -41,7 +41,7 @@ const MainScreen = () => {
         <View style={styles.safeArea}>
             <View style={styles.content}>
                 <AppBar
-                    title="TODO APP"
+                    title="MACROTASKER"
                     onIconPress={() => navigation.navigate('CreateTask')}
                 ></AppBar>
                 <SwitchTabs

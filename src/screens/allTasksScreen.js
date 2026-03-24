@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -29,7 +29,7 @@ const generateDateList = () => {
       fullDate: d.toLocaleDateString('en-GB'),
       dayNumber: d.getDate().toString(),
       dayName: d
-        .toLocaleDateString('en-US', { weekday: 'short' })
+        .toLocaleDateString('en-GB', { weekday: 'short' })
         .toUpperCase(),
     });
   }
@@ -59,8 +59,11 @@ const AllTasksScreen = () => {
     Low: { iconColor: Colors.low },
   };
 
-  const dateList = generateDateList();
-  const filteredTasks = tasks.filter(task => task.date === selectedDate);
+  const dateList = useMemo(() => generateDateList(), []);
+  const filteredTasks = useMemo(
+    () => tasks.filter(task => task.date === selectedDate),
+    [tasks, selectedDate],
+  );
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -83,52 +86,54 @@ const AllTasksScreen = () => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  const completedCount = filteredTasks.filter(t => t.completed).length;
-  const overdueCount = filteredTasks.filter(t => {
-    if (t.completed || !t.endDate) return false;
-    const taskDate = parseDate(t.endDate);
-    return taskDate && taskDate < now;
-  }).length;
-  const ongoingCount = filteredTasks.length - completedCount - overdueCount;
+  const chartData = useMemo(() => {
+    if (filteredTasks.length === 0)
+      return [{ value: 1, color: Colors.chartEmpty, label: 'No Tasks' }];
 
-  const chartData =
-    filteredTasks.length > 0
-      ? [
-        {
-          value: ongoingCount,
-          color: Colors.chartOngoing,
-          label: 'Ongoing Tasks',
-          onPress: () =>
-            setSelectedData({
-              label: 'Ongoing',
-              value: ongoingCount,
-              color: Colors.chartOngoing,
-            }),
-        },
-        {
-          value: completedCount,
-          color: Colors.chartCompleted,
-          label: 'Completed Tasks',
-          onPress: () =>
-            setSelectedData({
-              label: 'Completed',
-              value: completedCount,
-              color: Colors.chartCompleted,
-            }),
-        },
-        {
-          value: overdueCount,
-          color: Colors.chartOverdue,
-          label: 'Overdue Tasks',
-          onPress: () =>
-            setSelectedData({
-              label: 'Overdue',
-              value: overdueCount,
-              color: Colors.chartOverdue,
-            }),
-        },
-      ]
-      : [{ value: 1, color: Colors.chartEmpty, label: 'No Tasks' }];
+    const completedCount = filteredTasks.filter(t => t.completed).length;
+    const overdueCount = filteredTasks.filter(t => {
+      if (t.completed || !t.endDate) return false;
+      const taskDate = parseDate(t.endDate);
+      return taskDate && taskDate < now;
+    }).length;
+    const ongoingCount = filteredTasks.length - completedCount - overdueCount;
+
+    return [
+      {
+        value: ongoingCount,
+        color: Colors.chartOngoing,
+        label: 'Ongoing Tasks',
+        onPress: () =>
+          setSelectedData({
+            label: 'Ongoing',
+            value: ongoingCount,
+            color: Colors.chartOngoing,
+          }),
+      },
+      {
+        value: completedCount,
+        color: Colors.chartCompleted,
+        label: 'Completed Tasks',
+        onPress: () =>
+          setSelectedData({
+            label: 'Completed',
+            value: completedCount,
+            color: Colors.chartCompleted,
+          }),
+      },
+      {
+        value: overdueCount,
+        color: Colors.chartOverdue,
+        label: 'Overdue Tasks',
+        onPress: () =>
+          setSelectedData({
+            label: 'Overdue',
+            value: overdueCount,
+            color: Colors.chartOverdue,
+          }),
+      },
+    ];
+  }, [filteredTasks]);
 
   const handlePriorityChange = (taskId, newPriority) => {
     const taskToUpdate = tasks.find(t => t.id === taskId);
@@ -145,13 +150,13 @@ const AllTasksScreen = () => {
     const meridiem = hours >= 12 ? 'PM' : 'AM';
 
     hours = hours % 12 || 12;
-    return `${hours.toString().padStart(2, '0')}:${m}:${meridiem}`;
+    return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
   };
 
   return (
     <View style={styles.container}>
       <AppBar
-        title="TODO APP"
+        title="MACROTASKER"
         onIconPress={() => navigation.navigate('CreateTask')}
       />
       <View style={styles.content}>
@@ -256,119 +261,124 @@ const AllTasksScreen = () => {
           </View>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.list}>
-          {filteredTasks.length > 0 ? (
-            filteredTasks.map(task => {
-              const isEndDate = !!task.endDate;
-              const taskDate = isEndDate ? parseDate(task.endDate) : null;
-              const isOverdue = !task.completed && isEndDate && taskDate < now;
-              const stylePriority =
-                priorityStyles[task.priority] || priorityStyles.Normal;
-
-              return (
-                <View
-                  key={task.id}
-                  style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
-                >
-                  <View style={styles.cardTopRow}>
-                    <Text
-                      style={[
-                        styles.taskTitle,
-                        task.completed && {
-                          textDecorationLine: 'line-through',
-                          color: Colors.textMuted,
-                        },
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {task.title}
-                    </Text>
-                    <View style={styles.actionButtons}>
-                      <TouchableOpacity
-                        style={[styles.iconCircle,
-                        task.completed && styles.checkedCircle
-                        ]}
-                        disabled={task.completed}
-                        onPress={() =>
-                          navigation.navigate('CreateTask', {
-                            existingTask: task,
-                          })
-                        }
-                      >
-                        <FeatherIcon
-                          name="edit-3"
-                          size={18}
-                          color={Colors.editIcon}
-                        ></FeatherIcon>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.iconCircle,
-                        task.completed && styles.checkedCircle
-                        ]}
-                        onPress={() => deleteTask(task.id)}
-                      >
-                        <Icon
-                          name="trash-outline"
-                          size={18}
-                          color={Colors.deleteIcon}
-                        ></Icon>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  <View style={styles.cardBottomRow}>
-                    <View style={styles.leftInfoGroup}>
-                      <Text style={styles.dateTimeText}>
-                        {task.date} | {formatTime(task.time)}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setPriorityModal({ visible: true, taskId: task.id })
-                        }
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      >
-                        <Icon
-                          name="bookmark"
-                          size={20}
-                          color={stylePriority.iconColor}
-                          style={{ marginLeft: 8 }}
-                        ></Icon>
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.rightActionsGroup}>
-                      <View style={styles.textPriorityBadge}>
-                        <Text style={styles.badgeText}>
-                          {task.priority || 'Normal'}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        style={[
-                          styles.completeCheckCircle,
-                          task.completed && styles.checkedCircle,
-                        ]}
-                        onPress={() => completeTask(task.id)}
-                      >
-                        <Icon
-                          name="checkmark-sharp"
-                          size={18}
-                          color={task.completed ? Colors.white : Colors.black}
-                          opacity={0.5}
-                        ></Icon>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  {isOverdue && <View style={styles.overdueIndicator} />}
-                </View>
-              );
-            })
-          ) : (
+        <FlatList
+          data={filteredTasks}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ marginBottom: 20 }}
+          ListEmptyComponent={() => (
             <View style={{ alignItems: 'center', marginTop: 50 }}>
               <Text style={{ color: Colors.textMuted }}>No tasks for this day.</Text>
             </View>
           )}
-        </ScrollView>
+          renderItem={({ item: task }) => {
+            const isEndDate = !!task.endDate;
+            const taskDate = isEndDate ? parseDate(task.endDate) : null;
+            const isOverdue = !task.completed && isEndDate && taskDate < now;
+            const stylePriority =
+              priorityStyles[task.priority] || priorityStyles.Normal;
 
+            return (
+              <View
+                key={task.id}
+                style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
+              >
+                <View style={styles.cardTopRow}>
+                  <Text
+                    style={[
+                      styles.taskTitle,
+                      task.completed && {
+                        textDecorationLine: 'line-through',
+                        color: Colors.textMuted,
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {task.title}
+                  </Text>
+                  <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                      style={[
+                        styles.iconCircle,
+                        task.completed && styles.checkedCircle,
+                      ]}
+                      disabled={task.completed}
+                      onPress={() =>
+                        navigation.navigate('CreateTask', {
+                          existingTask: task,
+                        })
+                      }
+                    >
+                      <FeatherIcon
+                        name="edit-3"
+                        size={18}
+                        color={Colors.editIcon}
+                      ></FeatherIcon>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.iconCircle,
+                        task.completed && styles.checkedCircle,
+                      ]}
+                      onPress={() => deleteTask(task.id)}
+                    >
+                      <Icon
+                        name="trash-outline"
+                        size={18}
+                        color={Colors.deleteIcon}
+                      ></Icon>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View style={styles.cardBottomRow}>
+                  <View style={styles.leftInfoGroup}>
+                    <Text style={styles.dateTimeText}>
+                      {task.date} | {formatTime(task.time)}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setPriorityModal({ visible: true, taskId: task.id })
+                      }
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      disabled={task.completed}
+                    >
+                      <Icon
+                        name="bookmark"
+                        size={20}
+                        color={stylePriority.iconColor}
+                        style={{ marginLeft: 8 }}
+                      ></Icon>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.rightActionsGroup}>
+                    <View style={styles.textPriorityBadge}>
+                      <Text style={styles.badgeText}>
+                        {task.priority || 'Normal'}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={[
+                        styles.completeCheckCircle,
+                        task.completed && styles.checkedCircle,
+                      ]}
+                      onPress={() => completeTask(task.id)}
+                    >
+                      <Icon
+                        name="checkmark-sharp"
+                        size={18}
+                        color={task.completed ? Colors.white : Colors.black}
+                        opacity={0.5}
+                      ></Icon>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {isOverdue && <View style={styles.overdueIndicator} />}
+              </View>
+            );
+          }
+          }></FlatList>
         <Modal transparent visible={priorityModal.visible} animationType="fade">
           <TouchableOpacity
             style={styles.modalOverlay}
@@ -411,11 +421,10 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   list: { marginTop: 10 },
   sectionHeader: { marginVertical: 10 },
-  sectionTitle:
-  {
+  sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.textPrimary
+    color: Colors.textPrimary,
   },
   topSection: { marginBottom: 15 },
 
@@ -451,7 +460,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderRadius: 20,
     padding: 16,
-
   },
   overdueIndicator: {
     position: 'absolute',
@@ -467,17 +475,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  taskTitle:
-  {
+  taskTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.blackSecondary,
-    flex: 1
+    flex: 1,
   },
-  actionButtons:
-  {
+  actionButtons: {
     flexDirection: 'row',
-    gap: 15
+    gap: 15,
   },
   cardBottomRow: {
     marginTop: -10,
@@ -485,27 +491,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  leftInfoGroup:
-  {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  medalIcon:
-  {
-    fontSize: 22,
-    marginRight: 8
-  },
-  dateTimeText:
-  {
-    fontSize: 12,
-    color: Colors.textMuted,
-    fontWeight: '500'
-  },
-  rightActionsGroup:
-  {
+  leftInfoGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12
+  },
+  medalIcon: {
+    fontSize: 22,
+    marginRight: 8,
+  },
+  dateTimeText: {
+    fontSize: 12,
+    color: Colors.blackSecondary,
+    fontWeight: '500',
+  },
+  rightActionsGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   textPriorityBadge: {
     backgroundColor: Colors.badgeBackground,
@@ -513,11 +515,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 10,
   },
-  badgeText:
-  {
+  badgeText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: Colors.textBadge
+    color: Colors.textBadge,
   },
   checkCircle: {
     borderColor: Colors.borderLight,
@@ -538,12 +539,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     height: 32,
     width: 32,
-    marginTop: 5
+    marginTop: 5,
   },
   checkedCircle: {
     backgroundColor: Colors.completedBg,
     borderColor: Colors.completedBg,
-    opacity: 0.5
+    opacity: 0.5,
   },
   checkIcon: {
     fontSize: 14,
@@ -575,23 +576,20 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 20,
   },
-  chartItem:
-  {
+  chartItem: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-  dotText:
-  {
+  dotText: {
     fontSize: 11,
     color: Colors.textChartLabel,
-    fontWeight: '500'
+    fontWeight: '500',
   },
-  dot:
-  {
+  dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginRight: 6
+    marginRight: 6,
   },
 
   modalOverlay: {

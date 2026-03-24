@@ -9,7 +9,7 @@ const AppBar = ({ title = 'APP NAME', onIconPress }) => {
     <View style={styles.container}>
       <View style={styles.left}>
         <View style={styles.blackBox}>
-          <Text style={styles.textLogo}>TA</Text>
+          <Text style={styles.textLogo}>MT</Text>
         </View>
         <Text style={styles.textBrand}>{title}</Text>
       </View>
