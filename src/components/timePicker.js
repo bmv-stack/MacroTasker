@@ -33,7 +33,6 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
                 display='default'
                 onChange={onAndroid} />
         )
-
     }
 
     useEffect(() => {

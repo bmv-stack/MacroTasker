@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
   Platform,
@@ -22,7 +21,7 @@ import { Colors } from '../themes/color';
 
 const generateDateList = () => {
   const dates = [];
-  for (let i = -30; i < 30; i++) {
+  for (let i = -30; i < 355; i++) {
     const d = new Date();
     d.setDate(d.getDate() + i);
     dates.push({
@@ -40,6 +39,7 @@ const AllTasksScreen = () => {
   const navigation = useNavigation();
   const { tasks, deleteTask, completeTask, updateTask } = useTasks();
   const [activeTab, setActiveTab] = useState('All');
+  const [chartKey, setChartKey] = useState(0);
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleDateString('en-GB'),
   );
@@ -81,6 +81,7 @@ const AllTasksScreen = () => {
       value: filteredTasks.length,
       color: Colors.blackSecondary,
     });
+    setChartKey(prev => prev + 1);
   };
 
   const now = new Date();
@@ -111,17 +112,6 @@ const AllTasksScreen = () => {
           }),
       },
       {
-        value: completedCount,
-        color: Colors.chartCompleted,
-        label: 'Completed Tasks',
-        onPress: () =>
-          setSelectedData({
-            label: 'Completed',
-            value: completedCount,
-            color: Colors.chartCompleted,
-          }),
-      },
-      {
         value: overdueCount,
         color: Colors.chartOverdue,
         label: 'Overdue Tasks',
@@ -130,6 +120,17 @@ const AllTasksScreen = () => {
             label: 'Overdue',
             value: overdueCount,
             color: Colors.chartOverdue,
+          }),
+      },
+      {
+        value: completedCount,
+        color: Colors.chartCompleted,
+        label: 'Completed Tasks',
+        onPress: () =>
+          setSelectedData({
+            label: 'Completed',
+            value: completedCount,
+            color: Colors.chartCompleted,
           }),
       },
     ];
@@ -164,7 +165,7 @@ const AllTasksScreen = () => {
           activeTab={activeTab}
           onTabChange={value => {
             if (value === 'Focus') {
-              navigation.navigate('Main');
+              navigation.replace('Main');
             } else {
               setActiveTab(value);
             }
@@ -172,7 +173,7 @@ const AllTasksScreen = () => {
         />
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>All Tasks</Text>
+          <Text style={styles.sectionTitle}>All tasks</Text>
         </View>
 
         <View style={styles.topSection}>
@@ -183,8 +184,8 @@ const AllTasksScreen = () => {
             initialScrollIndex={30}
             showsHorizontalScrollIndicator={false}
             getItemLayout={(data, index) => ({
-              length: 50,
-              offset: 50 * index,
+              length: 53,
+              offset: 53 * index,
               index,
             })}
             renderItem={({ item }) => {
@@ -218,6 +219,7 @@ const AllTasksScreen = () => {
           <View style={styles.chartContainer}>
             <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
               <PieChart
+                key={chartKey}
                 donut
                 focusOnPress
                 sectionAutoFocus
@@ -429,8 +431,8 @@ const styles = StyleSheet.create({
   topSection: { marginBottom: 15 },
 
   dateCard: {
-    width: 42,
-    height: 60,
+    width: 45,
+    height: 67,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
@@ -451,7 +453,8 @@ const styles = StyleSheet.create({
   dateDay: {
     fontSize: 10,
     color: Colors.textMuted,
-    marginTop: 2,
+    marginTop: 6,
+    marginBottom: 4
   },
   activeDateText: {
     color: Colors.surface,
@@ -460,6 +463,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderRadius: 20,
     padding: 16,
+    borderTopColor: Colors.taskDefaultBg,
+    borderTopWidth: 1.8,
   },
   overdueIndicator: {
     position: 'absolute',
@@ -508,17 +513,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    marginRight: -10
   },
   textPriorityBadge: {
     backgroundColor: Colors.badgeBackground,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 10,
+    marginTop: 4,
+    width: 70
   },
   badgeText: {
     fontSize: 12,
     fontWeight: 'bold',
     color: Colors.textBadge,
+    textAlign: 'center'
   },
   checkCircle: {
     borderColor: Colors.borderLight,
@@ -537,8 +546,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: 16,
-    height: 32,
-    width: 32,
+    height: 26,
+    width: 26,
     marginTop: 5,
   },
   checkedCircle: {
@@ -551,9 +560,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   iconCircle: {
-    width: 32,
-    height: 32,
+    width: 26,
+    height: 26,
     borderRadius: 16,
+    marginRight: -10,
     backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
@@ -573,7 +583,7 @@ const styles = StyleSheet.create({
   dotContainer: {
     justifyContent: 'space-between',
     flexDirection: 'row',
-    width: '100%',
+    width: '107%',
     marginTop: 20,
   },
   chartItem: {
@@ -583,13 +593,14 @@ const styles = StyleSheet.create({
   dotText: {
     fontSize: 11,
     color: Colors.textChartLabel,
-    fontWeight: '500',
+    fontWeight: '700',
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 6.5,
+    height: 6.5,
     borderRadius: 4,
-    marginRight: 6,
+    marginRight: 8,
+    marginLeft: 8
   },
 
   modalOverlay: {

@@ -48,7 +48,7 @@ const MainScreen = () => {
                     activeTab={activeTab}
                     onTabChange={value => {
                         if (value === 'All') {
-                            navigation.navigate('All');
+                            navigation.replace('All')
                         } else {
                             setActiveTab(value);
                         }

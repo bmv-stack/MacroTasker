@@ -4,7 +4,7 @@ import { Colors } from '../themes/color';
 
 const SwitchTabs = ({ activeTab, onTabChange }) => {
   return (
-    <View style={styles.tabRow}>
+    <View style={styles.container}>
       <TouchableOpacity
         style={[styles.tabPill, activeTab === 'Focus' && styles.activeTab]}
         onPress={() => onTabChange('Focus')}
@@ -13,6 +13,16 @@ const SwitchTabs = ({ activeTab, onTabChange }) => {
           style={[styles.tabText, activeTab === 'Focus' && styles.activeText]}
         >
           Today's Focus
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tabPill, activeTab === 'Gmail' && styles.activeTab]}
+        onPress={() => onTabChange('Gmail')}
+      >
+        <Text
+          style={[styles.tabText, activeTab === 'Gmail' && styles.activeText]}
+        >
+          Gmail Tasks
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -30,24 +40,23 @@ const SwitchTabs = ({ activeTab, onTabChange }) => {
 };
 
 const styles = StyleSheet.create({
-  tabRow: {
+  container: {
     flexDirection: 'row',
-    marginVertical: 15,
+    paddingVertical: 15,
   },
   tabPill: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
     paddingVertical: 10,
-    alignItems: 'center',
+    alignItems: 'space-evenly',
     justifyContent: 'center',
     borderRadius: 22,
     backgroundColor: Colors.pillInactiveBg,
     marginRight: 12,
-    width: 135,
     height: 42,
   },
   activeTab: {
     backgroundColor: Colors.primary,
-    color: 'white',
+    color: Colors.white,
   },
   tabText: {
     color: Colors.textPillInactive,

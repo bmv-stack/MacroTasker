@@ -8,10 +8,10 @@ export const Colors = {
 
     background: '#F8F9FA',
     completedBg: '#bebec1f3',
-    surface: '#FFF',
+    surface: '#FFFF',
     taskDefaultBg: '#F2F2F7',
     transparent: 'transparent',
-    pillInactiveBg: '#F3F3F3', //Switch Tabs Bg
+    pillInactiveBg: '#f2eeeef3', //Switch Tabs Bg
 
     modalOverlay: '#00000080',
     modalOverlayLight: '#0000004D',
