@@ -55,7 +55,7 @@ export const Colors = {
     //Calendar
     calendarHeader: '#B6B1B1',
     calendarDayText: '#2D4150',
-    calendarDisabled: '#D9E1E8',
+    calendarDisabled: '#B6B1B1',
 
     //Task Card Random Palette
     taskCardPalette: [
@@ -63,12 +63,12 @@ export const Colors = {
         '#FDFD96',
         '#9192F3',
         '#AEC6CF',
-        '#F9BBB7',
-        '#DE97F7',
+        '#D7A3C5',
+        '#E7D8AA',
         '#8CF7D7',
-        '#7DECFF',
-        '#F3E65E',
-        '#ffae62',
+        '#7EA8D9',
+        '#A6C290',
+        '#FFAE62',
     ],
 
     badgeBackground: '#f9f3e1',

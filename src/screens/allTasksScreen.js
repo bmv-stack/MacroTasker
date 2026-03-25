@@ -28,7 +28,7 @@ const generateDateList = () => {
       fullDate: d.toLocaleDateString('en-GB'),
       dayNumber: d.getDate().toString(),
       dayName: d
-        .toLocaleDateString('en-GB', { weekday: 'short' })
+        .toLocaleDateString('en-GB', { month: 'short', weekday: 'short' })
         .toUpperCase(),
     });
   }
@@ -184,12 +184,13 @@ const AllTasksScreen = () => {
             initialScrollIndex={30}
             showsHorizontalScrollIndicator={false}
             getItemLayout={(data, index) => ({
-              length: 53,
-              offset: 53 * index,
+              length: 55,
+              offset: 55 * index,
               index,
             })}
             renderItem={({ item }) => {
               const isSelected = item.fullDate === selectedDate;
+              const [monthName, dayName] = item.dayName.split(' ');
               return (
                 <TouchableOpacity
                   onPress={() => setSelectedDate(item.fullDate)}
@@ -209,7 +210,13 @@ const AllTasksScreen = () => {
                       isSelected && styles.activeDateText,
                     ]}
                   >
-                    {item.dayName}
+                    {dayName}
+                  </Text>
+                  <Text style={[
+                    styles.dateMonthName,
+                    isSelected && styles.activeDateText
+                  ]}>
+                    {monthName}
                   </Text>
                 </TouchableOpacity>
               );
@@ -432,12 +439,12 @@ const styles = StyleSheet.create({
 
   dateCard: {
     width: 45,
-    height: 67,
+    height: 75,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
     backgroundColor: Colors.surface,
-    marginRight: 8,
+    marginRight: 10,
     borderWidth: 1,
     borderColor: Colors.borderLight,
   },
@@ -451,10 +458,17 @@ const styles = StyleSheet.create({
     color: Colors.blackSecondary,
   },
   dateDay: {
-    fontSize: 10,
+    fontSize: 9,
     color: Colors.textMuted,
     marginTop: 6,
-    marginBottom: 4
+    marginBottom: 4,
+    textAlign: 'center'
+  },
+  dateMonthName: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: Colors.textMuted,
+    marginTop: 1
   },
   activeDateText: {
     color: Colors.surface,

@@ -6,11 +6,25 @@ import { Colors } from '../themes/color';
 
 const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
 
+    const todayDate = (date = new Date()) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`
+    }
+
+    const today = todayDate();
+
     const [tempSelectedDate, setTempSelectedDate] = useState(initialDate);
+    const [currentVisibleMonth, setCurrentVisibleMonth] = useState((initialDate || today).substring(0, 7));
+
+    const currentMonth = today.substring(0, 7);
+    const minMonth = currentVisibleMonth <= currentMonth;
 
     useEffect(() => {
         if (visible) {
             setTempSelectedDate(initialDate);
+            setCurrentVisibleMonth((initialDate || today).substring(0, 7));
         }
     }, [visible, initialDate])
 
@@ -27,7 +41,8 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
             <View style={styles.overlay}>
                 <View style={styles.modalContainer}>
                     <Calendar
-                        current={initialDate}
+                        minDate={today}
+                        current={initialDate || today}
                         onDayPress={(day) => setTempSelectedDate(day.dateString)}
                         markedDates={{
                             [tempSelectedDate]: {
@@ -40,6 +55,7 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
                             backgroundColor: Colors.surface,
                             calendarBackground: Colors.surface,
                             textSectionTitleColor: Colors.calendarHeader,
+
                             selectedDayBackgroundColor: Colors.primary,
                             selectedDayTextColor: Colors.white,
                             todayTextColor: Colors.primary,
@@ -52,6 +68,12 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
                             textMonthFontSize: 16,
                             textDayHeaderFontSize: 12,
                         }}
+                        disableArrowLeft={minMonth}
+                        onMonthChange={(month) => {
+                            setCurrentVisibleMonth(month.dateString.substring(0, 7))
+                        }}
+                        hideExtraDays={true}
+                        disableAllTouchEventsForDisabledDays={false}
                         renderArrow={(direction) => (
                             <Icon
                                 name={direction === 'left' ? 'chevron-thin-left' : 'chevron-thin-right'}></Icon>

@@ -113,12 +113,21 @@ const CreateTaskScreen = () => {
         }, 1500);
     };
 
+    const todayDate = (date = new Date()) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`
+    }
+
     const getInitialDate = () => {
         const dateToParse = currentField === 'date' ? form.date : form.endDate;
-        const parsed = parseDate(dateToParse);
-        return parsed
-            ? parsed.toISOString().split('T')[0]
-            : new Date().toISOString().split('T')[0];
+        if (!dateToParse) {
+            return todayDate();
+        }
+        const [date, month, year] = dateToParse.split('/');
+        return `${year}-${month}-${date}`;
+
     };
     return (
         <View style={styles.container}>
