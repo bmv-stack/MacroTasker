@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
-import { useTasks } from '../context/taskContext';
+import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Colors } from '../themes/color';
 
@@ -28,7 +28,7 @@ const formatTime = timeString => {
 const MainScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { tasks } = useTasks();
+    const tasks = useSelector(state => state.tasks.items);
     const [activeTab, setActiveTab] = useState(
         route.params?.openScreen || 'Focus',
     );
@@ -48,7 +48,7 @@ const MainScreen = () => {
                     activeTab={activeTab}
                     onTabChange={value => {
                         if (value === 'All') {
-                            navigation.replace('All')
+                            navigation.replace('All');
                         } else {
                             setActiveTab(value);
                         }
@@ -71,7 +71,9 @@ const MainScreen = () => {
                         </TouchableOpacity>
                     )}
                 </View>
-                <View style={[styles.whiteContainer, expanded && styles.expandedContainer]}>
+                <View
+                    style={[styles.whiteContainer, expanded && styles.expandedContainer]}
+                >
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ padding: 15 }}
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
         shadowRadius: 20,
     },
     expandedContainer: {
-        maxHeight: '70%'
+        maxHeight: '70%',
     },
     container: {
         flex: 1,

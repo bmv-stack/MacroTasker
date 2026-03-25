@@ -16,6 +16,7 @@
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/native": "^7.1.28",
     "@react-navigation/native-stack": "^7.13.0",
+    "@reduxjs/toolkit": "^2.11.2",
     "patch-package": "^8.0.1",
     "react": "19.2.3",
     "react-native": "0.84.0",
@@ -28,6 +29,7 @@
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-svg": "^15.15.3",
     "react-native-vector-icons": "^10.3.0",
+    "react-redux": "^9.2.0",
     "storage": "^0.2.0"
   },
   "devDependencies": {

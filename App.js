@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AllTasksScreen from './src/screens/allTasksScreen';
 import MainScreen from './src/screens/mainScreen';
 import CreateTaskScreen from './src/screens/createTaskScreen';
-import { TaskProvider } from './src/context/taskContext';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import { Colors } from './src/themes/color';
+import { store } from './src/redux/store';
+import { Provider, useDispatch } from 'react-redux';
+import { fetchTasks } from './src/redux/slices/taskSlice';
 
 
 const PlaceholderScreen = ({ route }) => (
@@ -132,11 +134,20 @@ const RootStack = createNativeStackNavigator({
 });
 const Navigation = createStaticNavigation(RootStack);
 
+const AppContent = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
+  return <Navigation />
+}
+
 export default function App() {
   return (
-    <TaskProvider>
-      <Navigation></Navigation>
-    </TaskProvider>
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   );
 }
 const styles = StyleSheet.create({

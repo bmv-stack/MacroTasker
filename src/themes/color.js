@@ -50,6 +50,7 @@ export const Colors = {
     chartOngoing: '#007BFF',
     chartCompleted: '#51d761',
     chartOverdue: '#e6552d',
+    chartPending: '#FFBF00',
     chartEmpty: '#f2f2f7',
 
     //Calendar
@@ -60,11 +61,8 @@ export const Colors = {
     //Task Card Random Palette
     taskCardPalette: [
         '#C1E1C1',
-        '#FDFD96',
         '#9192F3',
-        '#AEC6CF',
         '#D7A3C5',
-        '#E7D8AA',
         '#8CF7D7',
         '#7EA8D9',
         '#A6C290',

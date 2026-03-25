@@ -10,7 +10,13 @@ import {
   Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTasks } from '../context/taskContext';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  fetchTasks,
+  deleteTask,
+  completeTask,
+  addNewTask,
+} from '../redux/slices/taskSlice';
 import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { PieChart } from 'react-native-gifted-charts';
@@ -36,8 +42,10 @@ const generateDateList = () => {
 };
 
 const AllTasksScreen = () => {
+  const dispatch = useDispatch();
+  const tasks = useSelector(state => state.tasks.items);
+
   const navigation = useNavigation();
-  const { tasks, deleteTask, completeTask, updateTask } = useTasks();
   const [activeTab, setActiveTab] = useState('All');
   const [chartKey, setChartKey] = useState(0);
   const [selectedDate, setSelectedDate] = useState(
@@ -46,6 +54,11 @@ const AllTasksScreen = () => {
   const [priorityModal, setPriorityModal] = useState({
     visible: false,
     taskId: null,
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    visible: false,
+    taskId: null,
+    taskTitle: '',
   });
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
@@ -60,10 +73,14 @@ const AllTasksScreen = () => {
   };
 
   const dateList = useMemo(() => generateDateList(), []);
-  const filteredTasks = useMemo(
-    () => tasks.filter(task => task.date === selectedDate),
-    [tasks, selectedDate],
-  );
+  const filteredTasks = useMemo(() => {
+    const todayTasks = tasks.filter(task => task.date === selectedDate);
+
+    return [...todayTasks].sort((a, b) => {
+      if (a.completed === b.completed) return 0;
+      return a.completed ? 1 : -1;
+    });
+  }, [tasks, selectedDate]);
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -88,18 +105,33 @@ const AllTasksScreen = () => {
   now.setHours(0, 0, 0, 0);
 
   const chartData = useMemo(() => {
-    if (filteredTasks.length === 0)
-      return [{ value: 1, color: Colors.chartEmpty, label: 'No Tasks' }];
+    if (filteredTasks.length === 0) return [];
 
     const completedCount = filteredTasks.filter(t => t.completed).length;
+    const pendingCount = filteredTasks.filter(t => {
+      const taskDate = parseDate(t.date);
+      return !t.completed && taskDate > now;
+    }).length;
     const overdueCount = filteredTasks.filter(t => {
       if (t.completed || !t.endDate) return false;
       const taskDate = parseDate(t.endDate);
       return taskDate && taskDate < now;
     }).length;
-    const ongoingCount = filteredTasks.length - completedCount - overdueCount;
+    const ongoingCount =
+      filteredTasks.length - completedCount - overdueCount - pendingCount;
 
     return [
+      {
+        value: pendingCount,
+        color: Colors.chartPending,
+        label: 'Pending Tasks',
+        onPress: () =>
+          setSelectedData({
+            label: 'Pending',
+            value: pendingCount,
+            color: Colors.chartPending,
+          }),
+      },
       {
         value: ongoingCount,
         color: Colors.chartOngoing,
@@ -133,13 +165,13 @@ const AllTasksScreen = () => {
             color: Colors.chartCompleted,
           }),
       },
-    ];
+    ].filter(item => item.value > 0);
   }, [filteredTasks]);
 
   const handlePriorityChange = (taskId, newPriority) => {
     const taskToUpdate = tasks.find(t => t.id === taskId);
     if (taskToUpdate) {
-      updateTask({ ...taskToUpdate, priority: newPriority });
+      dispatch(addNewTask({ ...taskToUpdate, priority: newPriority }));
     }
     setPriorityModal({ visible: false, taskId: null });
   };
@@ -206,78 +238,85 @@ const AllTasksScreen = () => {
                   </Text>
                   <Text
                     style={[
+                      styles.dateMonthName,
+                      isSelected && styles.activeDateText,
+                    ]}
+                  >
+                    {monthName}
+                  </Text>
+                  <Text
+                    style={[
                       styles.dateDay,
                       isSelected && styles.activeDateText,
                     ]}
                   >
                     {dayName}
                   </Text>
-                  <Text style={[
-                    styles.dateMonthName,
-                    isSelected && styles.activeDateText
-                  ]}>
-                    {monthName}
-                  </Text>
                 </TouchableOpacity>
               );
             }}
           />
+          {filteredTasks.length > 0 && (
+            <View style={styles.chartContainer}>
+              <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
+                <PieChart
+                  key={chartKey}
+                  donut
+                  focusOnPress
+                  sectionAutoFocus
+                  shadow
+                  radius={70}
+                  innerRadius={55}
+                  data={chartData}
+                  centerLabelComponent={() => (
+                    <View style={{ alignItems: 'center' }}>
+                      <Text
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: 22,
+                          color: selectedData.color,
+                        }}
+                      >
+                        {selectedData.value}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          color: Colors.textMuted,
+                          fontWeight: '600',
+                        }}
+                      >
+                        {selectedData.label}
+                      </Text>
+                    </View>
+                  )}
+                />
+              </TouchableOpacity>
 
-          <View style={styles.chartContainer}>
-            <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
-              <PieChart
-                key={chartKey}
-                donut
-                focusOnPress
-                sectionAutoFocus
-                shadow
-                radius={70}
-                innerRadius={55}
-                data={chartData}
-                centerLabelComponent={() => (
-                  <View style={{ alignItems: 'center' }}>
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: 22,
-                        color: selectedData.color,
-                      }}
-                    >
-                      {selectedData.value}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: Colors.textMuted,
-                        fontWeight: '600',
-                      }}
-                    >
-                      {selectedData.label}
-                    </Text>
+              <View style={styles.dotContainer}>
+                {chartData.map((item, index) => (
+                  <View key={index} style={styles.chartItem}>
+                    <View
+                      style={[styles.dot, { backgroundColor: item.color }]}
+                    />
+                    <Text style={styles.dotText}>{item.label}</Text>
                   </View>
-                )}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.dotContainer}>
-              {chartData.map((item, index) => (
-                <View key={index} style={styles.chartItem}>
-                  <View style={[styles.dot, { backgroundColor: item.color }]} />
-                  <Text style={styles.dotText}>{item.label}</Text>
-                </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         <FlatList
           data={filteredTasks}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ marginBottom: 20 }}
           ListEmptyComponent={() => (
             <View style={{ alignItems: 'center', marginTop: 50 }}>
-              <Text style={{ color: Colors.textMuted }}>No tasks for this day.</Text>
+              <Text style={{ color: Colors.textMuted }}>
+                No tasks for this day.
+              </Text>
             </View>
           )}
           renderItem={({ item: task }) => {
@@ -329,7 +368,13 @@ const AllTasksScreen = () => {
                         styles.iconCircle,
                         task.completed && styles.checkedCircle,
                       ]}
-                      onPress={() => deleteTask(task.id)}
+                      onPress={() =>
+                        setDeleteModal({
+                          visible: true,
+                          taskId: task.id,
+                          taskTitle: task.title,
+                        })
+                      }
                     >
                       <Icon
                         name="trash-outline"
@@ -372,7 +417,7 @@ const AllTasksScreen = () => {
                         styles.completeCheckCircle,
                         task.completed && styles.checkedCircle,
                       ]}
-                      onPress={() => completeTask(task.id)}
+                      onPress={() => dispatch(completeTask(task.id))}
                     >
                       <Icon
                         name="checkmark-sharp"
@@ -386,8 +431,8 @@ const AllTasksScreen = () => {
                 {isOverdue && <View style={styles.overdueIndicator} />}
               </View>
             );
-          }
-          }></FlatList>
+          }}
+        ></FlatList>
         <Modal transparent visible={priorityModal.visible} animationType="fade">
           <TouchableOpacity
             style={styles.modalOverlay}
@@ -414,6 +459,45 @@ const AllTasksScreen = () => {
               ))}
             </View>
           </TouchableOpacity>
+        </Modal>
+        <Modal transparent visible={deleteModal.visible} animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.deleteBox}>
+              <Icon
+                name="alert-circle-outline"
+                size={50}
+                color={Colors.deleteIcon}
+                style={{ marginBottom: 10 }}
+              />
+              <Text style={styles.deleteText}>
+                Delete task '{deleteModal.taskTitle}' ?
+              </Text>
+              <Text style={styles.subTitle}>
+                This action cannot be reverted.
+              </Text>
+
+              <View style={styles.modalButtonRow}>
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() =>
+                    setDeleteModal({ visible: false, taskId: null })
+                  }
+                >
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.confirmBtn}
+                  onPress={() => {
+                    dispatch(deleteTask(deleteModal.taskId));
+                    setDeleteModal({ visible: false, taskId: null });
+                  }}
+                >
+                  <Text style={styles.confirmBtnText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
         </Modal>
       </View>
     </View>
@@ -462,13 +546,13 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     marginTop: 6,
     marginBottom: 4,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   dateMonthName: {
     fontSize: 9,
     fontWeight: 'bold',
     color: Colors.textMuted,
-    marginTop: 1
+    marginTop: 1,
   },
   activeDateText: {
     color: Colors.surface,
@@ -527,7 +611,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginRight: -10
+    marginRight: -10,
   },
   textPriorityBadge: {
     backgroundColor: Colors.badgeBackground,
@@ -535,13 +619,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 10,
     marginTop: 4,
-    width: 70
+    width: 70,
   },
   badgeText: {
     fontSize: 12,
     fontWeight: 'bold',
     color: Colors.textBadge,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   checkCircle: {
     borderColor: Colors.borderLight,
@@ -614,7 +698,7 @@ const styles = StyleSheet.create({
     height: 6.5,
     borderRadius: 4,
     marginRight: 8,
-    marginLeft: 8
+    marginLeft: 8,
   },
 
   modalOverlay: {
@@ -644,6 +728,49 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.taskDefaultBg,
   },
   menuItemText: { fontSize: 17, fontWeight: '600' },
+  deleteBox: {
+    backgroundColor: Colors.white,
+    width: '80%',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  subTitle: {
+    color: Colors.textMuted,
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 12,
+  },
+  cancelBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  cancelBtnText: {
+    color: Colors.blackSecondary,
+    fontWeight: '600',
+  },
+  confirmBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: Colors.deleteIcon,
+    alignItems: 'center',
+  },
+  confirmBtnText: {
+    color: Colors.white,
+    fontWeight: '600',
+  },
 });
 
 export default AllTasksScreen;

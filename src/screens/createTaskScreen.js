@@ -11,7 +11,8 @@ import {
     ScrollView,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useTasks } from '../context/taskContext';
+import { useDispatch } from 'react-redux';
+import { addNewTask } from '../redux/slices/taskSlice';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
@@ -32,7 +33,7 @@ const formatTime = timeString => {
 const CreateTaskScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { addNewTask, updateTask } = useTasks();
+    const dispatch = useDispatch();
     const { existingTask } = route.params || {};
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
 
@@ -81,17 +82,11 @@ const CreateTaskScreen = () => {
 
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    const startDate = parseDate(form.date);
-    const endDate = parseDate(form.endDate);
-    const isStartDateValid =
-        !startDate || (existingTask ? true : startDate >= now);
-    const isDateValid = !endDate || (startDate && endDate >= startDate);
     const isFormValid =
         form.title.length > 0 &&
         form.date.length > 0 &&
-        form.time.length > 0 &&
-        isDateValid &&
-        isStartDateValid;
+        form.time.length > 0;
+
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -101,11 +96,8 @@ const CreateTaskScreen = () => {
             ...form,
             id: existingTask?.id || Math.random().toString(),
         };
-        if (existingTask) {
-            updateTask(taskData);
-        } else {
-            addNewTask(taskData);
-        }
+        dispatch(addNewTask(taskData));
+
         setShowSuccess(true);
         setTimeout(() => {
             setShowSuccess(false);
@@ -159,18 +151,6 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    {form.date.length > 0 && !isStartDateValid && (
-                        <Text
-                            style={{
-                                color: Colors.textError,
-                                fontSize: 12,
-                                marginBottom: 13,
-                                marginTop: -17,
-                            }}
-                        >
-                            Start date cannot be before current date
-                        </Text>
-                    )}
                     <TouchableOpacity
                         onPress={() => {
                             setCurrentField('time');
@@ -204,18 +184,6 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    {!isDateValid && (
-                        <Text
-                            style={{
-                                color: Colors.textError,
-                                fontSize: 12,
-                                marginBottom: 13,
-                                marginTop: -17,
-                            }}
-                        >
-                            End date cannot be before 'Date'
-                        </Text>
-                    )}
                     <TouchableOpacity
                         onPress={() => {
                             setCurrentField('endTime');
