@@ -12,7 +12,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  fetchTasks,
   deleteTask,
   completeTask,
   addNewTask,
@@ -117,11 +116,10 @@ const AllTasksScreen = () => {
       const taskDate = parseDate(t.endDate);
       return taskDate && taskDate < now;
     }).length;
-    const ongoingCount =
-      filteredTasks.length - completedCount - overdueCount - pendingCount;
+    const isFuture = parseDate(selectedDate) > now;
 
-    return [
-      {
+    if (isFuture) {
+      return [{
         value: pendingCount,
         color: Colors.chartPending,
         label: 'Pending Tasks',
@@ -131,7 +129,12 @@ const AllTasksScreen = () => {
             value: pendingCount,
             color: Colors.chartPending,
           }),
-      },
+      }];
+    }
+    const ongoingCount =
+      filteredTasks.length - completedCount - overdueCount - pendingCount;
+
+    return [
       {
         value: ongoingCount,
         color: Colors.chartOngoing,
@@ -165,7 +168,7 @@ const AllTasksScreen = () => {
             color: Colors.chartCompleted,
           }),
       },
-    ].filter(item => item.value > 0);
+    ]
   }, [filteredTasks]);
 
   const handlePriorityChange = (taskId, newPriority) => {
@@ -415,7 +418,7 @@ const AllTasksScreen = () => {
                     <TouchableOpacity
                       style={[
                         styles.completeCheckCircle,
-                        task.completed && styles.checkedCircle,
+                        task.completed && styles.checkCompleted,
                       ]}
                       onPress={() => dispatch(completeTask(task.id))}
                     >
@@ -636,6 +639,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     height: 32,
     width: 32,
+  },
+  checkCompleted: {
+    backgroundColor: Colors.checkCompleted
   },
   completeCheckCircle: {
     borderColor: Colors.borderLight,
