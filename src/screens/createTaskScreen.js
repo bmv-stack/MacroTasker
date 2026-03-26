@@ -19,6 +19,20 @@ import TimePicker from '../components/timePicker';
 import { Colors } from '../themes/color';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+const getMinute = (stringTime) => {
+    if (!stringTime) return 0;
+    const [time, meridiem] = stringTime.split(' ');
+    let [hours, minutes] = stringTime.split(':').map(Number);
+
+    if (meridiem === 'PM' && hours !== 12) {
+        hours += 12;
+    }
+    if (meridiem === 'AM' && hours === 12) {
+        hours = 0;
+    }
+    return hours * 60 + minutes
+}
+
 const formatTime = timeString => {
     if (!timeString || !timeString.includes(':')) return timeString;
 
@@ -81,10 +95,21 @@ const CreateTaskScreen = () => {
 
     const now = new Date();
     now.setHours(0, 0, 0, 0);
+
+    const isTimeValid = () => {
+        if (!form.endDate || !form.endTime) return true;
+        if (form.date === form.endDate) {
+            const startMinutes = getMinute(form.time);
+            const endMinutes = getMinute(form.endTime);
+            return endMinutes > startMinutes;
+        }
+        return true;
+    }
     const isFormValid =
         form.title.length > 0 &&
         form.date.length > 0 &&
-        form.time.length > 0;
+        form.time.length > 0 &&
+        isTimeValid();
 
 
     const handleInputChange = (field, value) => {
@@ -198,6 +223,9 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
+                    {(!isTimeValid() && form.date === form.endDate) && (
+                        <Text style={{ color: 'red', fontSize: 12, marginBottom: 10, marginTop: -5 }}>End Time must be after 'Time'</Text>
+                    )}
                     <FormInput
                         label="Note"
                         placeholder="Add note"
