@@ -27,9 +27,10 @@ export const createTable = async db => {
   await db.executeSql(query);
 
   try {
-    await db.executeSql('ALTER TABLE Tasks ADD COLUMN createdAt DATETIME DEFAULT CURRENT_TIMESTAMP;');
+    await db.executeSql(
+      'ALTER TABLE Tasks ADD COLUMN createdAt DATETIME DEFAULT CURRENT_TIMESTAMP;',
+    );
     console.log('Added createdAt column');
-
   } catch (e) {
     console.log('Column already exists or setup complete');
   }

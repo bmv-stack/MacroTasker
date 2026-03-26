@@ -19,7 +19,7 @@ import TimePicker from '../components/timePicker';
 import { Colors } from '../themes/color';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const getMinute = (stringTime) => {
+const getMinute = stringTime => {
     if (!stringTime) return 0;
     const [time, meridiem] = stringTime.split(' ');
     let [hours, minutes] = stringTime.split(':').map(Number);
@@ -30,8 +30,8 @@ const getMinute = (stringTime) => {
     if (meridiem === 'AM' && hours === 12) {
         hours = 0;
     }
-    return hours * 60 + minutes
-}
+    return hours * 60 + minutes;
+};
 
 const formatTime = timeString => {
     if (!timeString || !timeString.includes(':')) return timeString;
@@ -104,13 +104,12 @@ const CreateTaskScreen = () => {
             return endMinutes > startMinutes;
         }
         return true;
-    }
+    };
     const isFormValid =
         form.title.length > 0 &&
         form.date.length > 0 &&
         form.time.length > 0 &&
         isTimeValid();
-
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -133,8 +132,8 @@ const CreateTaskScreen = () => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`
-    }
+        return `${year}-${month}-${day}`;
+    };
 
     const getInitialDate = () => {
         const dateToParse = currentField === 'date' ? form.date : form.endDate;
@@ -143,7 +142,6 @@ const CreateTaskScreen = () => {
         }
         const [date, month, year] = dateToParse.split('/');
         return `${year}-${month}-${date}`;
-
     };
     return (
         <View style={styles.container}>
@@ -223,8 +221,17 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    {(!isTimeValid() && form.date === form.endDate) && (
-                        <Text style={{ color: 'red', fontSize: 12, marginBottom: 10, marginTop: -5 }}>End Time must be after 'Time'</Text>
+                    {!isTimeValid() && form.date === form.endDate && (
+                        <Text
+                            style={{
+                                color: Colors.textError,
+                                fontSize: 12,
+                                marginBottom: 10,
+                                marginTop: -5,
+                            }}
+                        >
+                            End Time must be after 'Time'
+                        </Text>
                     )}
                     <FormInput
                         label="Note"
@@ -263,14 +270,22 @@ const CreateTaskScreen = () => {
                 )}
                 <Modal transparent visible={showSuccess} animationType="fade">
                     <View style={styles.modalOverlay}>
-                        <TouchableOpacity style={styles.modalContent}
+                        <TouchableOpacity
+                            style={styles.modalContent}
                             activeOpacity={1}
-                            onPress={() => setShowSuccess(false)}>
-                            <Icon name='checkmark-done-circle'
+                            onPress={() => setShowSuccess(false)}
+                        >
+                            <Icon
+                                name="checkmark-done-circle"
                                 size={60}
                                 color={Colors.chartCompleted}
-                                style={styles.modalIcon}></Icon>
-                            <Text style={styles.modalText}>{existingTask ? 'Task Updated Successfully!' : 'Task Created Successfully!'}</Text>
+                                style={styles.modalIcon}
+                            ></Icon>
+                            <Text style={styles.modalText}>
+                                {existingTask
+                                    ? 'Task Updated Successfully!'
+                                    : 'Task Created Successfully!'}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </Modal>
@@ -378,7 +393,7 @@ const styles = StyleSheet.create({
         color: Colors.textPrimary,
     },
     modalIcon: {
-        marginBottom: 20
+        marginBottom: 20,
     },
     priorityRow: {
         flexDirection: 'row',

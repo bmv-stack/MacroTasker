@@ -13,21 +13,24 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
     return await getTask(db);
 });
 
-export const addNewTask = createAsyncThunk('tasks/addNewTask', async (task, { getState }) => {
-    const state = getState();
-    const existingTask = state.tasks.items.find(t => t.id === task.id);
-    const taskWithColor = {
-        ...task,
-        color:
-            existingTask?.color ||
-            Colors.taskCardPalette[
-            Math.floor(Math.random() * Colors.taskCardPalette.length)
-            ],
-    };
-    const db = await getDBConnection();
-    await saveTask(db, taskWithColor);
-    return await getTask(db);
-});
+export const addNewTask = createAsyncThunk(
+    'tasks/addNewTask',
+    async (task, { getState }) => {
+        const state = getState();
+        const existingTask = state.tasks.items.find(t => t.id === task.id);
+        const taskWithColor = {
+            ...task,
+            color:
+                existingTask?.color ||
+                Colors.taskCardPalette[
+                Math.floor(Math.random() * Colors.taskCardPalette.length)
+                ],
+        };
+        const db = await getDBConnection();
+        await saveTask(db, taskWithColor);
+        return await getTask(db);
+    },
+);
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async id => {
     const db = await getDBConnection();
     await deleteTaskFromDB(db, id);
@@ -62,15 +65,15 @@ const taskSlice = createSlice({
                 state.status = 'succeeded';
             })
             .addCase(addNewTask.fulfilled, (state, action) => {
-                console.log("Payload is:", action.payload);
+                console.log('Payload is:', action.payload);
                 state.items = action.payload;
             })
             .addCase(deleteTask.fulfilled, (state, action) => {
-                console.log("Payload is:", action.payload);
+                console.log('Payload is:', action.payload);
                 state.items = state.items.filter(t => t.id !== action.payload);
             })
             .addCase(completeTask.fulfilled, (state, action) => {
-                console.log("Payload is:", action.payload)
+                console.log('Payload is:', action.payload);
                 const task = state.items.find(t => t.id === action.payload.id);
                 if (task) {
                     task.completed = action.payload.completed;
