@@ -13,11 +13,13 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
     return await getTask(db);
 });
 
-export const addNewTask = createAsyncThunk('tasks/addNewTask', async task => {
+export const addNewTask = createAsyncThunk('tasks/addNewTask', async (task, { getState }) => {
+    const state = getState();
+    const existingTask = state.tasks.items.find(t => t.id === task.id);
     const taskWithColor = {
         ...task,
         color:
-            task.color ||
+            existingTask?.color ||
             Colors.taskCardPalette[
             Math.floor(Math.random() * Colors.taskCardPalette.length)
             ],
@@ -41,7 +43,7 @@ export const completeTask = createAsyncThunk(
         const newStatus = taskToUpdate.completed ? 0 : 1;
         const db = await getDBConnection();
         await updateTaskStatus(db, id, newStatus);
-        return { id, completed: !!newStatus };
+        return { id, completed: newStatus === 1 };
     },
 );
 

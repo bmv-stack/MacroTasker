@@ -78,7 +78,7 @@ export const Colors = {
     shadow: '#0000001A',
 
     editIcon: '#34C759',
-    checkedBorder: '#34C759',
+    checkedBg: '#34C759',
     deleteIcon: '#FF3B30',
 
     activeTabBar: '#000',

@@ -393,12 +393,7 @@ const AllTasksScreen = () => {
                     <Text style={styles.dateTimeText}>
                       {task.date} | {formatTime(task.time)}
                     </Text>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setPriorityModal({ visible: true, taskId: task.id })
-                      }
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      disabled={task.completed}
+                    <View
                     >
                       <Icon
                         name="bookmark"
@@ -406,15 +401,23 @@ const AllTasksScreen = () => {
                         color={stylePriority.iconColor}
                         style={{ marginLeft: 8 }}
                       ></Icon>
-                    </TouchableOpacity>
+                    </View>
                   </View>
 
                   <View style={styles.rightActionsGroup}>
-                    <View style={styles.textPriorityBadge}>
+                    <TouchableOpacity style={styles.textPriorityBadge}
+                      onPress={() => setPriorityModal({ visible: true, taskId: task.id })}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      disabled={task.completed}>
                       <Text style={styles.badgeText}>
                         {task.priority || 'Normal'}
                       </Text>
-                    </View>
+                      <Icon
+                        name='chevron-down'
+                        size={12}
+                        color={Colors.textBadge}
+                        style={{ marginLeft: 4 }}></Icon>
+                    </TouchableOpacity>
                     <TouchableOpacity
                       style={[
                         styles.completeCheckCircle,
@@ -617,12 +620,13 @@ const styles = StyleSheet.create({
     marginRight: -10,
   },
   textPriorityBadge: {
+    flexDirection: 'row',
     backgroundColor: Colors.badgeBackground,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 10,
     marginTop: 4,
-    width: 70,
+    width: 72,
   },
   badgeText: {
     fontSize: 12,
@@ -641,7 +645,7 @@ const styles = StyleSheet.create({
     width: 32,
   },
   checkCompleted: {
-    backgroundColor: Colors.checkCompleted
+    backgroundColor: Colors.checkedBg
   },
   completeCheckCircle: {
     borderColor: Colors.borderLight,
@@ -685,7 +689,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   dotContainer: {
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     flexDirection: 'row',
     width: '107%',
     marginTop: 20,

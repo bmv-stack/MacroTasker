@@ -10,7 +10,6 @@ export const getDBConnection = async () => {
     location: 'default',
   });
 };
-
 export const createTable = async db => {
   const query = `CREATE TABLE IF NOT EXISTS Tasks(
     id TEXT PRIMARY KEY,
@@ -22,9 +21,18 @@ export const createTable = async db => {
     priority TEXT,
     notes TEXT,
     color TEXT,
-    completed INTEGER DEFAULT 0
+    completed INTEGER DEFAULT 0,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );`;
   await db.executeSql(query);
+
+  try {
+    await db.executeSql('ALTER TABLE Tasks ADD COLUMN createdAt DATETIME DEFAULT CURRENT_TIMESTAMP;');
+    console.log('Added createdAt column');
+
+  } catch (e) {
+    console.log('Column already exists or setup complete');
+  }
 };
 
 export const saveTask = async (db, task) => {
@@ -34,11 +42,18 @@ export const saveTask = async (db, task) => {
   if (results.rows.length > 0) {
     const updateQuery = `UPDATE Tasks SET title = ?, date = ?, time = ?, endDate = ?, endTime = ?, priority = ?, notes = ?, color = ?, completed = ? WHERE id = ?`;
     const values = [
-      task.title, task.date, task.time, task.endDate || null,
-      task.endTime || null, task.priority, task.notes || '',
-      task.color, task.completed ? 1 : 0, task.id
+      task.title,
+      task.date,
+      task.time,
+      task.endDate || null,
+      task.endTime || null,
+      task.priority,
+      task.notes || '',
+      task.color,
+      task.completed ? 1 : 0,
+      task.id,
     ];
-    return db.executeSql(updateQuery, values)
+    return db.executeSql(updateQuery, values);
   } else {
     const insertQuery = `INSERT INTO Tasks (id, title, date, time, endDate, endTime, priority, notes, color, completed)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
@@ -63,7 +78,7 @@ export const getTask = async db => {
   try {
     const tasks = [];
     const [results] = await db.executeSql(
-      'SELECT * FROM Tasks ORDER BY completed ASC, rowid ASC',
+      'SELECT * FROM Tasks ORDER BY completed ASC, createdAt DESC',
     );
 
     for (let index = 0; index < results.rows.length; index++) {

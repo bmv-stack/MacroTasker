@@ -12,6 +12,7 @@ import { Colors } from './src/themes/color';
 import { store } from './src/redux/store';
 import { Provider, useDispatch } from 'react-redux';
 import { fetchTasks } from './src/redux/slices/taskSlice';
+import { getDBConnection, createTable } from './src/database/db';
 
 
 const PlaceholderScreen = ({ route }) => (
@@ -138,7 +139,13 @@ const AppContent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchTasks());
+    const startApp = async () => {
+
+      const db = await getDBConnection();
+      await createTable(db);
+      dispatch(fetchTasks());
+    };
+    startApp();
   }, [dispatch]);
   return <Navigation />
 }

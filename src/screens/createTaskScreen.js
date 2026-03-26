@@ -27,7 +27,7 @@ const formatTime = timeString => {
     const meridiem = hours >= 12 ? 'PM' : 'AM';
 
     hours = hours % 12 || 12;
-    return `${hours.toString().padStart(2, '0')}:${m}`;
+    return `${hours.toString().padStart(2, '0')}:${m}:${meridiem}`;
 };
 
 const CreateTaskScreen = () => {
@@ -50,7 +50,6 @@ const CreateTaskScreen = () => {
     const [currentField, setCurrentField] = useState(null);
 
     const handleOpenCalendar = field => {
-        console.log('Opening calendar for field:', field);
         setCurrentField(field);
         setIsCalendarVisible(true);
     };
@@ -243,7 +242,7 @@ const CreateTaskScreen = () => {
                                 size={60}
                                 color={Colors.chartCompleted}
                                 style={styles.modalIcon}></Icon>
-                            <Text style={styles.modalText}>Task Created Successfully!</Text>
+                            <Text style={styles.modalText}>{existingTask ? 'Task Updated Successfully!' : 'Task Created Successfully!'}</Text>
                         </TouchableOpacity>
                     </View>
                 </Modal>
