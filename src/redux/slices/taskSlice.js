@@ -54,8 +54,6 @@ const taskSlice = createSlice({
     name: 'tasks',
     initialState: {
         items: [],
-        status: 'idle',
-        error: null,
     },
     reducers: {},
     extraReducers: builder => {

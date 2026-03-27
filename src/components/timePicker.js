@@ -5,7 +5,7 @@ import { Colors } from '../themes/color';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
-    const [selectedHours, setSelectedHours] = useState('00');
+    const [selectedHours, setSelectedHours] = useState('12');
     const [selectedMinutes, setSelectedMinutes] = useState('00');
     const [selectedSeconds, setSelectedSeconds] = useState('00');
     const [selectedMeridiem, setSelectedMeridiem] = useState('AM');
