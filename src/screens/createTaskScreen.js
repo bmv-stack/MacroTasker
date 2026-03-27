@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import DatePicker from 'react-native-date-picker';
 import {
     View,
@@ -9,6 +9,7 @@ import {
     StatusBar,
     Platform,
     ScrollView,
+    KeyboardAvoidingView
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
@@ -45,6 +46,7 @@ const formatTime = timeString => {
 };
 
 const CreateTaskScreen = () => {
+    const scrollRef = useRef(null);
     const navigation = useNavigation();
     const route = useRoute();
     const dispatch = useDispatch();
@@ -153,213 +155,225 @@ const CreateTaskScreen = () => {
         return `${year}-${month}-${date}`;
     };
     return (
-        <View style={styles.container}>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollView}
-            >
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={styles.backArrow}>←</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Create Task</Text>
-                    <View style={{ width: 30 }}></View>
-                </View>
-                <View style={{ marginLeft: 15, marginTop: 20 }}>
-                    <FormInput
-                        label="Title"
-                        placeholder="Add Title"
-                        value={form.title}
-                        onChangeText={val => handleInputChange('title', val)}
-                    ></FormInput>
-                    <TouchableOpacity onPress={() => handleOpenCalendar('date')}>
-                        <View pointerEvents="none">
-                            <FormInput
-                                label="Date"
-                                placeholder="Add Date"
-                                value={form.date}
-                                editable={false}
-                            ></FormInput>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => {
-                            setCurrentField('time');
-                            setTimeModalVisible(true);
-                        }}
-                    >
-                        <View pointerEvents="none">
-                            <FormInput
-                                label="Time"
-                                placeholder="Add Time"
-                                value={formatTime(form.time)}
-                                editable={false}
-                            ></FormInput>
-                        </View>
-                    </TouchableOpacity>
-                    <TimePicker
-                        visible={timeModalVisible}
-                        initialTime={new Date()}
-                        onClose={() => setTimeModalVisible(false)}
-                        onSelect={formattedTime =>
-                            handleInputChange(currentField, formattedTime)
-                        }
-                    ></TimePicker>
-                    <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
-                        <View pointerEvents="none">
-                            <FormInput
-                                label="End Date"
-                                placeholder="Add end date"
-                                value={form.endDate}
-                                editable={false}
-                            ></FormInput>
-                        </View>
-                    </TouchableOpacity>
-                    {form.endDate && !isDateValid() && (
-                        <Text
-                            style={{
-                                color: Colors.textError,
-                                fontSize: 12,
-                                marginBottom: 10,
-                                marginTop: -5,
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : null}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+            <View style={styles.container}>
+                <ScrollView
+                    ref={scrollRef}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.scrollView}
+                    keyboardShouldPersistTaps='never'
+                >
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Text style={styles.backArrow}>←</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.headerTitle}>Create Task</Text>
+                        <View style={{ width: 30 }}></View>
+                    </View>
+                    <View style={{ marginLeft: 15, marginTop: 20 }}>
+                        <FormInput
+                            label="Title"
+                            placeholder="Add Title"
+                            value={form.title}
+                            onChangeText={val => handleInputChange('title', val)}
+                        ></FormInput>
+                        <TouchableOpacity onPress={() => handleOpenCalendar('date')}>
+                            <View pointerEvents="none">
+                                <FormInput
+                                    label="Date"
+                                    placeholder="Add Date"
+                                    value={form.date}
+                                    editable={false}
+                                ></FormInput>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setCurrentField('time');
+                                setTimeModalVisible(true);
                             }}
                         >
-                            End Date cannot be before 'Date'
-                        </Text>
-                    )}
-                    <TouchableOpacity
-                        onPress={() => {
-                            setCurrentField('endTime');
-                            setTimeModalVisible(true);
-                        }}
-                    >
-                        <View pointerEvents="none">
-                            <FormInput
-                                label="End Time"
-                                placeholder="Add end time"
-                                value={formatTime(form.endTime)}
-                                editable={false}
-                            ></FormInput>
-                        </View>
-                    </TouchableOpacity>
-                    {!isTimeValid() && form.date === form.endDate && (
-                        <Text
-                            style={{
-                                color: Colors.textError,
-                                fontSize: 12,
-                                marginBottom: 10,
-                                marginTop: -5,
-                            }}
-                        >
-                            End Time must be after 'Time'
-                        </Text>
-                    )}
-
-                    <Text style={styles.label}>Task Priority</Text>
-                    <View style={styles.priorityRow}>
-                        {['Low', 'Normal', 'High'].map(priority => (
-                            <TouchableOpacity
-                                key={priority}
-                                style={[
-                                    styles.priorityPill,
-                                    form.priority === priority && styles.activePriorityPill,
-                                ]}
-                                onPress={() => handleInputChange('priority', priority)}
+                            <View pointerEvents="none">
+                                <FormInput
+                                    label="Time"
+                                    placeholder="Add Time"
+                                    value={formatTime(form.time)}
+                                    editable={false}
+                                ></FormInput>
+                            </View>
+                        </TouchableOpacity>
+                        <TimePicker
+                            visible={timeModalVisible}
+                            initialTime={new Date()}
+                            onClose={() => setTimeModalVisible(false)}
+                            onSelect={formattedTime =>
+                                handleInputChange(currentField, formattedTime)
+                            }
+                        ></TimePicker>
+                        <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
+                            <View pointerEvents="none">
+                                <FormInput
+                                    label="End Date"
+                                    placeholder="Add end date"
+                                    value={form.endDate}
+                                    editable={false}
+                                ></FormInput>
+                            </View>
+                        </TouchableOpacity>
+                        {form.endDate && !isDateValid() && (
+                            <Text
+                                style={{
+                                    color: Colors.textError,
+                                    fontSize: 12,
+                                    marginBottom: 10,
+                                    marginTop: -5,
+                                }}
                             >
-                                <Text
+                                End Date cannot be before 'Date'
+                            </Text>
+                        )}
+                        <TouchableOpacity
+                            onPress={() => {
+                                setCurrentField('endTime');
+                                setTimeModalVisible(true);
+                            }}
+                        >
+                            <View pointerEvents="none">
+                                <FormInput
+                                    label="End Time"
+                                    placeholder="Add end time"
+                                    value={formatTime(form.endTime)}
+                                    editable={false}
+                                ></FormInput>
+                            </View>
+                        </TouchableOpacity>
+                        {!isTimeValid() && form.date === form.endDate && (
+                            <Text
+                                style={{
+                                    color: Colors.textError,
+                                    fontSize: 12,
+                                    marginBottom: 10,
+                                    marginTop: -5,
+                                }}
+                            >
+                                End Time must be after 'Time'
+                            </Text>
+                        )}
+                        <Text style={styles.label}>Task Priority</Text>
+                        <View style={styles.priorityRow}>
+                            {['Low', 'Normal', 'High'].map(priority => (
+                                <TouchableOpacity
+                                    key={priority}
                                     style={[
-                                        styles.priorityPillText,
-                                        form.priority === priority && styles.activePriorityText,
+                                        styles.priorityPill,
+                                        form.priority === priority && styles.activePriorityPill,
                                     ]}
+                                    onPress={() => handleInputChange('priority', priority)}
                                 >
-                                    {priority}
+                                    <Text
+                                        style={[
+                                            styles.priorityPillText,
+                                            form.priority === priority && styles.activePriorityText,
+                                        ]}
+                                    >
+                                        {priority}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        <FormInput
+                            label="Note"
+                            placeholder="Add note"
+                            value={form.notes}
+                            onChangeText={val => handleInputChange('notes', val)}
+                            onFocus={() => {
+                                setTimeout(() => {
+                                    scrollRef.current?.scrollToEnd({ animated: true });
+                                }, 100)
+
+                            }}
+
+                        ></FormInput>
+                    </View>
+                    <CalendarComponent
+                        visible={isCalendarVisible}
+                        initialDate={getInitialDate()}
+                        onClose={() => setIsCalendarVisible(false)}
+                        onSelect={day => {
+                            if (day && day.dateString) {
+                                const [y, m, d] = day.dateString.split('-');
+                                const formattedDate = `${d}/${m}/${y}`;
+                                handleInputChange(currentField, formattedDate);
+                                setIsCalendarVisible(false);
+                            }
+                        }}
+                    ></CalendarComponent>
+                    {picker.open && (
+                        <DatePicker
+                            modal
+                            open={picker.open}
+                            date={new Date()}
+                            mode={picker.mode}
+                            theme="light"
+                            onConfirm={onPickerChange}
+                            onCancel={() => setPicker(prev => ({ ...prev, open: false }))}
+                            confirmText="Select"
+                            cancelText="Cancel"
+                            title="Set Time"
+                        />
+                    )}
+                    <Modal transparent visible={showSuccess} animationType="fade">
+                        <View style={styles.modalOverlay}>
+                            <TouchableOpacity
+                                style={styles.modalContent}
+                                activeOpacity={1}
+                                onPress={() => setShowSuccess(false)}
+                            >
+                                <Icon
+                                    name="checkmark-done-circle"
+                                    size={60}
+                                    color={Colors.chartCompleted}
+                                    style={styles.modalIcon}
+                                ></Icon>
+                                <Text style={styles.modalText}>
+                                    {existingTask
+                                        ? 'Task Updated Successfully!'
+                                        : 'Task Created Successfully!'}
                                 </Text>
                             </TouchableOpacity>
-                        ))}
-                    </View>
-                    <FormInput
-                        label="Note"
-                        placeholder="Add note"
-                        value={form.notes}
-                        onChangeText={val => handleInputChange('notes', val)}
-                    ></FormInput>
-                </View>
-                <CalendarComponent
-                    visible={isCalendarVisible}
-                    initialDate={getInitialDate()}
-                    onClose={() => setIsCalendarVisible(false)}
-                    onSelect={day => {
-                        if (day && day.dateString) {
-                            const [y, m, d] = day.dateString.split('-');
-                            const formattedDate = `${d}/${m}/${y}`;
-                            handleInputChange(currentField, formattedDate);
-                            setIsCalendarVisible(false);
-                        }
+                        </View>
+                    </Modal>
+                </ScrollView>
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: Platform.OS === 'ios' ? 22 : 40,
                     }}
-                ></CalendarComponent>
-
-                {picker.open && (
-                    <DatePicker
-                        modal
-                        open={picker.open}
-                        date={new Date()}
-                        mode={picker.mode}
-                        theme="light"
-                        onConfirm={onPickerChange}
-                        onCancel={() => setPicker(prev => ({ ...prev, open: false }))}
-                        confirmText="Select"
-                        cancelText="Cancel"
-                        title="Set Time"
-                    />
-                )}
-                <Modal transparent visible={showSuccess} animationType="fade">
-                    <View style={styles.modalOverlay}>
-                        <TouchableOpacity
-                            style={styles.modalContent}
-                            activeOpacity={1}
-                            onPress={() => setShowSuccess(false)}
-                        >
-                            <Icon
-                                name="checkmark-done-circle"
-                                size={60}
-                                color={Colors.chartCompleted}
-                                style={styles.modalIcon}
-                            ></Icon>
-                            <Text style={styles.modalText}>
-                                {existingTask
-                                    ? 'Task Updated Successfully!'
-                                    : 'Task Created Successfully!'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </Modal>
-            </ScrollView>
-            <View
-                style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: Platform.OS === 'ios' ? 22 : 40,
-                }}
-            >
-                <TouchableOpacity
-                    style={[
-                        styles.submitButton,
-                        isFormValid ? styles.activeButton : styles.disableButton,
-                    ]}
-                    onPress={handleFinalSubmit}
-                    disabled={!isFormValid}
                 >
-                    <Text style={styles.submitText}>Submit</Text>
-                    <View style={styles.arrowContainer}>
-                        <Text
-                            style={{ color: Colors.white, fontWeight: 'bold', marginLeft: 5 }}
-                        >
-                            ➜
-                        </Text>
-                    </View>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[
+                            styles.submitButton,
+                            isFormValid ? styles.activeButton : styles.disableButton,
+                        ]}
+                        onPress={handleFinalSubmit}
+                        disabled={!isFormValid}
+                    >
+                        <Text style={styles.submitText}>Submit</Text>
+                        <View style={styles.arrowContainer}>
+                            <Text
+                                style={{ color: Colors.white, fontWeight: 'bold', marginLeft: 5 }}
+                            >
+                                ➜
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 

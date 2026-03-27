@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -41,6 +41,7 @@ const generateDateList = () => {
 };
 
 const AllTasksScreen = () => {
+  const dateListRef = useRef(null);
   const dispatch = useDispatch();
   const tasks = useSelector(state => state.tasks.items);
 
@@ -73,7 +74,14 @@ const AllTasksScreen = () => {
 
   const dateList = useMemo(() => generateDateList(), []);
   const goToday = () => {
-    setSelectedDate(new Date().toLocaleDateString('en-GB'));
+    const today = new Date().toLocaleDateString('en-GB');
+    setSelectedDate(today);
+
+    dateListRef.current?.scrollToIndex({
+      index: 30,
+      animated: true,
+      viewPosition: 0.5,
+    });
   }
   const filteredTasks = useMemo(() => {
     const todayTasks = tasks.filter(task => task.date === selectedDate);
@@ -222,6 +230,7 @@ const AllTasksScreen = () => {
         <View style={styles.topSection}>
           <FlatList
             horizontal
+            ref={dateListRef}
             data={dateList}
             keyExtractor={item => item.fullDate}
             initialScrollIndex={30}

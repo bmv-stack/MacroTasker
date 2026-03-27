@@ -60,7 +60,6 @@ const taskSlice = createSlice({
         builder
             .addCase(fetchTasks.fulfilled, (state, action) => {
                 state.items = action.payload;
-                state.status = 'succeeded';
             })
             .addCase(addNewTask.fulfilled, (state, action) => {
                 console.log('Payload is:', action.payload);
