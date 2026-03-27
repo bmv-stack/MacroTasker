@@ -96,7 +96,11 @@ const CreateTaskScreen = () => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
-    const isTimeValid = () => {
+    const isTimeDateValid = () => {
+        if (!form.endDate) return true;
+        const startDate = parseDate(form.date);
+        const endDate = parseDate(form.endDate);
+        if (endDate < startDate) return false;
         if (!form.endDate || !form.endTime) return true;
         if (form.date === form.endDate) {
             const startMinutes = getMinute(form.time);
@@ -109,7 +113,7 @@ const CreateTaskScreen = () => {
         form.title.length > 0 &&
         form.date.length > 0 &&
         form.time.length > 0 &&
-        isTimeValid();
+        isTimeDateValid();
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -206,6 +210,18 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
+                    {form.endDate && !isTimeDateValid() && (
+                        <Text
+                            style={{
+                                color: Colors.textError,
+                                fontSize: 12,
+                                marginBottom: 10,
+                                marginTop: -5,
+                            }}
+                        >
+                            End Date cannot be before 'Date'
+                        </Text>
+                    )}
                     <TouchableOpacity
                         onPress={() => {
                             setCurrentField('endTime');
@@ -221,7 +237,7 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    {!isTimeValid() && form.date === form.endDate && (
+                    {!isTimeDateValid() && form.date === form.endDate && (
                         <Text
                             style={{
                                 color: Colors.textError,
@@ -233,6 +249,29 @@ const CreateTaskScreen = () => {
                             End Time must be after 'Time'
                         </Text>
                     )}
+
+                    <Text style={styles.label}>Task Priority</Text>
+                    <View style={styles.priorityRow}>
+                        {['Low', 'Normal', 'High'].map(priority => (
+                            <TouchableOpacity
+                                key={priority}
+                                style={[
+                                    styles.priorityPill,
+                                    form.priority === priority && styles.activePriorityPill,
+                                ]}
+                                onPress={() => handleInputChange('priority', priority)}
+                            >
+                                <Text
+                                    style={[
+                                        styles.priorityPillText,
+                                        form.priority === priority && styles.activePriorityText,
+                                    ]}
+                                >
+                                    {priority}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
                     <FormInput
                         label="Note"
                         placeholder="Add note"
@@ -417,7 +456,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     activePriorityText: {
-        color: Colors.textSecondary,
+        color: Colors.whitePure,
     },
     label: {
         fontSize: 14,

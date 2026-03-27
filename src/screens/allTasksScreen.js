@@ -72,6 +72,9 @@ const AllTasksScreen = () => {
   };
 
   const dateList = useMemo(() => generateDateList(), []);
+  const goToday = () => {
+    setSelectedDate(new Date().toLocaleDateString('en-GB'));
+  }
   const filteredTasks = useMemo(() => {
     const todayTasks = tasks.filter(task => task.date === selectedDate);
 
@@ -209,6 +212,11 @@ const AllTasksScreen = () => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All tasks</Text>
+          {selectedDate !== goToday && (
+            <TouchableOpacity onPress={goToday}>
+              <Text style={{ color: Colors.accent, fontWeight: 'bold', fontSize: 14, marginBottom: -4.7 }}>Today</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.topSection}>
@@ -234,7 +242,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateNumber,
-                      isSelected && styles.activeDateText,
+                      { color: isSelected ? Colors.white : Colors.blackSecondary }
                     ]}
                   >
                     {item.dayNumber}
@@ -519,7 +527,11 @@ const styles = StyleSheet.create({
   },
   content: { flex: 1 },
   list: { marginTop: 10 },
-  sectionHeader: { marginVertical: 10 },
+  sectionHeader: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    marginVertical: 10
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
