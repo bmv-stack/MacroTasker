@@ -20,9 +20,9 @@ import { Colors } from '../themes/color';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const getMinute = stringTime => {
-    if (!stringTime) return 0;
+    if (!stringTime || !stringTime.includes(' ')) return 0;
     const [time, meridiem] = stringTime.split(' ');
-    let [hours, minutes] = stringTime.split(':').map(Number);
+    let [hours, minutes] = time.split(':').map(Number);
 
     if (meridiem === 'PM' && hours !== 12) {
         hours += 12;
@@ -41,7 +41,7 @@ const formatTime = timeString => {
     const meridiem = hours >= 12 ? 'PM' : 'AM';
 
     hours = hours % 12 || 12;
-    return `${hours.toString().padStart(2, '0')}:${m}:${meridiem}`;
+    return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
 };
 
 const CreateTaskScreen = () => {
@@ -96,24 +96,29 @@ const CreateTaskScreen = () => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
-    const isTimeDateValid = () => {
+    const isDateValid = () => {
         if (!form.endDate) return true;
         const startDate = parseDate(form.date);
         const endDate = parseDate(form.endDate);
-        if (endDate < startDate) return false;
-        if (!form.endDate || !form.endTime) return true;
-        if (form.date === form.endDate) {
-            const startMinutes = getMinute(form.time);
-            const endMinutes = getMinute(form.endTime);
-            return endMinutes > startMinutes;
-        }
-        return true;
+        return endDate >= startDate;
     };
+    const isTimeValid = () => {
+        if (!form.endDate || !form.endTime || form.date !== form.endDate) return true;
+
+        const startTime = formatTime(form.time);
+        const endTime = formatTime(form.endTime)
+
+        const startMinute = getMinute(startTime);
+        const endMinute = getMinute(endTime);
+        return endMinute > startMinute;
+    };
+
     const isFormValid =
         form.title.length > 0 &&
         form.date.length > 0 &&
         form.time.length > 0 &&
-        isTimeDateValid();
+        isDateValid() &&
+        isTimeValid();
 
     const handleInputChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -210,7 +215,7 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    {form.endDate && !isTimeDateValid() && (
+                    {form.endDate && !isDateValid() && (
                         <Text
                             style={{
                                 color: Colors.textError,
@@ -237,7 +242,7 @@ const CreateTaskScreen = () => {
                             ></FormInput>
                         </View>
                     </TouchableOpacity>
-                    {!isTimeDateValid() && form.date === form.endDate && (
+                    {!isTimeValid() && form.date === form.endDate && (
                         <Text
                             style={{
                                 color: Colors.textError,
