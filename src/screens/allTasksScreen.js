@@ -207,7 +207,6 @@ const AllTasksScreen = () => {
     if (deletedTask) {
       dispatch(addNewTask(deletedTask));
       setUndoVisible(false);
-      setDeletedTask(null);
       clearTimeout(undoTimer.current);
 
     }
@@ -341,6 +340,7 @@ const AllTasksScreen = () => {
           )}
         </View>
 
+
         <FlatList
           data={filteredTasks}
           keyExtractor={item => item.id}
@@ -359,114 +359,114 @@ const AllTasksScreen = () => {
             const isOverdue = !task.completed && isEndDate && taskDate < now;
             const stylePriority =
               priorityStyles[task.priority] || priorityStyles.Normal;
-
             return (
-              <View
-                key={task.id}
-                style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
-              >
-                <View style={styles.cardTopRow}>
-                  <Text
-                    style={[
-                      styles.taskTitle,
-                      task.completed && {
-                        textDecorationLine: 'line-through',
-                        color: Colors.textMuted,
-                      },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {task.title}
-                  </Text>
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity
+              <TouchableOpacity activeOpacity={0.5}
+                onPress={() => navigation.navigate('TaskDetail', { task })}>
+                <View
+                  key={task.id}
+                  style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
+                >
+                  <View style={styles.cardTopRow}>
+                    <Text
                       style={[
-                        styles.iconCircle,
-                        task.completed && styles.checkedCircle,
+                        styles.taskTitle,
+                        task.completed && {
+                          textDecorationLine: 'line-through',
+                          color: Colors.textMuted,
+                        },
                       ]}
-                      disabled={task.completed}
-                      onPress={() =>
-                        navigation.navigate('CreateTask', {
-                          existingTask: task,
-                        })
-                      }
+                      numberOfLines={1}
                     >
-                      <FeatherIcon
-                        name="edit-3"
-                        size={18}
-                        color={Colors.editIcon}
-                      ></FeatherIcon>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.iconCircle,
-                        task.completed && styles.checkedCircle,
-                      ]}
-                      onPress={() =>
-                        setDeleteModal({
-                          visible: true,
-                          taskId: task.id,
-                          taskTitle: task.title,
-                        })
-                      }
-                    >
-                      <Icon
-                        name="trash-outline"
-                        size={18}
-                        color={Colors.deleteIcon}
-                      ></Icon>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={styles.cardBottomRow}>
-                  <View style={styles.leftInfoGroup}>
-                    <Text style={styles.dateTimeText}>
-                      {task.date} | {formatTime(task.time)}
+                      {task.title}
                     </Text>
-                    <View
-                    >
-                      <Icon
-                        name="bookmark"
-                        size={20}
-                        color={stylePriority.iconColor}
-                        style={{ marginLeft: 8 }}
-                      ></Icon>
+                    <View style={styles.actionButtons}>
+                      <TouchableOpacity
+                        style={[
+                          styles.iconCircle,
+                          task.completed && styles.checkedCircle,
+                        ]}
+                        disabled={task.completed}
+                        onPress={() =>
+                          navigation.navigate('CreateTask', {
+                            existingTask: task,
+                          })
+                        }
+                      >
+                        <FeatherIcon
+                          name="edit-3"
+                          size={18}
+                          color={Colors.editIcon}
+                        ></FeatherIcon>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.iconCircle,
+                          task.completed && styles.checkedCircle,
+                        ]}
+                        onPress={() =>
+                          setDeleteModal({
+                            visible: true,
+                            taskId: task.id,
+                            taskTitle: task.title,
+                          })
+                        }
+                      >
+                        <Icon
+                          name="trash-outline"
+                          size={18}
+                          color={Colors.deleteIcon}
+                        ></Icon>
+                      </TouchableOpacity>
                     </View>
                   </View>
-
-                  <View style={styles.rightActionsGroup}>
-                    <TouchableOpacity style={styles.textPriorityBadge}
-                      onPress={() => setPriorityModal({ visible: true, taskId: task.id })}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      disabled={task.completed}>
-                      <Text style={styles.badgeText}>
-                        {task.priority || 'Normal'}
+                  <View style={styles.cardBottomRow}>
+                    <View style={styles.leftInfoGroup}>
+                      <Text style={styles.dateTimeText}>
+                        {task.date} | {formatTime(task.time)}
                       </Text>
-                      <Icon
-                        name='chevron-down'
-                        size={12}
-                        color={Colors.textBadge}
-                        style={{ marginLeft: 4 }}></Icon>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.completeCheckCircle,
-                        task.completed && styles.checkCompleted,
-                      ]}
-                      onPress={() => dispatch(completeTask(task.id))}
-                    >
-                      <Icon
-                        name="checkmark-sharp"
-                        size={18}
-                        color={task.completed ? Colors.white : Colors.black}
-                        opacity={0.5}
-                      ></Icon>
-                    </TouchableOpacity>
+                      <View
+                      >
+                        <Icon
+                          name="bookmark"
+                          size={20}
+                          color={stylePriority.iconColor}
+                          style={{ marginLeft: 8 }}
+                        ></Icon>
+                      </View>
+                    </View>
+                    <View style={styles.rightActionsGroup}>
+                      <TouchableOpacity style={styles.textPriorityBadge}
+                        onPress={() => setPriorityModal({ visible: true, taskId: task.id })}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        disabled={task.completed}>
+                        <Text style={styles.badgeText}>
+                          {task.priority || 'Normal'}
+                        </Text>
+                        <Icon
+                          name='chevron-down'
+                          size={12}
+                          color={Colors.textBadge}
+                          style={{ marginLeft: 4 }}></Icon>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.completeCheckCircle,
+                          task.completed && styles.checkCompleted,
+                        ]}
+                        onPress={() => dispatch(completeTask(task.id))}
+                      >
+                        <Icon
+                          name="checkmark-sharp"
+                          size={18}
+                          color={task.completed ? Colors.white : Colors.black}
+                          opacity={0.5}
+                        ></Icon>
+                      </TouchableOpacity>
+                    </View>
                   </View>
+                  {isOverdue && <View style={styles.overdueIndicator} />}
                 </View>
-                {isOverdue && <View style={styles.overdueIndicator} />}
-              </View>
+              </TouchableOpacity>
             );
           }}
         ></FlatList>

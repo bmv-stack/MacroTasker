@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AllTasksScreen from './src/screens/allTasksScreen';
 import MainScreen from './src/screens/mainScreen';
 import CreateTaskScreen from './src/screens/createTaskScreen';
+import TaskDetailScreen from './src/screens/taskDetailScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -34,6 +35,13 @@ const DashboardStack = createNativeStackNavigator({
       options: {
         headerShown: false,
         animation: 'fade'
+      }
+    },
+    TaskDetail: {
+      screen: TaskDetailScreen,
+      options: {
+        headerShown: false,
+        animation: 'ios_from_right'
       }
     }
   }
