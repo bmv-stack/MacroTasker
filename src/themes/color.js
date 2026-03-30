@@ -58,7 +58,6 @@ export const Colors = {
     calendarDayText: '#2D4150',
     calendarDisabled: '#B6B1B1',
 
-    //Task Card Random Palette
     taskCardPalette: [
         '#C1E1C1',
         '#9192F3',

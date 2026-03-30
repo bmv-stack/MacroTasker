@@ -14,7 +14,6 @@ import { Provider, useDispatch } from 'react-redux';
 import { fetchTasks } from './src/redux/slices/taskSlice';
 import { getDBConnection, createTable } from './src/database/db';
 
-
 const PlaceholderScreen = ({ route }) => (
   <View style={styles.center}>
     <Text style={styles.devText}>{route.name} is under development!</Text>

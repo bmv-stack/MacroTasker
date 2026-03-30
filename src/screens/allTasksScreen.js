@@ -46,6 +46,9 @@ const AllTasksScreen = () => {
   const tasks = useSelector(state => state.tasks.items);
 
   const navigation = useNavigation();
+  const [undoVisible, setUndoVisible] = useState(false);
+  const [deletedTask, setDeletedTask] = useState(null);
+  const undoTimer = useRef(null);
   const [activeTab, setActiveTab] = useState('All');
   const [chartKey, setChartKey] = useState(0);
   const [selectedDate, setSelectedDate] = useState(
@@ -108,7 +111,7 @@ const AllTasksScreen = () => {
       value: filteredTasks.length,
       color: Colors.blackSecondary,
     });
-    setChartKey(prev => prev + 1);
+    setChartKey(chartKey + 1);
   };
 
   const now = new Date();
@@ -198,6 +201,16 @@ const AllTasksScreen = () => {
 
     hours = hours % 12 || 12;
     return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
+  };
+
+  const handleUndo = () => {
+    if (deletedTask) {
+      dispatch(addNewTask(deletedTask));
+      setUndoVisible(false);
+      setDeletedTask(null);
+      clearTimeout(undoTimer.current);
+
+    }
   };
 
   return (
@@ -513,8 +526,13 @@ const AllTasksScreen = () => {
                 <TouchableOpacity
                   style={styles.confirmBtn}
                   onPress={() => {
+                    const taskToSave = tasks.find(t => t.id === deleteModal.taskId);
+                    setDeletedTask(taskToSave);
                     dispatch(deleteTask(deleteModal.taskId));
                     setDeleteModal({ visible: false, taskId: null });
+                    setUndoVisible(true);
+                    if (undoTimer.current) clearTimeout(undoTimer.current);
+                    undoTimer.current = setTimeout(() => setUndoVisible(false), 5000)
                   }}
                 >
                   <Text style={styles.confirmBtnText}>Delete</Text>
@@ -524,6 +542,14 @@ const AllTasksScreen = () => {
           </View>
         </Modal>
       </View>
+      {undoVisible && (
+        <View style={styles.undoMessage}>
+          <Text style={styles.undoText}>Task Deleted</Text>
+          <TouchableOpacity onPress={handleUndo}>
+            <Text style={styles.undoBtn}>UNDO</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -803,6 +829,27 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: '600',
   },
+  undoMessage: {
+    position: 'absolute',
+    bottom: 10,
+    left: 20,
+    right: 20,
+    backgroundColor: Colors.blackSecondary,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderRadius: 12,
+    elevation: 5,
+    alignItems: 'center'
+  },
+  undoText: {
+    color: Colors.white,
+    fontWeight: '600'
+  },
+  undoBtn: {
+    color: Colors.accent,
+    fontWeight: 'bold'
+  }
 });
 
 export default AllTasksScreen;
