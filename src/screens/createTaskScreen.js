@@ -186,7 +186,6 @@ const CreateTaskScreen = () => {
                                     label="Date"
                                     placeholder="Add Date"
                                     value={form.date}
-                                    editable={false}
                                 ></FormInput>
                             </View>
                         </TouchableOpacity>
@@ -201,7 +200,6 @@ const CreateTaskScreen = () => {
                                     label="Time"
                                     placeholder="Add Time"
                                     value={formatTime(form.time)}
-                                    editable={false}
                                 ></FormInput>
                             </View>
                         </TouchableOpacity>
@@ -219,7 +217,6 @@ const CreateTaskScreen = () => {
                                     label="End Date"
                                     placeholder="Add end date"
                                     value={form.endDate}
-                                    editable={false}
                                 ></FormInput>
                             </View>
                         </TouchableOpacity>
@@ -246,7 +243,6 @@ const CreateTaskScreen = () => {
                                     label="End Time"
                                     placeholder="Add end time"
                                     value={formatTime(form.endTime)}
-                                    editable={false}
                                 ></FormInput>
                             </View>
                         </TouchableOpacity>
@@ -362,10 +358,10 @@ const CreateTaskScreen = () => {
                         onPress={handleFinalSubmit}
                         disabled={!isFormValid}
                     >
-                        <Text style={styles.submitText}>Submit</Text>
+                        <Text style={styles.submitText}>{existingTask ? 'Update' : 'Submit'}</Text>
                         <View style={styles.arrowContainer}>
                             <Text
-                                style={{ color: Colors.white, fontWeight: 'bold', marginLeft: 5 }}
+                                style={{ color: Colors.white, fontWeight: 'bold', marginLeft: 5, fontSize: 16 }}
                             >
                                 ➜
                             </Text>

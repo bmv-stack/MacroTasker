@@ -220,7 +220,7 @@ const AllTasksScreen = () => {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>All tasks</Text>
-          {selectedDate !== goToday && (
+          {selectedDate !== new Date().toLocaleDateString('en-GB') && (
             <TouchableOpacity onPress={goToday}>
               <Text style={{ color: Colors.accent, fontWeight: 'bold', fontSize: 14, marginBottom: -4.7 }}>Today</Text>
             </TouchableOpacity>
@@ -232,6 +232,7 @@ const AllTasksScreen = () => {
             horizontal
             ref={dateListRef}
             data={dateList}
+            extraData={selectedDate}
             keyExtractor={item => item.fullDate}
             initialScrollIndex={30}
             showsHorizontalScrollIndicator={false}
@@ -246,7 +247,7 @@ const AllTasksScreen = () => {
               return (
                 <TouchableOpacity
                   onPress={() => setSelectedDate(item.fullDate)}
-                  style={[styles.dateCard, isSelected && styles.activeDateCard]}
+                  style={[styles.dateCard, { backgroundColor: isSelected ? Colors.blackSecondary : Colors.surface }]}
                 >
                   <Text
                     style={[
@@ -259,7 +260,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateMonthName,
-                      isSelected && styles.activeDateText,
+                      { color: isSelected ? Colors.white : Colors.textMuted }
                     ]}
                   >
                     {monthName}
@@ -267,7 +268,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateDay,
-                      isSelected && styles.activeDateText,
+                      { color: isSelected ? Colors.white : Colors.textMuted }
                     ]}
                   >
                     {dayName}
