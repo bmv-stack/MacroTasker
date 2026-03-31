@@ -9,7 +9,7 @@ const SplashScreen = () => {
             <Image
                 source={logo}
                 style={styles.logo}
-                resizeMode='contain'></Image>
+                resizeMode='cover'></Image>
         </View>
     )
 }

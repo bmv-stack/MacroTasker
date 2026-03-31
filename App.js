@@ -153,7 +153,6 @@ const AppContent = () => {
       const db = await getDBConnection();
       await createTable(db);
       dispatch(fetchTasks());
-      setTimeout(() => setIsReady(true), 15000);
       setIsReady(true);
     };
     startApp();
