@@ -10,11 +10,13 @@ import {
 import { Colors } from '../themes/color';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useSelector } from 'react-redux';
 import React from 'react';
 
 const TaskDetailScreen = ({ route }) => {
     const navigation = useNavigation();
-    const { task } = route.params;
+    const { task: initialTask } = route.params;
+    const task = useSelector(state => state.tasks.items.find(t => t.id === initialTask.id)) || initialTask;
     return (
         <View style={styles.container}>
             <View style={styles.header}>

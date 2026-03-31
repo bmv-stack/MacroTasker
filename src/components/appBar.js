@@ -1,21 +1,24 @@
-import { useNavigation } from '@react-navigation/native';
+
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Colors } from '../themes/color';
+import Icon from 'react-native-vector-icons/Ionicons';
+import logo from '../../assets/final_logo.png';
 
 const AppBar = ({ title = 'APP NAME', onIconPress }) => {
-  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <View style={styles.blackBox}>
-          <Text style={styles.textLogo}>MT</Text>
-        </View>
+        <Image
+          source={logo}
+          style={styles.logo}
+          resizeMode='contain'></Image>
         <Text style={styles.textBrand}>{title}</Text>
       </View>
-      <TouchableOpacity onPress={onIconPress}>
+      <TouchableOpacity onPress={onIconPress} hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}>
         <View style={styles.createTaskBox}>
-          <Text style={styles.createSymbol}>+</Text>
+          <Icon name='add'
+            size={22} color={Colors.white}></Icon>
         </View>
       </TouchableOpacity>
     </View>
@@ -27,8 +30,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
     backgroundColor: 'transparent',
+    height: 60
   },
   left: {
     flexDirection: 'row',
@@ -38,7 +41,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     backgroundColor: Colors.blackCharcol,
-    borderRadius: 6,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -48,24 +51,38 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   textBrand: {
-    marginLeft: 18,
+    marginLeft: -12,
     fontSize: 18,
     fontWeight: 'bold',
     color: Colors.textBrand,
   },
   createTaskBox: {
-    height: 22,
-    width: 22,
+    height: 31,
+    width: 31,
     backgroundColor: Colors.brandBlue,
-    borderRadius: 4,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: Colors.brandBlue,
+    shadowOffset: { height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    marginTop: -2
   },
   createSymbol: {
     color: Colors.textInverted,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '300',
+    marginTop: -2
   },
+  logo: {
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    marginVertical: -15,
+    marginLeft: -5
+  }
 });
 
 export default AppBar;
