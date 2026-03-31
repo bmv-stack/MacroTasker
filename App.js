@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,6 +6,7 @@ import AllTasksScreen from './src/screens/allTasksScreen';
 import MainScreen from './src/screens/mainScreen';
 import CreateTaskScreen from './src/screens/createTaskScreen';
 import TaskDetailScreen from './src/screens/taskDetailScreen';
+import SplashScreen from './src/screens/splashScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -144,6 +145,7 @@ const Navigation = createStaticNavigation(RootStack);
 
 const AppContent = () => {
   const dispatch = useDispatch();
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
     const startApp = async () => {
@@ -151,9 +153,14 @@ const AppContent = () => {
       const db = await getDBConnection();
       await createTable(db);
       dispatch(fetchTasks());
+      setTimeout(() => setIsReady(true), 15000);
+      setIsReady(true);
     };
     startApp();
   }, [dispatch]);
+  if (!isReady) {
+    return <SplashScreen />
+  }
   return <Navigation />
 }
 

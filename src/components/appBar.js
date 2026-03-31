@@ -12,7 +12,7 @@ const AppBar = ({ title = 'APP NAME', onIconPress }) => {
         <Image
           source={logo}
           style={styles.logo}
-          resizeMode='contain'></Image>
+          resizeMode='cover'></Image>
         <Text style={styles.textBrand}>{title}</Text>
       </View>
       <TouchableOpacity onPress={onIconPress} hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}>
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   textBrand: {
-    marginLeft: -12,
+    marginLeft: -1,
     fontSize: 18,
     fontWeight: 'bold',
     color: Colors.textBrand,
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     marginTop: -2
   },
   logo: {
-    width: 70,
-    height: 70,
+    width: 50,
+    height: 50,
     borderRadius: 8,
     marginVertical: -15,
     marginLeft: -5
