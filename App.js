@@ -28,45 +28,45 @@ const DashboardStack = createNativeStackNavigator({
       screen: MainScreen,
       options: {
         headerShown: false,
-        animation: 'fade'
-      }
+        animation: 'fade',
+      },
     },
     All: {
       screen: AllTasksScreen,
       options: {
         headerShown: false,
-        animation: 'fade'
-      }
+        animation: 'fade',
+      },
     },
     TaskDetail: {
       screen: TaskDetailScreen,
       options: {
         headerShown: false,
-        animation: 'ios_from_right'
-      }
-    }
-  }
-})
+        animation: 'ios_from_right',
+      },
+    },
+  },
+});
 const Tab = createBottomTabNavigator({
   screens: {
     Dashboard: {
       screen: DashboardStack,
       options: {
         animation: 'fade',
-        title: 'Dashboard'
-      }
+        title: 'Dashboard',
+      },
     },
     Bills: {
-      screen: PlaceholderScreen
+      screen: PlaceholderScreen,
     },
     AiTasks: {
-      screen: PlaceholderScreen
+      screen: PlaceholderScreen,
     },
     SmartHome: {
-      screen: PlaceholderScreen
+      screen: PlaceholderScreen,
     },
     Menu: {
-      screen: PlaceholderScreen
+      screen: PlaceholderScreen,
     },
   },
 
@@ -78,13 +78,16 @@ const Tab = createBottomTabNavigator({
     tabBarLabelStyle: styles.tabLabel,
     tabBarLabel: ({ focused, color }) => {
       return (
-        <Text style={[
-          styles.tabLabel,
-          { color }, focused && { fontWeight: '700', color: Colors.blackSecondary }
-        ]}>
+        <Text
+          style={[
+            styles.tabLabel,
+            { color },
+            focused && { fontWeight: '700', color: Colors.blackSecondary },
+          ]}
+        >
           {route.name === 'AiTasks' ? 'Ai Task' : route.name}
         </Text>
-      )
+      );
     },
     tabBarIcon: ({ focused, color }) => {
       let iconName;
@@ -108,29 +111,35 @@ const Tab = createBottomTabNavigator({
                 colors={['transparent', Colors.blackSecondary]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={styles.fadeLineLeft} />
+                style={styles.fadeLineLeft}
+              />
               <View style={styles.activeIndicatorDot}></View>
               <LinearGradient
                 colors={[Colors.blackSecondary, 'transparent']}
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
-                style={styles.fadeLineRight}></LinearGradient>
+                style={styles.fadeLineRight}
+              ></LinearGradient>
             </View>
           )}
-          <Icon name={iconName} size={22} color={focused ? Colors.blackSecondary : color}></Icon>
+          <Icon
+            name={iconName}
+            size={22}
+            color={focused ? Colors.blackSecondary : color}
+          ></Icon>
         </View>
-      )
-    }
-  })
-})
+      );
+    },
+  }),
+});
 
 const RootStack = createNativeStackNavigator({
   screens: {
     TabScreen: {
       screen: Tab,
       options: {
-        headerShown: false
-      }
+        headerShown: false,
+      },
     },
     CreateTask: {
       screen: CreateTaskScreen,
@@ -145,11 +154,10 @@ const Navigation = createStaticNavigation(RootStack);
 
 const AppContent = () => {
   const dispatch = useDispatch();
-  const [isReady, setIsReady] = useState(false)
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const startApp = async () => {
-
       const db = await getDBConnection();
       await createTable(db);
       dispatch(fetchTasks());
@@ -158,10 +166,10 @@ const AppContent = () => {
     startApp();
   }, [dispatch]);
   if (!isReady) {
-    return <SplashScreen />
+    return <SplashScreen />;
   }
-  return <Navigation />
-}
+  return <Navigation />;
+};
 
 export default function App() {
   return (
@@ -175,12 +183,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.surface
+    backgroundColor: Colors.surface,
   },
   devText: {
     fontSize: 16,
     color: Colors.textMuted,
-    fontWeight: '500'
+    fontWeight: '500',
   },
   tabBar: {
     height: 90,
@@ -191,13 +199,12 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingHorizontal: 20,
     shadowColor: Colors.shadow,
-    elevation: 0
-
+    elevation: 0,
   },
   tabLabel: {
     fontSize: 10,
     fontWeight: '600',
-    marginTop: 5
+    marginTop: 5,
   },
   activeIndicatorDot: {
     width: 6.5,
@@ -208,13 +215,13 @@ const styles = StyleSheet.create({
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'visible'
+    overflow: 'visible',
   },
   indicatorContainer: {
     position: 'absolute',
     top: -22,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   fadeLineLeft: {
     height: 1,
@@ -222,6 +229,6 @@ const styles = StyleSheet.create({
   },
   fadeLineRight: {
     height: 1,
-    width: 40
-  }
-})
+    width: 40,
+  },
+});

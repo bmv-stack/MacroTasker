@@ -85,7 +85,7 @@ const AllTasksScreen = () => {
       animated: true,
       viewPosition: 0.5,
     });
-  }
+  };
   const filteredTasks = useMemo(() => {
     const todayTasks = tasks.filter(task => task.date === selectedDate);
 
@@ -133,17 +133,19 @@ const AllTasksScreen = () => {
     const isFuture = parseDate(selectedDate) > now;
 
     if (isFuture) {
-      return [{
-        value: pendingCount,
-        color: Colors.chartPending,
-        label: 'Pending Tasks',
-        onPress: () =>
-          setSelectedData({
-            label: 'Pending',
-            value: pendingCount,
-            color: Colors.chartPending,
-          }),
-      }];
+      return [
+        {
+          value: pendingCount,
+          color: Colors.chartPending,
+          label: 'Pending Tasks',
+          onPress: () =>
+            setSelectedData({
+              label: 'Pending',
+              value: pendingCount,
+              color: Colors.chartPending,
+            }),
+        },
+      ];
     }
     const ongoingCount =
       filteredTasks.length - completedCount - overdueCount - pendingCount;
@@ -182,7 +184,7 @@ const AllTasksScreen = () => {
             color: Colors.chartCompleted,
           }),
       },
-    ]
+    ];
   }, [filteredTasks]);
 
   const handlePriorityChange = (taskId, newPriority) => {
@@ -208,7 +210,6 @@ const AllTasksScreen = () => {
       dispatch(addNewTask(deletedTask));
       setUndoVisible(false);
       clearTimeout(undoTimer.current);
-
     }
   };
 
@@ -234,7 +235,16 @@ const AllTasksScreen = () => {
           <Text style={styles.sectionTitle}>All tasks</Text>
           {selectedDate !== new Date().toLocaleDateString('en-GB') && (
             <TouchableOpacity onPress={goToday}>
-              <Text style={{ color: Colors.accent, fontWeight: 'bold', fontSize: 14, marginBottom: -4.7 }}>Today</Text>
+              <Text
+                style={{
+                  color: Colors.accent,
+                  fontWeight: 'bold',
+                  fontSize: 14,
+                  marginBottom: -4.7,
+                }}
+              >
+                Today
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -259,12 +269,23 @@ const AllTasksScreen = () => {
               return (
                 <TouchableOpacity
                   onPress={() => setSelectedDate(item.fullDate)}
-                  style={[styles.dateCard, { backgroundColor: isSelected ? Colors.blackSecondary : Colors.surface }]}
+                  style={[
+                    styles.dateCard,
+                    {
+                      backgroundColor: isSelected
+                        ? Colors.blackSecondary
+                        : Colors.surface,
+                    },
+                  ]}
                 >
                   <Text
                     style={[
                       styles.dateNumber,
-                      { color: isSelected ? Colors.white : Colors.blackSecondary }
+                      {
+                        color: isSelected
+                          ? Colors.white
+                          : Colors.blackSecondary,
+                      },
                     ]}
                   >
                     {item.dayNumber}
@@ -272,7 +293,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateMonthName,
-                      { color: isSelected ? Colors.white : Colors.textMuted }
+                      { color: isSelected ? Colors.white : Colors.textMuted },
                     ]}
                   >
                     {monthName}
@@ -280,7 +301,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateDay,
-                      { color: isSelected ? Colors.white : Colors.textMuted }
+                      { color: isSelected ? Colors.white : Colors.textMuted },
                     ]}
                   >
                     {dayName}
@@ -340,7 +361,6 @@ const AllTasksScreen = () => {
           )}
         </View>
 
-
         <FlatList
           data={filteredTasks}
           keyExtractor={item => item.id}
@@ -360,8 +380,10 @@ const AllTasksScreen = () => {
             const stylePriority =
               priorityStyles[task.priority] || priorityStyles.Normal;
             return (
-              <TouchableOpacity activeOpacity={0.5}
-                onPress={() => navigation.navigate('TaskDetail', { task })}>
+              <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={() => navigation.navigate('TaskDetail', { task })}
+              >
                 <View
                   key={task.id}
                   style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
@@ -424,8 +446,7 @@ const AllTasksScreen = () => {
                       <Text style={styles.dateTimeText}>
                         {task.date} | {formatTime(task.time)}
                       </Text>
-                      <View
-                      >
+                      <View>
                         <Icon
                           name="bookmark"
                           size={20}
@@ -435,18 +456,23 @@ const AllTasksScreen = () => {
                       </View>
                     </View>
                     <View style={styles.rightActionsGroup}>
-                      <TouchableOpacity style={styles.textPriorityBadge}
-                        onPress={() => setPriorityModal({ visible: true, taskId: task.id })}
+                      <TouchableOpacity
+                        style={styles.textPriorityBadge}
+                        onPress={() =>
+                          setPriorityModal({ visible: true, taskId: task.id })
+                        }
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                        disabled={task.completed}>
+                        disabled={task.completed}
+                      >
                         <Text style={styles.badgeText}>
                           {task.priority || 'Normal'}
                         </Text>
                         <Icon
-                          name='chevron-down'
+                          name="chevron-down"
                           size={12}
                           color={Colors.textBadge}
-                          style={{ marginLeft: 4 }}></Icon>
+                          style={{ marginLeft: 4 }}
+                        ></Icon>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={[
@@ -526,13 +552,18 @@ const AllTasksScreen = () => {
                 <TouchableOpacity
                   style={styles.confirmBtn}
                   onPress={() => {
-                    const taskToSave = tasks.find(t => t.id === deleteModal.taskId);
+                    const taskToSave = tasks.find(
+                      t => t.id === deleteModal.taskId,
+                    );
                     setDeletedTask(taskToSave);
                     dispatch(deleteTask(deleteModal.taskId));
                     setDeleteModal({ visible: false, taskId: null });
                     setUndoVisible(true);
                     if (undoTimer.current) clearTimeout(undoTimer.current);
-                    undoTimer.current = setTimeout(() => setUndoVisible(false), 5000)
+                    undoTimer.current = setTimeout(
+                      () => setUndoVisible(false),
+                      5000,
+                    );
                   }}
                 >
                   <Text style={styles.confirmBtnText}>Delete</Text>
@@ -566,7 +597,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     justifyContent: 'space-between',
     flexDirection: 'row',
-    marginVertical: 10
+    marginVertical: 10,
   },
   sectionTitle: {
     fontSize: 18,
@@ -693,7 +724,7 @@ const styles = StyleSheet.create({
     width: 32,
   },
   checkCompleted: {
-    backgroundColor: Colors.checkedBg
+    backgroundColor: Colors.checkedBg,
   },
   completeCheckCircle: {
     borderColor: Colors.borderLight,
@@ -840,16 +871,16 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     elevation: 5,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   undoText: {
     color: Colors.white,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   undoBtn: {
     color: Colors.accent,
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 });
 
 export default AllTasksScreen;

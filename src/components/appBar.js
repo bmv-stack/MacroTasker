@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Colors } from '../themes/color';
@@ -9,16 +8,15 @@ const AppBar = ({ title = 'APP NAME', onIconPress }) => {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <Image
-          source={logo}
-          style={styles.logo}
-          resizeMode='cover'></Image>
+        <Image source={logo} style={styles.logo} resizeMode="cover"></Image>
         <Text style={styles.textBrand}>{title}</Text>
       </View>
-      <TouchableOpacity onPress={onIconPress} hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}>
+      <TouchableOpacity
+        onPress={onIconPress}
+        hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
+      >
         <View style={styles.createTaskBox}>
-          <Icon name='add'
-            size={22} color={Colors.white}></Icon>
+          <Icon name="add" size={22} color={Colors.white}></Icon>
         </View>
       </TouchableOpacity>
     </View>
@@ -31,7 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    height: 60
+    height: 60,
   },
   left: {
     flexDirection: 'row',
@@ -68,21 +66,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
-    marginTop: -2
+    marginTop: -2,
   },
   createSymbol: {
     color: Colors.textInverted,
     fontSize: 22,
     fontWeight: '300',
-    marginTop: -2
+    marginTop: -2,
   },
   logo: {
     width: 50,
     height: 50,
     borderRadius: 8,
     marginVertical: -15,
-    marginLeft: -5
-  }
+    marginLeft: -5,
+  },
 });
 
 export default AppBar;
