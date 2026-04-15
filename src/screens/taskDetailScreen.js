@@ -7,13 +7,16 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { Colors } from '../themes/color';
+import { lightTheme, darkTheme } from '../themes/color';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
 import React from 'react';
 
 const TaskDetailScreen = ({ route }) => {
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
   const navigation = useNavigation();
   const { task: initialTask } = route.params;
   const task =
@@ -31,7 +34,7 @@ const TaskDetailScreen = ({ route }) => {
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View
-          style={[styles.badge, { backgroundColor: Colors.badgeBackground }]}
+          style={[styles.badge, { backgroundColor: theme.badgeBackground }]}
         >
           <Text style={styles.badgeText}>{task.priority} Priority</Text>
         </View>
@@ -40,14 +43,14 @@ const TaskDetailScreen = ({ route }) => {
           <Icon
             name="calendar-outline"
             size={20}
-            color={Colors.textMuted}
+            color={theme.textMuted}
           ></Icon>
           <Text style={styles.infoText}>
             Created At: {task.date} at {task.time}
           </Text>
         </View>
         <View style={styles.infoRow}>
-          <Icon name="skull" size={20} color={Colors.textMuted}></Icon>
+          <Icon name="skull" size={20} color={theme.textMuted}></Icon>
           <Text style={styles.infoText}>
             Ending At: {task.endDate || 'Not set'} {task.endTime || ''}
           </Text>
@@ -64,7 +67,7 @@ const TaskDetailScreen = ({ route }) => {
           navigation.navigate('CreateTask', { existingTask: task })
         }
       >
-        <Icon name="pencil" size={24} color={Colors.white}></Icon>
+        <Icon name="pencil" size={24} color={theme.white}></Icon>
       </TouchableOpacity>
     </View>
   );
@@ -72,66 +75,67 @@ const TaskDetailScreen = ({ route }) => {
 
 export default TaskDetailScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    paddingTop: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
-  },
-  scrollContent: { padding: 20 },
-  badge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  badgeText: { fontWeight: 'bold', color: Colors.textBadge, fontSize: 12 },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.blackSecondary,
-    marginBottom: 20,
-  },
-  infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  infoText: { marginLeft: 10, color: Colors.blackSecondary, fontSize: 16 },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
-    marginVertical: 20,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: Colors.textMuted,
-    marginBottom: 10,
-    textTransform: 'uppercase',
-  },
-  notesText: { fontSize: 16, color: Colors.blackSecondary, lineHeight: 24 },
-  editBtn: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    backgroundColor: Colors.blackSecondary,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-  },
-  backArrow: {
-    color: Colors.textPrimary,
-    fontSize: 30,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      paddingTop: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
+    },
+    scrollContent: { padding: 20 },
+    badge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+      borderRadius: 8,
+      marginBottom: 15,
+    },
+    badgeText: { fontWeight: 'bold', color: theme.textBadge, fontSize: 12 },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.blackSecondary,
+      marginBottom: 20,
+    },
+    infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+    infoText: { marginLeft: 10, color: theme.blackSecondary, fontSize: 16 },
+    divider: {
+      height: 1,
+      backgroundColor: theme.borderLight,
+      marginVertical: 20,
+    },
+    sectionLabel: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: theme.textMuted,
+      marginBottom: 10,
+      textTransform: 'uppercase',
+    },
+    notesText: { fontSize: 16, color: theme.blackSecondary, lineHeight: 24 },
+    editBtn: {
+      position: 'absolute',
+      bottom: 30,
+      right: 20,
+      backgroundColor: theme.blackSecondary,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 5,
+    },
+    backArrow: {
+      color: theme.textPrimary,
+      fontSize: 30,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+    },
+  });

@@ -12,7 +12,7 @@ import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Colors } from '../themes/color';
+import { darkTheme, lightTheme } from '../themes/color';
 
 const formatTime = timeString => {
   if (!timeString || !timeString.includes(':')) return timeString;
@@ -26,6 +26,9 @@ const formatTime = timeString => {
 };
 
 const MainScreen = () => {
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
   const navigation = useNavigation();
   const route = useRoute();
   const tasks = useSelector(state => state.tasks.items);
@@ -85,7 +88,7 @@ const MainScreen = () => {
                     key={item.id}
                     style={[
                       styles.taskRow,
-                      { backgroundColor: item.color || Colors.taskDefaultBg },
+                      { backgroundColor: item.color || theme.taskDefaultBg },
                     ]}
                   >
                     <View style={styles.taskHeaderRow}>
@@ -129,122 +132,123 @@ const MainScreen = () => {
     </View>
   );
 };
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
-  },
-  whiteContainer: {
-    flexDirection: 'column',
-    backgroundColor: Colors.surface,
-    borderRadius: 30,
-    padding: 1,
-    marginVertical: 10,
-    shadowOpacity: 0.1,
-    elevation: 2,
-    shadowRadius: 20,
-  },
-  expandedContainer: {
-    maxHeight: '70%',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  greetingContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  userGreetings: {
-    fontSize: 14,
-    color: Colors.textTertiary,
-    fontWeight: '500',
-  },
-  viewallText: {
-    color: Colors.accent,
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  taskRow: {
-    flexDirection: 'row',
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-  taskHeaderRow: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    flexDirection: 'row',
-  },
-  taskTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-    flex: 1,
-    marginRight: 15,
-  },
-  taskTime: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: Colors.textSecondary,
-    textAlign: 'right',
-  },
-  taskText: {
-    fontWeight: '700',
-    marginBottom: 10,
-    fontSize: 20,
-    color: Colors.textPrimary,
-    marginTop: 4,
-    marginBottom: 15,
-  },
-  tabContainer: {
-    marginBottom: 25,
-  },
-  pill: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
-    backgroundColor: Colors.inactivePill,
-    marginRight: 10,
-    marginBottom: 15,
-  },
-  activePill: {
-    backgroundColor: Colors.primary,
-    color: Colors.white,
-  },
-  pillText: {
-    color: Colors.textPlaceholder,
-    fontWeight: '600',
-  },
-  activePillText: {
-    color: Colors.white,
-  },
-  taskListContainer: {
-    flex: 1,
-    marginTop: 10,
-    minHeight: 50,
-  },
-  taskListCard: {
-    borderRadius: 30,
-    padding: 20,
-  },
-  emptyTaskContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    paddingVertical: 10,
-  },
-  emptyTaskText: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: Colors.textMuted,
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: theme.background,
+      paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+    },
+    whiteContainer: {
+      flexDirection: 'column',
+      backgroundColor: theme.surface,
+      borderRadius: 30,
+      padding: 1,
+      marginVertical: 10,
+      shadowOpacity: 0.1,
+      elevation: 2,
+      shadowRadius: 20,
+    },
+    expandedContainer: {
+      maxHeight: '70%',
+    },
+    container: {
+      flex: 1,
+      backgroundColor: theme.surface,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 16,
+    },
+    greetingContainer: {
+      marginTop: 20,
+      marginBottom: 20,
+    },
+    userGreetings: {
+      fontSize: 14,
+      color: theme.textTertiary,
+      fontWeight: '500',
+    },
+    viewallText: {
+      color: theme.accent,
+      fontWeight: '600',
+      fontSize: 14,
+    },
+    taskRow: {
+      flexDirection: 'row',
+      paddingVertical: 10,
+      paddingHorizontal: 25,
+      borderRadius: 50,
+      marginBottom: 10,
+    },
+    taskHeaderRow: {
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+      flexDirection: 'row',
+    },
+    taskTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.textPrimary,
+      flex: 1,
+      marginRight: 15,
+    },
+    taskTime: {
+      fontSize: 12,
+      fontWeight: '400',
+      color: theme.textSecondary,
+      textAlign: 'right',
+    },
+    taskText: {
+      fontWeight: '700',
+      marginBottom: 10,
+      fontSize: 20,
+      color: theme.textPrimary,
+      marginTop: 4,
+      marginBottom: 15,
+    },
+    tabContainer: {
+      marginBottom: 25,
+    },
+    pill: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 25,
+      backgroundColor: theme.inactivePill,
+      marginRight: 10,
+      marginBottom: 15,
+    },
+    activePill: {
+      backgroundColor: theme.primary,
+      color: theme.white,
+    },
+    pillText: {
+      color: theme.textPlaceholder,
+      fontWeight: '600',
+    },
+    activePillText: {
+      color: theme.white,
+    },
+    taskListContainer: {
+      flex: 1,
+      marginTop: 10,
+      minHeight: 50,
+    },
+    taskListCard: {
+      borderRadius: 30,
+      padding: 20,
+    },
+    emptyTaskContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 40,
+      paddingVertical: 10,
+    },
+    emptyTaskText: {
+      fontWeight: 'bold',
+      fontSize: 16,
+      color: theme.textMuted,
+    },
+  });
 export default MainScreen;

@@ -1,9 +1,14 @@
 import { StyleSheet, View, Image } from 'react-native';
 import React from 'react';
-import { Colors } from '../themes/color';
+import { useSelector } from 'react-redux';
+import { useTheme } from '../themes/ThemeContext';
 import logo from '../../assets/final_logo.png';
+import { darkTheme, lightTheme } from '../themes/color';
 
 const SplashScreen = () => {
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
   return (
     <View style={styles.container}>
       <Image source={logo} style={styles.logo} resizeMode="cover"></Image>
@@ -13,15 +18,16 @@ const SplashScreen = () => {
 
 export default SplashScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    height: 150,
-    width: 150,
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    logo: {
+      height: 150,
+      width: 150,
+    },
+  });

@@ -8,10 +8,14 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
-import { Colors } from '../themes/color';
+import { lightTheme, darkTheme } from '../themes/color';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useSelector } from 'react-redux';
 
 const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
   const [selectedHours, setSelectedHours] = useState('12');
   const [selectedMinutes, setSelectedMinutes] = useState('00');
   const [selectedSeconds, setSelectedSeconds] = useState('00');
@@ -170,97 +174,98 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
 
 export default TimePicker;
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: Colors.modalOverlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '93%',
-    backgroundColor: Colors.surface,
-    borderRadius: 24,
-    padding: 20,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: 250,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    marginBottom: 10,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-    gap: 12,
-  },
-  pickerWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 200,
-    width: '100%',
-    backgroundColor: 'transparent',
-  },
-  cancelBtn: {
-    width: 100,
-    backgroundColor: Colors.buttonCancel,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  saveBtn: {
-    width: 100,
-    backgroundColor: Colors.buttonActive,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontWeight: '600',
-    color: Colors.blackSecondary,
-  },
-  saveText: {
-    fontWeight: '600',
-    color: Colors.white,
-  },
-  pickerColumn: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    textShadowColor: 'transparent',
-    marginHorizontal: -2,
-  },
-  separator: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.blackSecondary,
-  },
-  selectionLinesContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  topLine: {
-    width: '100%',
-    height: 0.5,
-    backgroundColor: Colors.pickerLine,
-    position: 'absolute',
-    top: 70,
-    marginBottom: 40,
-  },
-  bottomLine: {
-    width: '100%',
-    height: 1,
-    backgroundColor: Colors.pickerLine,
-    position: 'absolute',
-    bottom: 70,
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: theme.modalOverlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContainer: {
+      width: '93%',
+      backgroundColor: theme.surface,
+      borderRadius: 24,
+      padding: 20,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      minHeight: 250,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: theme.textPrimary,
+      marginBottom: 10,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 20,
+      gap: 12,
+    },
+    pickerWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 200,
+      width: '100%',
+      backgroundColor: 'transparent',
+    },
+    cancelBtn: {
+      width: 100,
+      backgroundColor: theme.buttonCancel,
+      paddingVertical: 12,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    saveBtn: {
+      width: 100,
+      backgroundColor: theme.buttonActive,
+      paddingVertical: 12,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    cancelText: {
+      fontWeight: '600',
+      color: theme.blackSecondary,
+    },
+    saveText: {
+      fontWeight: '600',
+      color: theme.white,
+    },
+    pickerColumn: {
+      flex: 1,
+      backgroundColor: 'transparent',
+      textShadowColor: 'transparent',
+      marginHorizontal: -2,
+    },
+    separator: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.blackSecondary,
+    },
+    selectionLinesContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1,
+    },
+    topLine: {
+      width: '100%',
+      height: 0.5,
+      backgroundColor: theme.pickerLine,
+      position: 'absolute',
+      top: 70,
+      marginBottom: 40,
+    },
+    bottomLine: {
+      width: '100%',
+      height: 1,
+      backgroundColor: theme.pickerLine,
+      position: 'absolute',
+      bottom: 70,
+    },
+  });

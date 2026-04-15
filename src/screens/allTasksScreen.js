@@ -22,7 +22,7 @@ import { PieChart } from 'react-native-gifted-charts';
 import { parseDate } from './createTaskScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { Colors } from '../themes/color';
+import { lightTheme, darkTheme } from '../themes/color';
 
 const generateDateList = () => {
   const dates = [];
@@ -41,38 +41,56 @@ const generateDateList = () => {
 };
 
 const AllTasksScreen = () => {
+  // THEME Data
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
   const dateListRef = useRef(null);
   const dispatch = useDispatch();
   const tasks = useSelector(state => state.tasks.items);
 
   const navigation = useNavigation();
+
+  // FILTER TASKS States
+  const [filterVisible, setFilterVisible] = useState(false);
+  const [currentFilterTab, setCurrentFilterTab] = useState('Type');
+
+  // UNDO States
   const [undoVisible, setUndoVisible] = useState(false);
-  const [deletedTask, setDeletedTask] = useState(null);
-  const undoTimer = useRef(null);
-  const [activeTab, setActiveTab] = useState('All');
-  const [chartKey, setChartKey] = useState(0);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toLocaleDateString('en-GB'),
-  );
-  const [priorityModal, setPriorityModal] = useState({
-    visible: false,
-    taskId: null,
-  });
+  // DELETE Modal States
   const [deleteModal, setDeleteModal] = useState({
     visible: false,
     taskId: null,
     taskTitle: '',
   });
+  const [deletedTask, setDeletedTask] = useState(null);
+  // --------------------------------------------------
+  const undoTimer = useRef(null);
+  // --------------------------------------------------
+  // ACTIVE TAB States
+  const [activeTab, setActiveTab] = useState('All');
+  // CHART States
+  const [chartKey, setChartKey] = useState(0);
+  // DATE States
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toLocaleDateString('en-GB'),
+  );
+  // PRIORITY States
+  const [priorityModal, setPriorityModal] = useState({
+    visible: false,
+    taskId: null,
+  });
+  // DATE LIST (On Top) States
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
     value: tasks.length,
-    color: Colors.blackSecondary,
+    color: theme.blackSecondary,
   });
 
   const priorityStyles = {
-    High: { iconColor: Colors.high },
-    Normal: { iconColor: Colors.normal },
-    Low: { iconColor: Colors.low },
+    High: { iconColor: theme.high },
+    Normal: { iconColor: theme.normal },
+    Low: { iconColor: theme.low },
   };
 
   const dateList = useMemo(() => generateDateList(), []);
@@ -109,7 +127,7 @@ const AllTasksScreen = () => {
     setSelectedData({
       label: 'Total',
       value: filteredTasks.length,
-      color: Colors.blackSecondary,
+      color: theme.blackSecondary,
     });
     setChartKey(chartKey + 1);
   };
@@ -136,13 +154,13 @@ const AllTasksScreen = () => {
       return [
         {
           value: pendingCount,
-          color: Colors.chartPending,
+          color: theme.chartPending,
           label: 'Pending Tasks',
           onPress: () =>
             setSelectedData({
               label: 'Pending',
               value: pendingCount,
-              color: Colors.chartPending,
+              color: theme.chartPending,
             }),
         },
       ];
@@ -153,35 +171,35 @@ const AllTasksScreen = () => {
     return [
       {
         value: ongoingCount,
-        color: Colors.chartOngoing,
+        color: theme.chartOngoing,
         label: 'Ongoing Tasks',
         onPress: () =>
           setSelectedData({
             label: 'Ongoing',
             value: ongoingCount,
-            color: Colors.chartOngoing,
+            color: theme.chartOngoing,
           }),
       },
       {
         value: overdueCount,
-        color: Colors.chartOverdue,
+        color: theme.chartOverdue,
         label: 'Overdue Tasks',
         onPress: () =>
           setSelectedData({
             label: 'Overdue',
             value: overdueCount,
-            color: Colors.chartOverdue,
+            color: theme.chartOverdue,
           }),
       },
       {
         value: completedCount,
-        color: Colors.chartCompleted,
+        color: theme.chartCompleted,
         label: 'Completed Tasks',
         onPress: () =>
           setSelectedData({
             label: 'Completed',
             value: completedCount,
-            color: Colors.chartCompleted,
+            color: theme.chartCompleted,
           }),
       },
     ];
@@ -232,21 +250,21 @@ const AllTasksScreen = () => {
         />
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>All tasks</Text>
-          {selectedDate !== new Date().toLocaleDateString('en-GB') && (
-            <TouchableOpacity onPress={goToday}>
-              <Text
-                style={{
-                  color: Colors.accent,
-                  fontWeight: 'bold',
-                  fontSize: 14,
-                  marginBottom: -4.7,
-                }}
-              >
-                Today
-              </Text>
-            </TouchableOpacity>
-          )}
+          <View style={styles.headerLeft}>
+            <Text style={styles.sectionTitle}>All tasks</Text>
+            {selectedDate !== new Date().toLocaleDateString('en-GB') && (
+              <TouchableOpacity onPress={goToday}>
+                <Text style={styles.todayText}>Today</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setFilterVisible(true)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Icon name="add" size={24} color={theme.blackSecondary} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.topSection}>
@@ -273,8 +291,8 @@ const AllTasksScreen = () => {
                     styles.dateCard,
                     {
                       backgroundColor: isSelected
-                        ? Colors.blackSecondary
-                        : Colors.surface,
+                        ? theme.blackSecondary
+                        : theme.surface,
                     },
                   ]}
                 >
@@ -282,9 +300,7 @@ const AllTasksScreen = () => {
                     style={[
                       styles.dateNumber,
                       {
-                        color: isSelected
-                          ? Colors.white
-                          : Colors.blackSecondary,
+                        color: isSelected ? theme.white : theme.blackSecondary,
                       },
                     ]}
                   >
@@ -293,7 +309,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateMonthName,
-                      { color: isSelected ? Colors.white : Colors.textMuted },
+                      { color: isSelected ? theme.white : theme.textMuted },
                     ]}
                   >
                     {monthName}
@@ -301,7 +317,7 @@ const AllTasksScreen = () => {
                   <Text
                     style={[
                       styles.dateDay,
-                      { color: isSelected ? Colors.white : Colors.textMuted },
+                      { color: isSelected ? theme.white : theme.textMuted },
                     ]}
                   >
                     {dayName}
@@ -336,7 +352,7 @@ const AllTasksScreen = () => {
                       <Text
                         style={{
                           fontSize: 10,
-                          color: Colors.textMuted,
+                          color: theme.textMuted,
                           fontWeight: '600',
                         }}
                       >
@@ -368,7 +384,7 @@ const AllTasksScreen = () => {
           contentContainerStyle={{ marginBottom: 20 }}
           ListEmptyComponent={() => (
             <View style={{ alignItems: 'center', marginTop: 50 }}>
-              <Text style={{ color: Colors.textMuted }}>
+              <Text style={{ color: theme.textMuted }}>
                 No tasks for this day.
               </Text>
             </View>
@@ -394,7 +410,7 @@ const AllTasksScreen = () => {
                         styles.taskTitle,
                         task.completed && {
                           textDecorationLine: 'line-through',
-                          color: Colors.textMuted,
+                          color: theme.textMuted,
                         },
                       ]}
                       numberOfLines={1}
@@ -417,7 +433,7 @@ const AllTasksScreen = () => {
                         <FeatherIcon
                           name="edit-3"
                           size={18}
-                          color={Colors.editIcon}
+                          color={theme.editIcon}
                         ></FeatherIcon>
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -436,7 +452,7 @@ const AllTasksScreen = () => {
                         <Icon
                           name="trash-outline"
                           size={18}
-                          color={Colors.deleteIcon}
+                          color={theme.deleteIcon}
                         ></Icon>
                       </TouchableOpacity>
                     </View>
@@ -470,7 +486,7 @@ const AllTasksScreen = () => {
                         <Icon
                           name="chevron-down"
                           size={12}
-                          color={Colors.textBadge}
+                          color={theme.textBadge}
                           style={{ marginLeft: 4 }}
                         ></Icon>
                       </TouchableOpacity>
@@ -484,7 +500,7 @@ const AllTasksScreen = () => {
                         <Icon
                           name="checkmark-sharp"
                           size={18}
-                          color={task.completed ? Colors.white : Colors.black}
+                          color={task.completed ? theme.white : theme.black}
                           opacity={0.5}
                         ></Icon>
                       </TouchableOpacity>
@@ -529,7 +545,7 @@ const AllTasksScreen = () => {
               <Icon
                 name="alert-circle-outline"
                 size={50}
-                color={Colors.deleteIcon}
+                color={theme.deleteIcon}
                 style={{ marginBottom: 10 }}
               />
               <Text style={styles.deleteText}>
@@ -581,306 +597,490 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
       )}
+      <Modal
+        transparent={false}
+        visible={filterVisible}
+        animationType="slide"
+        onRequestClose={() => setFilterVisible(false)}
+      >
+        <View style={styles.drawerOverlay}>
+          <View style={styles.drawerContent}>
+            <View style={styles.drawerHeader}>
+              <TouchableOpacity onPress={() => setFilterVisible(false)}>
+                <Icon
+                  name="arrow-back"
+                  size={24}
+                  color={theme.blackSecondary}
+                ></Icon>
+              </TouchableOpacity>
+              <Text style={styles.drawerHeaderText}>Filter</Text>
+              <TouchableOpacity>
+                <Text style={styles.resetText}>RESET</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.drawerBody}>
+              <View style={styles.drawerSideBar}>
+                {['Type', 'Date'].map(tab => (
+                  <TouchableOpacity
+                    key={tab}
+                    style={[
+                      styles.sidebarTab,
+                      currentFilterTab === tab && styles.activeSidebarTab,
+                    ]}
+                    onPress={() => setCurrentFilterTab(tab)}
+                  >
+                    <Text
+                      style={[
+                        styles.sidebarTabText,
+                        currentFilterTab === tab && styles.activeSidebarTabText,
+                      ]}
+                    >
+                      {tab}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={styles.drawerTabContent}>
+                {currentFilterTab === 'Type' ? (
+                  <View style={styles.tabSection}>
+                    <View style={styles.checkboxRow}>
+                      <Icon name="checkbox" size={24} color={theme.accent} />
+                      <Text style={styles.checkboxLabel}>A-z Sorting</Text>
+                    </View>
+                    <View style={styles.checkboxRow}>
+                      <View style={styles.emptyCheckbox} />
+                      <Text style={styles.checkboxLabel}>Z-a Sorting</Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.tabSection}>
+                    <Text style={styles.dateLabel}>Start Date</Text>
+                    <View style={styles.dateInputFake}>
+                      <Icon name="calendar" size={24} color={theme.textMuted} />
+                      <Text style={styles.dateInputText}>09/09/09</Text>
+                    </View>
+                    <Text style={[styles.dateLabel, { marginTop: 30 }]}>
+                      End Date
+                    </Text>
+                    <View style={styles.dateInputFake}>
+                      <Icon
+                        name="calendar-outline"
+                        size={20}
+                        color={theme.textMuted}
+                      />
+                      <Text style={styles.dateInputText}>10/02/2024</Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.applyBtn}
+              onPress={() => setFilterVisible(false)}
+            >
+              <Text style={styles.applyBtnText}>APPLY</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
-    paddingHorizontal: 16,
-  },
-  content: { flex: 1 },
-  list: { marginTop: 10 },
-  sectionHeader: {
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    marginVertical: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.textPrimary,
-  },
-  topSection: { marginBottom: 15 },
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+      paddingHorizontal: 16,
+    },
+    content: { flex: 1 },
+    list: { marginTop: 10 },
+    sectionHeader: {
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexDirection: 'row',
+      marginVertical: 10,
+    },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.textPrimary,
+    },
+    topSection: { marginBottom: 15 },
 
-  dateCard: {
-    width: 45,
-    height: 75,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-    backgroundColor: Colors.surface,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  activeDateCard: {
-    backgroundColor: Colors.blackSecondary,
-    borderColor: Colors.blackSecondary,
-  },
-  dateNumber: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.blackSecondary,
-  },
-  dateDay: {
-    fontSize: 9,
-    color: Colors.textMuted,
-    marginTop: 6,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  dateMonthName: {
-    fontSize: 9,
-    fontWeight: 'bold',
-    color: Colors.textMuted,
-    marginTop: 1,
-  },
-  activeDateText: {
-    color: Colors.surface,
-  },
-  taskCard: {
-    backgroundColor: Colors.background,
-    borderRadius: 20,
-    padding: 16,
-    borderTopColor: Colors.taskDefaultBg,
-    borderTopWidth: 1.8,
-  },
-  overdueIndicator: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    backgroundColor: Colors.chartOverdue,
-  },
-  cardTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  taskTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.blackSecondary,
-    flex: 1,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  cardBottomRow: {
-    marginTop: -10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  leftInfoGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  medalIcon: {
-    fontSize: 22,
-    marginRight: 8,
-  },
-  dateTimeText: {
-    fontSize: 12,
-    color: Colors.blackSecondary,
-    fontWeight: '500',
-  },
-  rightActionsGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginRight: -10,
-  },
-  textPriorityBadge: {
-    flexDirection: 'row',
-    backgroundColor: Colors.badgeBackground,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    marginTop: 4,
-    width: 72,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: Colors.textBadge,
-    textAlign: 'center',
-  },
-  checkCircle: {
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.whitePure,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 16,
-    height: 32,
-    width: 32,
-  },
-  checkCompleted: {
-    backgroundColor: Colors.checkedBg,
-  },
-  completeCheckCircle: {
-    borderColor: Colors.borderLight,
-    backgroundColor: Colors.checkButton,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 16,
-    height: 26,
-    width: 26,
-    marginTop: 5,
-  },
-  checkedCircle: {
-    backgroundColor: Colors.completedBg,
-    borderColor: Colors.completedBg,
-    opacity: 0.5,
-  },
-  checkIcon: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  iconCircle: {
-    width: 26,
-    height: 26,
-    borderRadius: 16,
-    marginRight: -10,
-    backgroundColor: Colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: Colors.blackPure,
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
+    dateCard: {
+      width: 45,
+      height: 75,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 12,
+      backgroundColor: theme.surface,
+      marginRight: 10,
+      borderWidth: 1,
+      borderColor: theme.borderLight,
+    },
+    activeDateCard: {
+      backgroundColor: theme.blackSecondary,
+      borderColor: theme.blackSecondary,
+    },
+    dateNumber: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: theme.blackSecondary,
+    },
+    dateDay: {
+      fontSize: 9,
+      color: theme.textMuted,
+      marginTop: 6,
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    dateMonthName: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: theme.textMuted,
+      marginTop: 1,
+    },
+    activeDateText: {
+      color: theme.surface,
+    },
+    taskCard: {
+      backgroundColor: theme.background,
+      borderRadius: 20,
+      padding: 16,
+      borderTopColor: theme.taskDefaultBg,
+      borderTopWidth: 1.8,
+    },
+    overdueIndicator: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      width: 4,
+      backgroundColor: theme.chartOverdue,
+    },
+    cardTopRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    taskTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.blackSecondary,
+      flex: 1,
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      gap: 15,
+    },
+    cardBottomRow: {
+      marginTop: -10,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    leftInfoGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    medalIcon: {
+      fontSize: 22,
+      marginRight: 8,
+    },
+    dateTimeText: {
+      fontSize: 12,
+      color: theme.blackSecondary,
+      fontWeight: '500',
+    },
+    rightActionsGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginRight: -10,
+    },
+    textPriorityBadge: {
+      flexDirection: 'row',
+      backgroundColor: theme.badgeBackground,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 10,
+      marginTop: 4,
+      width: 72,
+    },
+    badgeText: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: theme.textBadge,
+      textAlign: 'center',
+    },
+    checkCircle: {
+      borderColor: theme.borderLight,
+      backgroundColor: theme.whitePure,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderRadius: 16,
+      height: 32,
+      width: 32,
+    },
+    checkCompleted: {
+      backgroundColor: theme.checkedBg,
+    },
+    completeCheckCircle: {
+      borderColor: theme.borderLight,
+      backgroundColor: theme.checkButton,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderRadius: 16,
+      height: 26,
+      width: 26,
+      marginTop: 5,
+    },
+    checkedCircle: {
+      backgroundColor: theme.completedBg,
+      borderColor: theme.completedBg,
+      opacity: 0.5,
+    },
+    checkIcon: {
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    iconCircle: {
+      width: 26,
+      height: 26,
+      borderRadius: 16,
+      marginRight: -10,
+      backgroundColor: theme.surface,
+      justifyContent: 'center',
+      alignItems: 'center',
+      shadowColor: theme.blackPure,
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
 
-  chartContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    backgroundColor: Colors.background,
-    padding: 15,
-    width: '100%',
-  },
-  dotContainer: {
-    justifyContent: 'space-evenly',
-    flexDirection: 'row',
-    width: '107%',
-    marginTop: 20,
-  },
-  chartItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dotText: {
-    fontSize: 11,
-    color: Colors.textChartLabel,
-    fontWeight: '700',
-  },
-  dot: {
-    width: 6.5,
-    height: 6.5,
-    borderRadius: 4,
-    marginRight: 8,
-    marginLeft: 8,
-  },
+    chartContainer: {
+      alignItems: 'center',
+      marginTop: 20,
+      backgroundColor: theme.background,
+      padding: 15,
+      width: '100%',
+    },
+    dotContainer: {
+      justifyContent: 'space-evenly',
+      flexDirection: 'row',
+      width: '107%',
+      marginTop: 20,
+    },
+    chartItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    dotText: {
+      fontSize: 11,
+      color: theme.textChartLabel,
+      fontWeight: '700',
+    },
+    dot: {
+      width: 6.5,
+      height: 6.5,
+      borderRadius: 4,
+      marginRight: 8,
+      marginLeft: 8,
+    },
 
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: Colors.shadow,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  priorityMenu: {
-    backgroundColor: Colors.white,
-    width: '70%',
-    borderRadius: 24,
-    padding: 16,
-    elevation: 10,
-  },
-  menuTitle: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    color: Colors.textMuted,
-    marginBottom: 15,
-    fontSize: 15,
-  },
-  menuItem: {
-    paddingVertical: 15,
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: Colors.taskDefaultBg,
-  },
-  menuItemText: { fontSize: 17, fontWeight: '600' },
-  deleteBox: {
-    backgroundColor: Colors.white,
-    width: '80%',
-    borderRadius: 24,
-    padding: 24,
-    alignItems: 'center',
-    elevation: 10,
-  },
-  subTitle: {
-    color: Colors.textMuted,
-    fontSize: 14,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  modalButtonRow: {
-    flexDirection: 'row',
-    width: '100%',
-    gap: 12,
-  },
-  cancelBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: Colors.surface,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  cancelBtnText: {
-    color: Colors.blackSecondary,
-    fontWeight: '600',
-  },
-  confirmBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: Colors.deleteIcon,
-    alignItems: 'center',
-  },
-  confirmBtnText: {
-    color: Colors.white,
-    fontWeight: '600',
-  },
-  undoMessage: {
-    position: 'absolute',
-    bottom: 10,
-    left: 20,
-    right: 20,
-    backgroundColor: Colors.blackSecondary,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 15,
-    borderRadius: 12,
-    elevation: 5,
-    alignItems: 'center',
-  },
-  undoText: {
-    color: Colors.white,
-    fontWeight: '600',
-  },
-  undoBtn: {
-    color: Colors.accent,
-    fontWeight: 'bold',
-  },
-});
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: theme.shadow,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    priorityMenu: {
+      backgroundColor: theme.white,
+      width: '70%',
+      borderRadius: 24,
+      padding: 16,
+      elevation: 10,
+    },
+    menuTitle: {
+      textAlign: 'center',
+      fontWeight: 'bold',
+      color: theme.textMuted,
+      marginBottom: 15,
+      fontSize: 15,
+    },
+    menuItem: {
+      paddingVertical: 15,
+      alignItems: 'center',
+      borderTopWidth: 1,
+      borderTopColor: theme.taskDefaultBg,
+    },
+    menuItemText: { fontSize: 17, fontWeight: '600' },
+    deleteBox: {
+      backgroundColor: theme.white,
+      width: '80%',
+      borderRadius: 24,
+      padding: 24,
+      alignItems: 'center',
+      elevation: 10,
+    },
+    subTitle: {
+      color: theme.textMuted,
+      fontSize: 14,
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    modalButtonRow: {
+      flexDirection: 'row',
+      width: '100%',
+      gap: 12,
+    },
+    cancelBtn: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 12,
+      backgroundColor: theme.surface,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.borderLight,
+    },
+    cancelBtnText: {
+      color: theme.blackSecondary,
+      fontWeight: '600',
+    },
+    confirmBtn: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 12,
+      backgroundColor: theme.deleteIcon,
+      alignItems: 'center',
+    },
+    confirmBtnText: {
+      color: theme.white,
+      fontWeight: '600',
+    },
+    undoMessage: {
+      position: 'absolute',
+      bottom: 10,
+      left: 20,
+      right: 20,
+      backgroundColor: theme.blackSecondary,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 15,
+      borderRadius: 12,
+      elevation: 5,
+      alignItems: 'center',
+    },
+    undoText: {
+      color: theme.white,
+      fontWeight: '600',
+    },
+    undoBtn: {
+      color: theme.accent,
+      fontWeight: 'bold',
+    },
+    todayText: {
+      color: theme.accent,
+      fontWeight: 'bold',
+      fontSize: 14,
+    },
+    drawerOverlay: {
+      flex: 1,
+      flexDirection: 'row',
+      backgroundColor: theme.white,
+    },
+    drawerDrop: {
+      flex: 0.2,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    drawerContent: {
+      flex: 1,
+      backgroundColor: theme.white,
+      paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    },
+    drawerHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingBottom: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderLight,
+    },
+    drawerHeaderText: { fontSize: 18, fontWeight: 'bold' },
+    resetText: { color: theme.accent, fontWeight: 'bold' },
+    drawerBody: { flex: 1, flexDirection: 'row' },
+    drawerSideBar: {
+      width: 100,
+      backgroundColor: '#f8f8f8',
+      borderRightWidth: 1,
+      borderRightColor: theme.borderLight,
+    },
+    tabSection: {
+      flex: 1,
+      paddingTop: 10,
+    },
+    sidebarTab: {
+      paddingVertical: 20,
+      paddingHorizontal: 15,
+    },
+    activeSidebarTab: {
+      backgroundColor: theme.accent, // Matching your yellow/gold theme
+    },
+    sidebarTabText: { color: theme.textMuted, fontWeight: '600' },
+    activeSidebarTabText: { color: theme.blackSecondary },
+    drawerTabContent: { flex: 1, padding: 20 },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    checkboxLabel: {
+      marginLeft: 15,
+      fontSize: 16,
+      color: theme.blackSecondary,
+    },
+    emptyCheckbox: {
+      width: 22,
+      height: 22,
+      borderWidth: 2,
+      borderColor: theme.borderLight,
+      borderRadius: 4,
+    },
+    dateLabel: { color: theme.textMuted, fontSize: 14, marginBottom: 10 },
+    dateInputFake: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: theme.borderLight,
+      paddingVertical: 8,
+    },
+    dateInputText: {
+      marginLeft: 10,
+      fontSize: 16,
+      color: theme.blackSecondary,
+    },
+    applyBtn: {
+      backgroundColor: theme.accent,
+      paddingVertical: 20,
+      alignItems: 'center',
+    },
+    applyBtnText: {
+      fontWeight: 'bold',
+      fontSize: 16,
+      color: theme.blackSecondary,
+    },
+  });
 
 export default AllTasksScreen;

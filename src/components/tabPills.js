@@ -1,8 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../themes/color';
+import { lightTheme, darkTheme } from '../themes/color';
+import { useSelector } from 'react-redux';
 
 const SwitchTabs = ({ activeTab, onTabChange }) => {
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -39,35 +43,36 @@ const SwitchTabs = ({ activeTab, onTabChange }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    paddingVertical: 15,
-  },
-  tabPill: {
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    alignItems: 'space-evenly',
-    justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: Colors.pillInactiveBg,
-    marginRight: 12,
-    height: 42,
-  },
-  activeTab: {
-    backgroundColor: Colors.primary,
-    color: Colors.white,
-  },
-  tabText: {
-    color: Colors.textPillInactive,
-    fontWeight: '600',
-    fontSize: 13,
-    textAlign: 'center',
-    letterSpacing: -0.4,
-  },
-  activeText: {
-    color: Colors.textInverted,
-    fontWeight: '700',
-  },
-});
+const getStyles = theme =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      paddingVertical: 15,
+    },
+    tabPill: {
+      paddingHorizontal: 22,
+      paddingVertical: 10,
+      alignItems: 'space-evenly',
+      justifyContent: 'center',
+      borderRadius: 22,
+      backgroundColor: theme.pillInactiveBg,
+      marginRight: 12,
+      height: 42,
+    },
+    activeTab: {
+      backgroundColor: theme.primary,
+      color: theme.white,
+    },
+    tabText: {
+      color: theme.textPillInactive,
+      fontWeight: '600',
+      fontSize: 13,
+      textAlign: 'center',
+      letterSpacing: -0.4,
+    },
+    activeText: {
+      color: theme.textInverted,
+      fontWeight: '700',
+    },
+  });
 export default SwitchTabs;
