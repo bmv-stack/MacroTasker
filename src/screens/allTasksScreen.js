@@ -90,6 +90,8 @@ const AllTasksScreen = () => {
     visible: false,
     taskId: null,
   });
+  // -----FILTER States-----
+  const [sortOrder, setSortOrder] = useState(null);
   // -----DATE LIST (On Top) States-----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
@@ -120,10 +122,18 @@ const AllTasksScreen = () => {
     const todayTasks = tasks.filter(task => task.date === selectedDate);
 
     return [...todayTasks].sort((a, b) => {
-      if (a.completed === b.completed) return 0;
-      return a.completed ? 1 : -1;
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+      if (sortOrder === 'asc') {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortOrder === 'desc') {
+        return b.title.localeCompare(a.title);
+      }
+      return 0;
     });
-  }, [tasks, selectedDate]);
+  }, [tasks, selectedDate, sortOrder]);
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -571,7 +581,7 @@ const AllTasksScreen = () => {
                 color={theme.deleteIcon}
                 style={{ marginBottom: 10 }}
               />
-              <Text style={styles.deleteText}>
+              <Text style={{ color: theme.textPrimary }}>
                 Delete task '{deleteModal.taskTitle}' ?
               </Text>
               <Text style={styles.subTitle}>
@@ -635,7 +645,12 @@ const AllTasksScreen = () => {
                 <Icon name="arrow-back" size={24} color={theme.primary}></Icon>
               </TouchableOpacity>
               <Text style={styles.drawerHeaderText}>Filter</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setSortOrder(null);
+                  setCurrentFilterTab('Type');
+                }}
+              >
                 <Text style={styles.resetText}>RESET</Text>
               </TouchableOpacity>
             </View>
@@ -664,14 +679,32 @@ const AllTasksScreen = () => {
               <View style={styles.drawerTabContent}>
                 {currentFilterTab === 'Type' ? (
                   <View style={styles.tabSection}>
-                    <View style={styles.checkboxRow}>
-                      <Icon name="checkbox" size={24} color={theme.accent} />
+                    <TouchableOpacity
+                      style={styles.checkboxRow}
+                      onPress={() => setSortOrder('asc')}
+                    >
+                      <Icon
+                        name={
+                          sortOrder === 'asc' ? 'checkbox' : 'square-outline'
+                        }
+                        size={24}
+                        color={theme.accent}
+                      />
                       <Text style={styles.checkboxLabel}>A-z Sorting</Text>
-                    </View>
-                    <View style={styles.checkboxRow}>
-                      <View style={styles.emptyCheckbox} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.checkboxRow}
+                      onPress={() => setSortOrder('desc')}
+                    >
+                      <Icon
+                        name={
+                          sortOrder === 'desc' ? 'checkbox' : 'square-outline'
+                        }
+                        size={24}
+                        color={theme.accent}
+                      />
                       <Text style={styles.checkboxLabel}>Z-a Sorting</Text>
-                    </View>
+                    </TouchableOpacity>
                   </View>
                 ) : (
                   <View style={styles.tabSection}>
@@ -939,7 +972,7 @@ const getStyles = theme =>
     },
     menuItemText: { fontSize: 17, fontWeight: '600' },
     deleteBox: {
-      backgroundColor: theme.white,
+      backgroundColor: theme.surface,
       width: '80%',
       borderRadius: 24,
       padding: 24,
@@ -967,7 +1000,7 @@ const getStyles = theme =>
       borderColor: theme.borderLight,
     },
     cancelBtnText: {
-      color: theme.blackSecondary,
+      color: theme.primary,
       fontWeight: '600',
     },
     confirmBtn: {
@@ -1052,7 +1085,7 @@ const getStyles = theme =>
       paddingHorizontal: 15,
     },
     activeSidebarTab: {
-      backgroundColor: theme.accent, // Matching your yellow/gold theme
+      backgroundColor: theme.accent,
     },
     sidebarTabText: { color: theme.textMuted, fontWeight: '600' },
     activeSidebarTabText: { color: theme.primary },
@@ -1088,14 +1121,14 @@ const getStyles = theme =>
       color: theme.primary,
     },
     applyBtn: {
-      backgroundColor: theme.accent,
+      backgroundColor: theme.primary,
       paddingVertical: 20,
       alignItems: 'center',
     },
     applyBtnText: {
       fontWeight: 'bold',
       fontSize: 16,
-      color: theme.blackSecondary,
+      color: theme.textInverted,
     },
   });
 
