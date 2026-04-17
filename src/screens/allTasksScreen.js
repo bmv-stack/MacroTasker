@@ -7,7 +7,6 @@ import {
   Platform,
   StatusBar,
   FlatList,
-  Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,6 +23,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { lightTheme, darkTheme } from '../themes/color';
 import CalendarComponent from '../components/calendarComponent';
+import PriorityModal from '../components/Modals/PriorityModal';
+import DeleteModal from '../components/Modals/DeleteModal';
+import FilterModal from '../components/Modals/FilterModal';
 
 // -----DateList Generation function-----
 const generateDateList = () => {
@@ -32,7 +34,7 @@ const generateDateList = () => {
     const d = new Date();
     d.setDate(d.getDate() + i);
     dates.push({
-      fullDate: d.toLocaleDateString('en-GB'),
+      fullDate: d.toISOString().split('T')[0],
       dayNumber: d.getDate().toString(),
       dayName: d
         .toLocaleDateString('en-GB', { month: 'short', weekday: 'short' })
@@ -43,14 +45,13 @@ const generateDateList = () => {
 };
 
 // -----Date Conversion Functions-----
-const convertToDDMMYYYY = dateString => {
+const formatDate = dateString => {
+  if (!dateString) return '';
+  if (dateString.includes('/')) {
+    return dateString;
+  }
   const [year, month, day] = dateString.split('-');
   return `${day}/${month}/${year}`;
-};
-
-const convertToYYYYMMDD = dateString => {
-  const [day, month, year] = dateString.split('/');
-  return `${year}-${month}-${day}`;
 };
 
 const AllTasksScreen = () => {
@@ -95,7 +96,7 @@ const AllTasksScreen = () => {
   const [chartKey, setChartKey] = useState(0);
   // -----DATE States-----
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toLocaleDateString('en-GB'),
+    new Date().toISOString().split('T')[0],
   );
   // -----PRIORITY States-----
   const [priorityModal, setPriorityModal] = useState({
@@ -124,7 +125,7 @@ const AllTasksScreen = () => {
   const dateList = useMemo(() => generateDateList(), []);
 
   const goToday = () => {
-    const today = new Date().toLocaleDateString('en-GB');
+    const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);
 
     dateListRef.current?.scrollToIndex({
@@ -147,7 +148,15 @@ const AllTasksScreen = () => {
         });
       }
     } else {
-      tasksToFilter = tasks.filter(task => task.date === selectedDate);
+      const selected = parseDate(selectedDate);
+      if (selected) {
+        tasksToFilter = tasks.filter(task => {
+          const taskDate = parseDate(task.date);
+          return (
+            taskDate && taskDate.toDateString() === selected.toDateString()
+          );
+        });
+      }
     }
 
     return [...tasksToFilter].sort((a, b) => {
@@ -309,7 +318,7 @@ const AllTasksScreen = () => {
         <View style={styles.sectionHeader}>
           <View style={styles.headerLeft}>
             <Text style={styles.sectionTitle}>All tasks</Text>
-            {selectedDate !== new Date().toLocaleDateString('en-GB') && (
+            {selectedDate !== new Date().toISOString().split('T')[0] && (
               <TouchableOpacity onPress={goToday}>
                 <Text style={styles.todayText}>Today</Text>
               </TouchableOpacity>
@@ -578,7 +587,7 @@ const AllTasksScreen = () => {
                 <View style={styles.cardBottomRow}>
                   <View style={styles.leftInfoGroup}>
                     <Text style={styles.dateTimeText}>
-                      {task.date} | {formatTime(task.time)}
+                      {formatDate(task.date)} | {formatTime(task.time)}
                     </Text>
                     <View>
                       <Icon
@@ -631,84 +640,30 @@ const AllTasksScreen = () => {
             );
           }}
         ></FlatList>
-        {/* Priority Modal */}
-        <Modal transparent visible={priorityModal.visible} animationType="fade">
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => setPriorityModal({ visible: false, taskId: null })}
-          >
-            <View style={styles.priorityMenu}>
-              <Text style={styles.menuTitle}>Set Priority</Text>
-              {['High', 'Normal', 'Low'].map(p => (
-                <TouchableOpacity
-                  key={p}
-                  style={styles.menuItem}
-                  onPress={() => handlePriorityChange(priorityModal.taskId, p)}
-                >
-                  <Text
-                    style={[
-                      styles.menuItemText,
-                      { color: priorityStyles[p].iconColor },
-                    ]}
-                  >
-                    {p}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </TouchableOpacity>
-        </Modal>
-        {/* Delete Modal */}
-        <Modal transparent visible={deleteModal.visible} animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View style={styles.deleteBox}>
-              <Icon
-                name="alert-circle-outline"
-                size={50}
-                color={theme.deleteIcon}
-                style={{ marginBottom: 10 }}
-              />
-              <Text style={{ color: theme.textPrimary }}>
-                Delete task '{deleteModal.taskTitle}' ?
-              </Text>
-              <Text style={styles.subTitle}>
-                This action cannot be reverted.
-              </Text>
-
-              <View style={styles.modalButtonRow}>
-                <TouchableOpacity
-                  style={styles.cancelBtn}
-                  onPress={() =>
-                    setDeleteModal({ visible: false, taskId: null })
-                  }
-                >
-                  <Text style={styles.cancelBtnText}>Cancel</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.confirmBtn}
-                  onPress={() => {
-                    const taskToSave = tasks.find(
-                      t => t.id === deleteModal.taskId,
-                    );
-                    setDeletedTask(taskToSave);
-                    dispatch(deleteTask(deleteModal.taskId));
-                    setDeleteModal({ visible: false, taskId: null });
-                    setUndoVisible(true);
-                    if (undoTimer.current) clearTimeout(undoTimer.current);
-                    undoTimer.current = setTimeout(
-                      () => setUndoVisible(false),
-                      5000,
-                    );
-                  }}
-                >
-                  <Text style={styles.confirmBtnText}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        <PriorityModal
+          visible={priorityModal.visible}
+          onClose={() => setPriorityModal({ visible: false, taskId: null })}
+          onSelect={priority =>
+            handlePriorityChange(priorityModal.taskId, priority)
+          }
+        />
+        {
+          /* Delete Modal */
+          <DeleteModal
+            visible={deleteModal.visible}
+            taskTitle={deleteModal.taskTitle}
+            onCancel={() => setDeleteModal({ visible: false, taskId: null })}
+            onConfirm={() => {
+              const taskToSave = tasks.find(t => t.id === deleteModal.taskId);
+              setDeletedTask(taskToSave);
+              dispatch(deleteTask(deleteModal.taskId));
+              setDeleteModal({ visible: false, taskId: null });
+              setUndoVisible(true);
+              if (undoTimer.current) clearTimeout(undoTimer.current);
+              undoTimer.current = setTimeout(() => setUndoVisible(false), 5000);
+            }}
+          />
+        }
       </View>
       {/* UNDO Modal */}
       {undoVisible && (
@@ -719,162 +674,42 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
       )}
-      {/* -----Filter Modal----- */}
-      <Modal
-        transparent={true}
+      <FilterModal
         visible={filterVisible}
-        animationType="slide"
-        onRequestClose={() => setFilterVisible(false)}
-      >
-        <View style={styles.drawerOverlay}>
-          <View style={styles.drawerContent}>
-            <View style={styles.drawerHeader}>
-              <TouchableOpacity onPress={() => setFilterVisible(false)}>
-                <Icon name="arrow-back" size={24} color={theme.primary}></Icon>
-              </TouchableOpacity>
-              <Text style={styles.drawerHeaderText}>Filter</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setSortOrder(null);
-                  setCurrentFilterTab('Type');
-                  setStartDateFilter('');
-                  setEndDateFilter('');
-                }}
-              >
-                <Text style={styles.resetText}>RESET</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.drawerBody}>
-              <View style={styles.drawerSideBar}>
-                {['Type', 'Date'].map(tab => (
-                  <TouchableOpacity
-                    key={tab}
-                    style={[
-                      styles.sidebarTab,
-                      currentFilterTab === tab && styles.activeSidebarTab,
-                    ]}
-                    onPress={() => setCurrentFilterTab(tab)}
-                  >
-                    <Text
-                      style={[
-                        styles.sidebarTabText,
-                        currentFilterTab === tab && styles.activeSidebarTabText,
-                      ]}
-                    >
-                      {tab}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-              <View style={styles.drawerTabContent}>
-                {currentFilterTab === 'Type' ? (
-                  <View style={styles.tabSection}>
-                    <TouchableOpacity
-                      style={styles.checkboxRow}
-                      onPress={() => setSortOrder('asc')}
-                    >
-                      <Icon
-                        name={
-                          sortOrder === 'asc' ? 'checkbox' : 'square-outline'
-                        }
-                        size={24}
-                        color={theme.accent}
-                      />
-                      <Text style={styles.checkboxLabel}>A-z Sorting</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.checkboxRow}
-                      onPress={() => setSortOrder('desc')}
-                    >
-                      <Icon
-                        name={
-                          sortOrder === 'desc' ? 'checkbox' : 'square-outline'
-                        }
-                        size={24}
-                        color={theme.accent}
-                      />
-                      <Text style={styles.checkboxLabel}>Z-a Sorting</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View style={styles.tabSection}>
-                    <Text style={styles.dateLabel}>Start Date</Text>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setFilterVisible(false);
-                        setCalendarType('start');
-                        setCalendarVisible(true);
-                      }}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                      <View style={styles.dateInputFake}>
-                        <Icon
-                          name="calendar"
-                          size={24}
-                          color={theme.textMuted}
-                        />
-                        <Text style={styles.dateInputText}>
-                          {startDateFilter || 'Select Start Date'}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                    <Text style={[styles.dateLabel, { marginTop: 30 }]}>
-                      End Date
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setFilterVisible(false);
-                        setCalendarType('end');
-                        setCalendarVisible(true);
-                      }}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
-                      <View style={styles.dateInputFake}>
-                        <Icon
-                          name="calendar-outline"
-                          size={20}
-                          color={theme.textMuted}
-                        />
-                        <Text style={styles.dateInputText}>
-                          {endDateFilter || 'Select End Date'}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.applyBtn}
-              onPress={() => setFilterVisible(false)}
-            >
-              <Text style={styles.applyBtnText}>APPLY</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      {/* Calendar Modal */}
-      <CalendarComponent
-        visible={calendarVisible}
-        onClose={() => setCalendarVisible(false)}
-        onSelect={day => {
-          const formatted = convertToDDMMYYYY(day.dateString);
+        onClose={() => setFilterVisible(false)}
+        currentFilterTab={currentFilterTab}
+        onTabChange={setCurrentFilterTab}
+        sortOrder={sortOrder}
+        onSortChange={setSortOrder}
+        onReset={() => {
+          setSortOrder(null);
+          setCurrentFilterTab('Type');
+          setStartDateFilter('');
+          setEndDateFilter('');
+        }}
+        startDateFilter={startDateFilter}
+        endDateFilter={endDateFilter}
+        onOpenCalendar={type => {
+          setCalendarType(type);
+          setCalendarVisible(true);
+        }}
+        calendarVisible={calendarVisible}
+        calendarType={calendarType}
+        calendarInitialDate={
+          calendarType === 'start'
+            ? startDateFilter || undefined
+            : endDateFilter || undefined
+        }
+        onCalendarSelect={day => {
           if (calendarType === 'start') {
-            setStartDateFilter(formatted);
+            setStartDateFilter(day.dateString);
           } else {
-            setEndDateFilter(formatted);
+            setEndDateFilter(day.dateString);
           }
           setCalendarVisible(false);
         }}
-        initialDate={
-          calendarType === 'start'
-            ? startDateFilter
-              ? convertToYYYYMMDD(startDateFilter)
-              : undefined
-            : endDateFilter
-            ? convertToYYYYMMDD(endDateFilter)
-            : undefined
-        }
+        onCalendarClose={() => setCalendarVisible(false)}
+        onApply={() => setFilterVisible(false)}
       />
     </View>
   );

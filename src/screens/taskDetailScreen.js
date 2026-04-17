@@ -14,6 +14,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleTheme } from '../redux/slices/taskSlice';
 import React from 'react';
 
+const formatDate = dateString => {
+  if (!dateString) return '';
+  if (dateString.includes('/')) {
+    return dateString; // Already DD/MM/YYYY
+  }
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const TaskDetailScreen = ({ route }) => {
   const isDarkMode = useSelector(state => state.tasks.isDarkMode);
   const theme = isDarkMode ? darkTheme : lightTheme;
@@ -64,7 +73,7 @@ const TaskDetailScreen = ({ route }) => {
             color={theme.textMuted}
           ></Icon>
           <Text style={styles.infoText}>
-            Created At: {task.date} at {task.time}
+            Created At: {formatDate(task.date)} at {task.time}
           </Text>
         </View>
         <View style={styles.infoRow}>

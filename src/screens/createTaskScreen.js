@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Modal,
   StatusBar,
   Platform,
   ScrollView,
@@ -17,6 +16,7 @@ import { addNewTask, toggleTheme } from '../redux/slices/taskSlice';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
+import SuccessModal from '../components/Modals/SuccessModal';
 import { lightTheme, darkTheme } from '../themes/color';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -43,6 +43,15 @@ const formatTime = timeString => {
 
   hours = hours % 12 || 12;
   return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
+};
+
+const formatDate = dateString => {
+  if (!dateString) return '';
+  if (dateString.includes('/')) {
+    return dateString; // Already DD/MM/YYYY
+  }
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
 };
 
 const CreateTaskScreen = () => {
@@ -86,7 +95,7 @@ const CreateTaskScreen = () => {
 
     let formattedValue = '';
     if (picker.mode === 'date') {
-      formattedValue = selectedVal.toLocaleDateString('en-GB');
+      formattedValue = selectedVal.toISOString().split('T')[0];
     } else {
       formattedValue = selectedVal.toLocaleTimeString([], {
         hour: '2-digit',
@@ -136,19 +145,12 @@ const CreateTaskScreen = () => {
   };
 
   const todayDate = (date = new Date()) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return date.toISOString().split('T')[0];
   };
 
   const getInitialDate = () => {
     const dateToParse = currentField === 'date' ? form.date : form.endDate;
-    if (!dateToParse) {
-      return todayDate();
-    }
-    const [date, month, year] = dateToParse.split('/');
-    return `${year}-${month}-${date}`;
+    return dateToParse || todayDate();
   };
   return (
     <KeyboardAvoidingView
@@ -191,7 +193,7 @@ const CreateTaskScreen = () => {
                 <FormInput
                   label="Date"
                   placeholder="Add Date"
-                  value={form.date}
+                  value={formatDate(form.date)}
                 ></FormInput>
               </View>
             </TouchableOpacity>
@@ -230,7 +232,7 @@ const CreateTaskScreen = () => {
                 <FormInput
                   label="End Date"
                   placeholder="Add end date"
-                  value={form.endDate}
+                  value={formatDate(form.endDate)}
                 ></FormInput>
               </View>
             </TouchableOpacity>
@@ -312,9 +314,7 @@ const CreateTaskScreen = () => {
             onClose={() => setIsCalendarVisible(false)}
             onSelect={day => {
               if (day && day.dateString) {
-                const [y, m, d] = day.dateString.split('-');
-                const formattedDate = `${d}/${m}/${y}`;
-                handleInputChange(currentField, formattedDate);
+                handleInputChange(currentField, day.dateString);
                 setIsCalendarVisible(false);
               }
             }}
@@ -333,27 +333,15 @@ const CreateTaskScreen = () => {
               title="Set Time"
             />
           )}
-          <Modal transparent visible={showSuccess} animationType="fade">
-            <View style={styles.modalOverlay}>
-              <TouchableOpacity
-                style={styles.modalContent}
-                activeOpacity={1}
-                onPress={() => setShowSuccess(false)}
-              >
-                <Icon
-                  name="checkmark-done-circle"
-                  size={60}
-                  color={theme.chartCompleted}
-                  style={styles.modalIcon}
-                ></Icon>
-                <Text style={styles.modalText}>
-                  {existingTask
-                    ? 'Task Updated Successfully!'
-                    : 'Task Created Successfully!'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
+          <SuccessModal
+            visible={showSuccess}
+            message={
+              existingTask
+                ? 'Task Updated Successfully!'
+                : 'Task Created Successfully!'
+            }
+            onClose={() => setShowSuccess(false)}
+          />
         </ScrollView>
         <View
           style={{
@@ -505,9 +493,16 @@ const getStyles = theme =>
 export default CreateTaskScreen;
 export const parseDate = dateString => {
   if (!dateString) return null;
-  const parts = dateString.split('/');
-  if (parts.length !== 3) return null;
-  const [day, month, year] = parts.map(Number);
+  let day, month, year;
+  if (dateString.includes('/')) {
+    // DD/MM/YYYY
+    [day, month, year] = dateString.split('/').map(Number);
+  } else if (dateString.includes('-')) {
+    // YYYY-MM-DD
+    [year, month, day] = dateString.split('-').map(Number);
+  } else {
+    return null;
+  }
   if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
   const date = new Date(year, month - 1, day);
   return isNaN(date.getTime()) ? null : date;
