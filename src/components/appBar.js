@@ -38,7 +38,7 @@ const AppBar = ({ title = 'APP NAME', onIconPress }) => {
         {onIconPress && (
           <TouchableOpacity
             onPress={onIconPress}
-            hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
+            hitSlop={{ top: 10, bottom: 10, right: 10, left: 5 }}
           >
             <View style={styles.createTaskBox}>
               <Icon name="add" size={22} color={theme.white}></Icon>

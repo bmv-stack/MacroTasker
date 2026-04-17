@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  Platform,
-  AppState,
-} from 'react-native';
-import { createStaticNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -34,102 +27,95 @@ const PlaceholderScreen = ({ route }) => {
   );
 };
 
-const DashboardStack = createNativeStackNavigator({
-  screens: {
-    Main: {
-      screen: MainScreen,
-      options: { headerShown: false, animation: 'fade' },
-    },
-    All: {
-      screen: AllTasksScreen,
-      options: { headerShown: false, animation: 'fade' },
-    },
-    TaskDetail: {
-      screen: TaskDetailScreen,
-      options: { headerShown: false, animation: 'ios_from_right' },
-    },
-  },
-});
+const DashboardStack = createNativeStackNavigator();
+const RootStack = createNativeStackNavigator();
 
-const Tab = createBottomTabNavigator({
-  screenOptions: {
-    headerShown: false,
-  },
-  screens: {
-    Dashboard: {
-      screen: DashboardStack,
-      options: {
-        tabBarIcon: ({ focused, color }) => (
-          <Icon
-            name={focused ? 'home' : 'home-outline'}
-            size={24}
-            color={color}
-          />
-        ),
-      },
-    },
-    Bills: {
-      screen: PlaceholderScreen,
-      options: {
-        tabBarIcon: ({ focused, color }) => (
-          <Icon
-            name={focused ? 'receipt' : 'receipt-outline'}
-            size={24}
-            color={color}
-          />
-        ),
-      },
-    },
-    AiTasks: {
-      screen: PlaceholderScreen,
-      options: {
-        tabBarIcon: ({ focused, color }) => (
-          <Icon
-            name={focused ? 'sparkles' : 'sparkles-outline'}
-            size={24}
-            color={color}
-          />
-        ),
-      },
-    },
-    SmartHome: {
-      screen: PlaceholderScreen,
-      options: {
-        tabBarIcon: ({ focused, color }) => (
-          <Icon
-            name={focused ? 'id-card' : 'id-card-outline'}
-            size={24}
-            color={color}
-          />
-        ),
-      },
-    },
-    Menu: {
-      screen: PlaceholderScreen,
-      options: {
-        tabBarIcon: ({ focused, color }) => (
-          <Icon
-            name={focused ? 'list' : 'list-outline'}
-            size={24}
-            color={color}
-          />
-        ),
-      },
-    },
-  },
-});
+const DashboardStackScreen = () => (
+  <DashboardStack.Navigator screenOptions={{ headerShown: false }}>
+    <DashboardStack.Screen
+      name="Main"
+      component={MainScreen}
+      options={{ animation: 'fade' }}
+    />
+    <DashboardStack.Screen
+      name="All"
+      component={AllTasksScreen}
+      options={{ animation: 'fade' }}
+    />
+    <DashboardStack.Screen
+      name="TaskDetail"
+      component={TaskDetailScreen}
+      options={{ animation: 'ios_from_right' }}
+    />
+  </DashboardStack.Navigator>
+);
 
-const RootStack = createNativeStackNavigator({
-  screens: {
-    TabScreen: { screen: Tab, options: { headerShown: false } },
-    CreateTask: {
-      screen: CreateTaskScreen,
-      options: { headerShown: false, animation: 'fade' },
-    },
-  },
-});
+const Tab = createBottomTabNavigator();
 
-const Navigation = createStaticNavigation(RootStack);
+const TabNavigator = () => {
+  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
+  const theme = isDarkMode ? darkTheme : lightTheme;
+  const styles = getStyles(theme);
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: theme.activeTabBar,
+        tabBarInactiveTintColor: theme.inactiveTabBar,
+        tabBarLabel: ({ focused, color }) => (
+          <Text
+            style={[
+              styles.tabLabel,
+              { color },
+              focused && { fontWeight: '700', color: theme.blackSecondary },
+            ]}
+          >
+            {route.name === 'AiTasks' ? 'Ai Task' : route.name}
+          </Text>
+        ),
+        tabBarIcon: ({ focused, color }) => {
+          let iconName;
+          if (route.name === 'Dashboard') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Bills') {
+            iconName = focused ? 'receipt' : 'receipt-outline';
+          } else if (route.name === 'AiTasks') {
+            iconName = focused ? 'sparkles' : 'sparkles-outline';
+          } else if (route.name === 'SmartHome') {
+            iconName = focused ? 'id-card' : 'id-card-outline';
+          } else if (route.name === 'Menu') {
+            iconName = focused ? 'list' : 'list-outline';
+          }
+
+          return <Icon name={iconName} size={24} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashboardStackScreen} />
+      <Tab.Screen name="Bills" component={PlaceholderScreen} />
+      <Tab.Screen name="AiTasks" component={PlaceholderScreen} />
+      <Tab.Screen name="SmartHome" component={PlaceholderScreen} />
+      <Tab.Screen name="Menu" component={PlaceholderScreen} />
+    </Tab.Navigator>
+  );
+};
+
+const RootStackScreen = () => (
+  <RootStack.Navigator screenOptions={{ headerShown: false }}>
+    <RootStack.Screen
+      name="TabScreen"
+      component={TabNavigator}
+      options={{ headerShown: false }}
+    />
+    <RootStack.Screen
+      name="CreateTask"
+      component={CreateTaskScreen}
+      options={{ headerShown: false, animation: 'fade' }}
+    />
+  </RootStack.Navigator>
+);
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -148,7 +134,7 @@ const AppContent = () => {
         setIsReady(true);
       } catch (error) {
         console.error('Failed to initialize app:', error);
-        setIsReady(true); // Still set ready to show error UI or fallback
+        setIsReady(true);
       }
     };
     startApp();
@@ -162,25 +148,9 @@ const AppContent = () => {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={theme.background}
       />
-      <Navigation
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarStyle: styles.tabBar,
-          tabBarActiveTintColor: theme.activeTabBar,
-          tabBarInactiveTintColor: theme.inactiveTabBar,
-          tabBarLabel: ({ focused, color }) => (
-            <Text
-              style={[
-                styles.tabLabel,
-                { color },
-                focused && { fontWeight: '700', color: theme.blackSecondary },
-              ]}
-            >
-              {route.name === 'AiTasks' ? 'Ai Task' : route.name}
-            </Text>
-          ),
-        })}
-      />
+      <NavigationContainer>
+        <RootStackScreen />
+      </NavigationContainer>
     </View>
   );
 };

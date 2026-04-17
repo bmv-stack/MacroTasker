@@ -43,7 +43,7 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <Calendar
-            minDate={today}
+            //minDate={today}
             current={initialDate || today}
             onDayPress={day => setTempSelectedDate(day.dateString)}
             markedDates={{
@@ -57,7 +57,6 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
               backgroundColor: theme.surface,
               calendarBackground: theme.surface,
               textSectionTitleColor: theme.calendarHeader,
-
               selectedDayBackgroundColor: theme.primary,
               selectedDayTextColor: theme.white,
               todayTextColor: theme.primary,
@@ -147,6 +146,6 @@ const getStyles = theme =>
     },
     selectText: {
       fontWeight: '600',
-      color: theme.white,
+      color: theme.textInverted,
     },
   });

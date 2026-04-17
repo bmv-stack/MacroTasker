@@ -112,11 +112,11 @@ const getStyles = theme =>
     title: {
       fontSize: 24,
       fontWeight: 'bold',
-      color: theme.blackSecondary,
+      color: theme.textPrimary,
       marginBottom: 20,
     },
     infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-    infoText: { marginLeft: 10, color: theme.blackSecondary, fontSize: 16 },
+    infoText: { marginLeft: 10, color: theme.textPrimary, fontSize: 16 },
     divider: {
       height: 1,
       backgroundColor: theme.borderLight,
@@ -129,7 +129,7 @@ const getStyles = theme =>
       marginBottom: 10,
       textTransform: 'uppercase',
     },
-    notesText: { fontSize: 16, color: theme.blackSecondary, lineHeight: 24 },
+    notesText: { fontSize: 16, color: theme.textPrimary, lineHeight: 24 },
     editBtn: {
       position: 'absolute',
       bottom: 30,
@@ -149,6 +149,7 @@ const getStyles = theme =>
     headerTitle: {
       fontSize: 20,
       fontWeight: 'bold',
+      color: theme.textPrimary,
     },
     header: {
       flexDirection: 'row',

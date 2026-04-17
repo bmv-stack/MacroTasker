@@ -110,18 +110,11 @@ const CreateTaskScreen = () => {
   const isTimeValid = () => {
     if (!form.endDate || !form.endTime || form.date !== form.endDate)
       return true;
-
-    const startMinute = timeToMinutes(form.time);
-    const endMinute = timeToMinutes(form.endTime);
-    return endMinute > startMinute;
   };
 
   const isFormValid =
-    form.title.length > 0 &&
-    form.date.length > 0 &&
-    form.time.length > 0 &&
-    isDateValid() &&
-    isTimeValid();
+    form.title.length > 0 && form.date.length > 0 && form.time.length > 0;
+  isDateValid() && isTimeValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -383,7 +376,7 @@ const CreateTaskScreen = () => {
             <View style={styles.arrowContainer}>
               <Text
                 style={{
-                  color: theme.white,
+                  color: theme.textInverted,
                   fontWeight: 'bold',
                   marginLeft: 5,
                   fontSize: 16,
@@ -427,6 +420,7 @@ const getStyles = theme =>
     headerTitle: {
       fontSize: 20,
       fontWeight: 'bold',
+      color: theme.primary,
     },
     button: {
       alignItems: 'center',
@@ -490,7 +484,7 @@ const getStyles = theme =>
       backgroundColor: theme.surface,
     },
     activePriorityPill: {
-      backgroundColor: theme.primary,
+      backgroundColor: theme.buttonActive,
       borderColor: theme.borderLight,
     },
     priorityPillText: {
@@ -498,7 +492,7 @@ const getStyles = theme =>
       fontWeight: '600',
     },
     activePriorityText: {
-      color: theme.white,
+      color: theme.textInverted,
     },
     label: {
       fontSize: 14,

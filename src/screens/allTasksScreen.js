@@ -24,6 +24,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { lightTheme, darkTheme } from '../themes/color';
 
+// -----DateList Generation function-----
 const generateDateList = () => {
   const dates = [];
   for (let i = -30; i < 355; i++) {
@@ -41,23 +42,25 @@ const generateDateList = () => {
 };
 
 const AllTasksScreen = () => {
-  // THEME Data
+  // -----THEME Data-----
   const isDarkMode = useSelector(state => state.tasks.isDarkMode);
   const theme = isDarkMode ? darkTheme : lightTheme;
   const styles = getStyles(theme);
+  // --------------------------------------------------
   const dateListRef = useRef(null);
+  // --------------------------------------------------
   const dispatch = useDispatch();
   const tasks = useSelector(state => state.tasks.items);
-
+  // --------------------------------------------------
   const navigation = useNavigation();
-
-  // FILTER TASKS States
+  // --------------------------------------------------
+  // -----FILTER TASKS States-----
   const [filterVisible, setFilterVisible] = useState(false);
   const [currentFilterTab, setCurrentFilterTab] = useState('Type');
 
-  // UNDO States
+  // -----UNDO States-----
   const [undoVisible, setUndoVisible] = useState(false);
-  // DELETE Modal States
+  // -----DELETE Modal States-----
   const [deleteModal, setDeleteModal] = useState({
     visible: false,
     taskId: null,
@@ -68,25 +71,26 @@ const AllTasksScreen = () => {
   const undoTimer = useRef(null);
   // --------------------------------------------------
 
+  // ----- UNDO Timer Function -----
   useEffect(() => {
     return () => {
       if (undoTimer.current) clearTimeout(undoTimer.current);
     };
   }, []);
-  // ACTIVE TAB States
+  // -----ACTIVE TAB States-----
   const [activeTab, setActiveTab] = useState('All');
-  // CHART States
+  // -----CHART States-----
   const [chartKey, setChartKey] = useState(0);
-  // DATE States
+  // -----DATE States-----
   const [selectedDate, setSelectedDate] = useState(
     new Date().toLocaleDateString('en-GB'),
   );
-  // PRIORITY States
+  // -----PRIORITY States-----
   const [priorityModal, setPriorityModal] = useState({
     visible: false,
     taskId: null,
   });
-  // DATE LIST (On Top) States
+  // -----DATE LIST (On Top) States-----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
     value: tasks.length,
@@ -98,8 +102,9 @@ const AllTasksScreen = () => {
     Normal: { iconColor: theme.normal },
     Low: { iconColor: theme.low },
   };
+  // -----DateList Memoization-----
+  const dateList = useMemo(() => generateDateList(), []);
 
-  const dateList = useMemo(() => generateDateList(), [selectedDate]);
   const goToday = () => {
     const today = new Date().toLocaleDateString('en-GB');
     setSelectedDate(today);
@@ -110,15 +115,6 @@ const AllTasksScreen = () => {
       viewPosition: 0.5,
     });
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const currentDate = new Date().toLocaleDateString('en-GB');
-      setSelectedDate(currentDate);
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [selectedDate]);
 
   const filteredTasks = useMemo(() => {
     const todayTasks = tasks.filter(task => task.date === selectedDate);
@@ -288,6 +284,7 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* DATES Flatlist */}
         <View style={styles.topSection}>
           <FlatList
             horizontal
@@ -305,48 +302,39 @@ const AllTasksScreen = () => {
             renderItem={({ item }) => {
               const isSelected = item.fullDate === selectedDate;
               const [monthName, dayName] = item.dayName.split(' ');
+              const backgroundColor = isSelected
+                ? isDarkMode
+                  ? theme.white
+                  : theme.blackSecondary
+                : isDarkMode
+                ? theme.surface
+                : theme.white;
+              const textColor = isSelected
+                ? isDarkMode
+                  ? '#000000'
+                  : theme.white
+                : isDarkMode
+                ? theme.textMuted
+                : theme.textMuted;
               return (
                 <TouchableOpacity
                   onPress={() => setSelectedDate(item.fullDate)}
-                  style={[
-                    styles.dateCard,
-                    {
-                      backgroundColor: isSelected
-                        ? theme.blackSecondary
-                        : theme.surface,
-                    },
-                  ]}
+                  style={[styles.dateCard, { backgroundColor }]}
                 >
-                  <Text
-                    style={[
-                      styles.dateNumber,
-                      {
-                        color: isSelected ? theme.white : theme.textMuted,
-                      },
-                    ]}
-                  >
+                  <Text style={[styles.dateNumber, { color: textColor }]}>
                     {item.dayNumber}
                   </Text>
-                  <Text
-                    style={[
-                      styles.dateMonthName,
-                      { color: isSelected ? theme.white : theme.textMuted },
-                    ]}
-                  >
+                  <Text style={[styles.dateMonthName, { color: textColor }]}>
                     {monthName}
                   </Text>
-                  <Text
-                    style={[
-                      styles.dateDay,
-                      { color: isSelected ? theme.white : theme.textMuted },
-                    ]}
-                  >
+                  <Text style={[styles.dateDay, { color: textColor }]}>
                     {dayName}
                   </Text>
                 </TouchableOpacity>
               );
             }}
           />
+          {/* -----Pie Chart----- */}
           {filteredTasks.length > 0 && (
             <View style={styles.chartContainer}>
               <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
@@ -358,6 +346,7 @@ const AllTasksScreen = () => {
                   shadow
                   radius={70}
                   innerRadius={55}
+                  innerCircleColor={isDarkMode ? theme.background : theme.white}
                   data={chartData}
                   centerLabelComponent={() => (
                     <View
@@ -369,7 +358,9 @@ const AllTasksScreen = () => {
                         style={{
                           fontWeight: 'bold',
                           fontSize: 22,
-                          color: selectedData.color,
+                          color: isDarkMode
+                            ? theme.white
+                            : theme.blackSecondary,
                         }}
                       >
                         {selectedData.value}
@@ -377,7 +368,9 @@ const AllTasksScreen = () => {
                       <Text
                         style={{
                           fontSize: 10,
-                          color: theme.textMuted,
+                          color: isDarkMode
+                            ? theme.white
+                            : theme.blackSecondary,
                           fontWeight: '600',
                         }}
                       >
@@ -421,15 +414,16 @@ const AllTasksScreen = () => {
             const stylePriority =
               priorityStyles[task.priority] || priorityStyles.Normal;
             return (
-              <TouchableOpacity
-                activeOpacity={0.5}
-                onPress={() => navigation.navigate('TaskDetail', { task })}
+              <View
+                key={task.id}
+                style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
               >
-                <View
-                  key={task.id}
-                  style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
-                >
-                  <View style={styles.cardTopRow}>
+                <View style={styles.cardTopRow}>
+                  <TouchableOpacity
+                    activeOpacity={0.5}
+                    hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                    onPress={() => navigation.navigate('TaskDetail', { task })}
+                  >
                     <Text
                       style={[
                         styles.taskTitle,
@@ -442,105 +436,104 @@ const AllTasksScreen = () => {
                     >
                       {task.title}
                     </Text>
-                    <View style={styles.actionButtons}>
-                      <TouchableOpacity
-                        style={[
-                          styles.iconCircle,
-                          task.completed && styles.checkedCircle,
-                        ]}
-                        disabled={task.completed}
-                        onPress={() =>
-                          navigation.navigate('CreateTask', {
-                            existingTask: task,
-                          })
-                        }
-                      >
-                        <FeatherIcon
-                          name="edit-3"
-                          size={18}
-                          color={theme.editIcon}
-                        ></FeatherIcon>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.iconCircle,
-                          task.completed && styles.checkedCircle,
-                        ]}
-                        onPress={() =>
-                          setDeleteModal({
-                            visible: true,
-                            taskId: task.id,
-                            taskTitle: task.title,
-                          })
-                        }
-                      >
-                        <Icon
-                          name="trash-outline"
-                          size={18}
-                          color={theme.deleteIcon}
-                        ></Icon>
-                      </TouchableOpacity>
-                    </View>
+                  </TouchableOpacity>
+                  <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                      style={[
+                        styles.iconCircle,
+                        task.completed && styles.checkedCircle,
+                      ]}
+                      disabled={task.completed}
+                      onPress={() =>
+                        navigation.navigate('CreateTask', {
+                          existingTask: task,
+                        })
+                      }
+                    >
+                      <FeatherIcon
+                        name="edit-3"
+                        size={18}
+                        color={theme.editIcon}
+                      ></FeatherIcon>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.iconCircle,
+                        task.completed && styles.checkedCircle,
+                      ]}
+                      onPress={() =>
+                        setDeleteModal({
+                          visible: true,
+                          taskId: task.id,
+                          taskTitle: task.title,
+                        })
+                      }
+                    >
+                      <Icon
+                        name="trash-outline"
+                        size={18}
+                        color={theme.deleteIcon}
+                      ></Icon>
+                    </TouchableOpacity>
                   </View>
-                  <View style={styles.cardBottomRow}>
-                    <View style={styles.leftInfoGroup}>
-                      <Text style={styles.dateTimeText}>
-                        {task.date} | {formatTime(task.time)}
-                      </Text>
-                      <View>
-                        <Icon
-                          name="bookmark"
-                          size={20}
-                          color={stylePriority.iconColor}
-                          style={{ marginLeft: 8 }}
-                        ></Icon>
-                      </View>
-                    </View>
-                    <View style={styles.rightActionsGroup}>
-                      <TouchableOpacity
-                        style={styles.textPriorityBadge}
-                        onPress={() =>
-                          setPriorityModal({ visible: true, taskId: task.id })
-                        }
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                        disabled={task.completed}
-                      >
-                        <Text style={styles.badgeText}>
-                          {task.priority || 'Normal'}
-                        </Text>
-                        <Icon
-                          name="chevron-down"
-                          size={12}
-                          color={theme.textBadge}
-                          style={{ marginLeft: 4 }}
-                        ></Icon>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.completeCheckCircle,
-                          task.completed && styles.checkCompleted,
-                        ]}
-                        onPress={() => dispatch(completeTask(task.id))}
-                      >
-                        <Icon
-                          name="checkmark-sharp"
-                          size={18}
-                          color={
-                            task.completed
-                              ? theme.white
-                              : theme.completeTaskIcon
-                          }
-                          opacity={0.5}
-                        ></Icon>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  {isOverdue && <View style={styles.overdueIndicator} />}
                 </View>
-              </TouchableOpacity>
+                <View style={styles.cardBottomRow}>
+                  <View style={styles.leftInfoGroup}>
+                    <Text style={styles.dateTimeText}>
+                      {task.date} | {formatTime(task.time)}
+                    </Text>
+                    <View>
+                      <Icon
+                        name="bookmark"
+                        size={20}
+                        color={stylePriority.iconColor}
+                        style={{ marginLeft: 8 }}
+                      ></Icon>
+                    </View>
+                  </View>
+                  <View style={styles.rightActionsGroup}>
+                    <TouchableOpacity
+                      style={styles.textPriorityBadge}
+                      onPress={() =>
+                        setPriorityModal({ visible: true, taskId: task.id })
+                      }
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      disabled={task.completed}
+                    >
+                      <Text style={styles.badgeText}>
+                        {task.priority || 'Normal'}
+                      </Text>
+                      <Icon
+                        name="chevron-down"
+                        size={12}
+                        color={theme.textBadge}
+                        style={{ marginLeft: 4 }}
+                      ></Icon>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.completeCheckCircle,
+                        task.completed && styles.checkCompleted,
+                      ]}
+                      onPress={() => dispatch(completeTask(task.id))}
+                    >
+                      <Icon
+                        name="checkmark-sharp"
+                        size={18}
+                        color={
+                          task.completed ? theme.white : theme.completeTaskIcon
+                        }
+                        opacity={0.5}
+                      ></Icon>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {isOverdue && <View style={styles.overdueIndicator} />}
+              </View>
             );
           }}
         ></FlatList>
+        {/* Priority Modal */}
         <Modal transparent visible={priorityModal.visible} animationType="fade">
           <TouchableOpacity
             style={styles.modalOverlay}
@@ -568,6 +561,7 @@ const AllTasksScreen = () => {
             </View>
           </TouchableOpacity>
         </Modal>
+        {/* Delete Modal */}
         <Modal transparent visible={deleteModal.visible} animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.deleteBox}>
@@ -618,6 +612,7 @@ const AllTasksScreen = () => {
           </View>
         </Modal>
       </View>
+      {/* UNDO Modal */}
       {undoVisible && (
         <View style={styles.undoMessage}>
           <Text style={styles.undoText}>Task Deleted</Text>
@@ -626,6 +621,7 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
       )}
+      {/* -----Filter Modal----- */}
       <Modal
         transparent={false}
         visible={filterVisible}
@@ -636,11 +632,7 @@ const AllTasksScreen = () => {
           <View style={styles.drawerContent}>
             <View style={styles.drawerHeader}>
               <TouchableOpacity onPress={() => setFilterVisible(false)}>
-                <Icon
-                  name="arrow-back"
-                  size={24}
-                  color={theme.blackSecondary}
-                ></Icon>
+                <Icon name="arrow-back" size={24} color={theme.primary}></Icon>
               </TouchableOpacity>
               <Text style={styles.drawerHeaderText}>Filter</Text>
               <TouchableOpacity>
@@ -750,19 +742,19 @@ const getStyles = theme =>
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
-      backgroundColor: theme.surface,
+      backgroundColor: theme.dateCard,
       marginRight: 10,
       borderWidth: 1,
       borderColor: theme.borderLight,
     },
     activeDateCard: {
-      backgroundColor: theme.blackSecondary,
+      backgroundColor: theme.primary,
       borderColor: theme.blackSecondary,
     },
     dateNumber: {
       fontSize: 16,
       fontWeight: 'bold',
-      color: theme.blackSecondary,
+      color: theme.dayTextColor,
     },
     dateDay: {
       fontSize: 9,
@@ -1018,7 +1010,7 @@ const getStyles = theme =>
     drawerOverlay: {
       flex: 1,
       flexDirection: 'row',
-      backgroundColor: theme.white,
+      backgroundColor: theme.surface,
     },
     drawerDrop: {
       flex: 0.2,
@@ -1026,7 +1018,7 @@ const getStyles = theme =>
     },
     drawerContent: {
       flex: 1,
-      backgroundColor: theme.white,
+      backgroundColor: theme.surface,
       paddingTop: Platform.OS === 'ios' ? 50 : 20,
     },
     drawerHeader: {
@@ -1038,12 +1030,16 @@ const getStyles = theme =>
       borderBottomWidth: 1,
       borderBottomColor: theme.borderLight,
     },
-    drawerHeaderText: { fontSize: 18, fontWeight: 'bold' },
+    drawerHeaderText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.primary,
+    },
     resetText: { color: theme.accent, fontWeight: 'bold' },
     drawerBody: { flex: 1, flexDirection: 'row' },
     drawerSideBar: {
       width: 100,
-      backgroundColor: '#f8f8f8',
+      backgroundColor: theme.surface,
       borderRightWidth: 1,
       borderRightColor: theme.borderLight,
     },
@@ -1059,7 +1055,7 @@ const getStyles = theme =>
       backgroundColor: theme.accent, // Matching your yellow/gold theme
     },
     sidebarTabText: { color: theme.textMuted, fontWeight: '600' },
-    activeSidebarTabText: { color: theme.blackSecondary },
+    activeSidebarTabText: { color: theme.primary },
     drawerTabContent: { flex: 1, padding: 20 },
     checkboxRow: {
       flexDirection: 'row',
@@ -1069,7 +1065,7 @@ const getStyles = theme =>
     checkboxLabel: {
       marginLeft: 15,
       fontSize: 16,
-      color: theme.blackSecondary,
+      color: theme.primary,
     },
     emptyCheckbox: {
       width: 22,
@@ -1089,7 +1085,7 @@ const getStyles = theme =>
     dateInputText: {
       marginLeft: 10,
       fontSize: 16,
-      color: theme.blackSecondary,
+      color: theme.primary,
     },
     applyBtn: {
       backgroundColor: theme.accent,

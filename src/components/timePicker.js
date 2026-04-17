@@ -96,12 +96,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
               style={styles.pickerColumn}
               selectedValue={selectedHours}
               selectionColor="transparent"
-              itemStyle={{
-                backgroundColor: 'transparent',
-                color: '#1C1C1E',
-                fontSize: 16,
-                fontWeight: '600',
-              }}
+              itemStyle={styles.pickerItems}
               onValueChange={itemValue => setSelectedHours(itemValue)}
             >
               {hours.map(h => (
@@ -113,12 +108,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
               style={styles.pickerColumn}
               selectedValue={selectedMinutes}
               selectionColor="transparent"
-              itemStyle={{
-                backgroundColor: 'transparent',
-                color: '#1C1C1E',
-                fontSize: 16,
-                fontWeight: '600',
-              }}
+              itemStyle={styles.pickerItems}
               onValueChange={itemValue => setSelectedMinutes(itemValue)}
             >
               {minuteSeconds.map(m => (
@@ -130,12 +120,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
               style={styles.pickerColumn}
               selectedValue={selectedSeconds}
               selectionColor="transparent"
-              itemStyle={{
-                backgroundColor: 'transparent',
-                color: '#1C1C1E',
-                fontSize: 16,
-                fontWeight: '600',
-              }}
+              itemStyle={styles.pickerItems}
               onValueChange={itemValue => setSelectedSeconds(itemValue)}
             >
               {minuteSeconds.map(s => (
@@ -146,12 +131,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
               style={styles.pickerColumn}
               selectedValue={selectedMeridiem}
               onValueChange={itemValue => setSelectedMeridiem(itemValue)}
-              itemStyle={{
-                backgroundColor: 'transparent',
-                color: '#1C1C1E',
-                fontSize: 16,
-                fontWeight: '600',
-              }}
+              itemStyle={styles.pickerItems}
             >
               {meridiem.map(p => (
                 <Picker.Item key={p} label={p} value={p} />
@@ -197,6 +177,12 @@ const getStyles = theme =>
       color: theme.textPrimary,
       marginBottom: 10,
     },
+    pickerItems: {
+      backgroundColor: 'transparent',
+      color: theme.textPrimary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
     buttonRow: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -230,7 +216,7 @@ const getStyles = theme =>
     },
     saveText: {
       fontWeight: '600',
-      color: theme.white,
+      color: theme.textInverted,
     },
     pickerColumn: {
       flex: 1,
