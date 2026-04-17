@@ -49,7 +49,7 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
             markedDates={{
               [tempSelectedDate]: {
                 selected: true,
-                selectedColor: theme.primary,
+                selectedColor: theme.black,
                 selectedTextColor: theme.white,
               },
             }}
@@ -143,7 +143,7 @@ const getStyles = theme =>
     },
     cancelText: {
       fontWeight: '600',
-      color: theme.primary,
+      color: theme.buttonCancelText,
     },
     selectText: {
       fontWeight: '600',

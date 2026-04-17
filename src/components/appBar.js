@@ -3,26 +3,49 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { lightTheme, darkTheme } from '../themes/color';
 import Icon from 'react-native-vector-icons/Ionicons';
 import logo from '../../assets/final_logo.png';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleTheme } from '../redux/slices/taskSlice';
 
 const AppBar = ({ title = 'APP NAME', onIconPress }) => {
   const isDarkMode = useSelector(state => state.tasks.isDarkMode);
   const theme = isDarkMode ? darkTheme : lightTheme;
   const styles = getStyles(theme);
+  const dispatch = useDispatch();
+
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.left}>
         <Image source={logo} style={styles.logo} resizeMode="cover"></Image>
         <Text style={styles.textBrand}>{title}</Text>
       </View>
-      <TouchableOpacity
-        onPress={onIconPress}
-        hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
-      >
-        <View style={styles.createTaskBox}>
-          <Icon name="add" size={22} color={theme.white}></Icon>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.right}>
+        <TouchableOpacity
+          onPress={handleToggleTheme}
+          hitSlop={{ top: 10, bottom: 10, right: 10, left: 2 }}
+        >
+          <View style={styles.themeToggleBox}>
+            <Icon
+              name={isDarkMode ? 'sunny' : 'moon'}
+              size={22}
+              color={theme.white}
+            />
+          </View>
+        </TouchableOpacity>
+        {onIconPress && (
+          <TouchableOpacity
+            onPress={onIconPress}
+            hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
+          >
+            <View style={styles.createTaskBox}>
+              <Icon name="add" size={22} color={theme.white}></Icon>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
@@ -37,6 +60,10 @@ const getStyles = theme =>
       height: 60,
     },
     left: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    right: {
       flexDirection: 'row',
       alignItems: 'center',
     },
@@ -67,6 +94,21 @@ const getStyles = theme =>
       justifyContent: 'center',
       alignItems: 'center',
       shadowColor: theme.brandBlue,
+      shadowOffset: { height: 5 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 5,
+      marginTop: -2,
+      marginLeft: 10,
+    },
+    themeToggleBox: {
+      height: 31,
+      width: 31,
+      backgroundColor: theme.blackCharcol,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      shadowColor: theme.blackCharcol,
       shadowOffset: { height: 5 },
       shadowOpacity: 0.3,
       shadowRadius: 4,

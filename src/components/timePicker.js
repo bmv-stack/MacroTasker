@@ -226,7 +226,7 @@ const getStyles = theme =>
     },
     cancelText: {
       fontWeight: '600',
-      color: theme.blackSecondary,
+      color: theme.buttonCancelText,
     },
     saveText: {
       fontWeight: '600',

@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { addNewTask } from '../redux/slices/taskSlice';
+import { addNewTask, toggleTheme } from '../redux/slices/taskSlice';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
@@ -111,11 +111,8 @@ const CreateTaskScreen = () => {
     if (!form.endDate || !form.endTime || form.date !== form.endDate)
       return true;
 
-    const startTime = formatTime(form.time);
-    const endTime = formatTime(form.endTime);
-
-    const startMinute = getMinute(startTime);
-    const endMinute = getMinute(endTime);
+    const startMinute = timeToMinutes(form.time);
+    const endMinute = timeToMinutes(form.endTime);
     return endMinute > startMinute;
   };
 
@@ -132,7 +129,9 @@ const CreateTaskScreen = () => {
   const handleFinalSubmit = () => {
     const taskData = {
       ...form,
-      id: existingTask?.id || Math.random().toString(),
+      id:
+        existingTask?.id ||
+        `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
     dispatch(addNewTask(taskData));
 
@@ -176,7 +175,16 @@ const CreateTaskScreen = () => {
               <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create Task</Text>
-            <View style={{ width: 30 }}></View>
+            <TouchableOpacity
+              onPress={() => dispatch(toggleTheme())}
+              hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
+            >
+              <Icon
+                name={isDarkMode ? 'sunny' : 'moon'}
+                size={24}
+                color={theme.textPrimary}
+              />
+            </TouchableOpacity>
           </View>
           <View style={{ marginLeft: 15, marginTop: 20 }}>
             <FormInput
@@ -210,7 +218,15 @@ const CreateTaskScreen = () => {
             </TouchableOpacity>
             <TimePicker
               visible={timeModalVisible}
-              initialTime={new Date()}
+              initialTime={(() => {
+                const timeStr =
+                  currentField === 'time' ? form.time : form.endTime;
+                if (timeStr) {
+                  const [h, m, s] = timeStr.split(':').map(Number);
+                  return new Date(2000, 0, 1, h, m, s || 0);
+                }
+                return new Date();
+              })()}
               onClose={() => setTimeModalVisible(false)}
               onSelect={formattedTime =>
                 handleInputChange(currentField, formattedTime)
@@ -482,7 +498,7 @@ const getStyles = theme =>
       fontWeight: '600',
     },
     activePriorityText: {
-      color: theme.whitePure,
+      color: theme.white,
     },
     label: {
       fontSize: 14,
@@ -495,6 +511,10 @@ const getStyles = theme =>
 export default CreateTaskScreen;
 export const parseDate = dateString => {
   if (!dateString) return null;
-  const [day, month, year] = dateString.split('/');
-  return new Date(year, month - 1, day);
+  const parts = dateString.split('/');
+  if (parts.length !== 3) return null;
+  const [day, month, year] = parts.map(Number);
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+  const date = new Date(year, month - 1, day);
+  return isNaN(date.getTime()) ? null : date;
 };

@@ -67,6 +67,12 @@ const AllTasksScreen = () => {
   // --------------------------------------------------
   const undoTimer = useRef(null);
   // --------------------------------------------------
+
+  useEffect(() => {
+    return () => {
+      if (undoTimer.current) clearTimeout(undoTimer.current);
+    };
+  }, []);
   // ACTIVE TAB States
   const [activeTab, setActiveTab] = useState('All');
   // CHART States
@@ -93,7 +99,7 @@ const AllTasksScreen = () => {
     Low: { iconColor: theme.low },
   };
 
-  const dateList = useMemo(() => generateDateList(), []);
+  const dateList = useMemo(() => generateDateList(), [selectedDate]);
   const goToday = () => {
     const today = new Date().toLocaleDateString('en-GB');
     setSelectedDate(today);
@@ -104,6 +110,16 @@ const AllTasksScreen = () => {
       viewPosition: 0.5,
     });
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentDate = new Date().toLocaleDateString('en-GB');
+      setSelectedDate(currentDate);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [selectedDate]);
+
   const filteredTasks = useMemo(() => {
     const todayTasks = tasks.filter(task => task.date === selectedDate);
 
@@ -141,12 +157,17 @@ const AllTasksScreen = () => {
     const completedCount = filteredTasks.filter(t => t.completed).length;
     const pendingCount = filteredTasks.filter(t => {
       const taskDate = parseDate(t.date);
-      return !t.completed && taskDate > now;
+      return !t.completed && taskDate != null && taskDate > now;
     }).length;
     const overdueCount = filteredTasks.filter(t => {
-      if (t.completed || !t.endDate) return false;
-      const taskDate = parseDate(t.endDate);
-      return taskDate && taskDate < now;
+      if (t.completed) return false;
+      if (t.endDate) {
+        const endDate = parseDate(t.endDate);
+        return endDate != null && endDate < now;
+      } else {
+        const taskDate = parseDate(t.date);
+        return taskDate != null && taskDate < now;
+      }
     }).length;
     const isFuture = parseDate(selectedDate) > now;
 
@@ -263,7 +284,7 @@ const AllTasksScreen = () => {
             onPress={() => setFilterVisible(true)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Icon name="add" size={24} color={theme.blackSecondary} />
+            <Icon name="filter" size={24} color={theme.textPrimary} />
           </TouchableOpacity>
         </View>
 
@@ -300,7 +321,7 @@ const AllTasksScreen = () => {
                     style={[
                       styles.dateNumber,
                       {
-                        color: isSelected ? theme.white : theme.blackSecondary,
+                        color: isSelected ? theme.white : theme.textMuted,
                       },
                     ]}
                   >
@@ -339,7 +360,11 @@ const AllTasksScreen = () => {
                   innerRadius={55}
                   data={chartData}
                   centerLabelComponent={() => (
-                    <View style={{ alignItems: 'center' }}>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                      }}
+                    >
                       <Text
                         style={{
                           fontWeight: 'bold',
@@ -500,7 +525,11 @@ const AllTasksScreen = () => {
                         <Icon
                           name="checkmark-sharp"
                           size={18}
-                          color={task.completed ? theme.white : theme.black}
+                          color={
+                            task.completed
+                              ? theme.white
+                              : theme.completeTaskIcon
+                          }
                           opacity={0.5}
                         ></Icon>
                       </TouchableOpacity>
@@ -775,7 +804,7 @@ const getStyles = theme =>
     taskTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: theme.blackSecondary,
+      color: theme.textPrimary,
       flex: 1,
     },
     actionButtons: {
@@ -798,7 +827,7 @@ const getStyles = theme =>
     },
     dateTimeText: {
       fontSize: 12,
-      color: theme.blackSecondary,
+      color: theme.textPrimary,
       fontWeight: '500',
     },
     rightActionsGroup: {
@@ -822,18 +851,9 @@ const getStyles = theme =>
       color: theme.textBadge,
       textAlign: 'center',
     },
-    checkCircle: {
-      borderColor: theme.borderLight,
-      backgroundColor: theme.whitePure,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderRadius: 16,
-      height: 32,
-      width: 32,
-    },
     checkCompleted: {
-      backgroundColor: theme.checkedBg,
+      backgroundColor: theme.completedBg,
+      borderColor: theme.completedBg,
     },
     completeCheckCircle: {
       borderColor: theme.borderLight,
@@ -847,8 +867,8 @@ const getStyles = theme =>
       marginTop: 5,
     },
     checkedCircle: {
-      backgroundColor: theme.completedBg,
-      borderColor: theme.completedBg,
+      backgroundColor: theme.buttonDisabled,
+      borderColor: theme.buttonDisabled,
       opacity: 0.5,
     },
     checkIcon: {
@@ -889,7 +909,7 @@ const getStyles = theme =>
     dotText: {
       fontSize: 11,
       color: theme.textChartLabel,
-      fontWeight: '700',
+      fontWeight: '400',
     },
     dot: {
       width: 6.5,

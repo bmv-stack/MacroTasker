@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  Platform,
+  AppState,
+} from 'react-native';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -45,15 +52,70 @@ const DashboardStack = createNativeStackNavigator({
 });
 
 const Tab = createBottomTabNavigator({
+  screenOptions: {
+    headerShown: false,
+  },
   screens: {
     Dashboard: {
       screen: DashboardStack,
-      options: { animation: 'fade', headerShown: false },
+      options: {
+        tabBarIcon: ({ focused, color }) => (
+          <Icon
+            name={focused ? 'home' : 'home-outline'}
+            size={24}
+            color={color}
+          />
+        ),
+      },
     },
-    Bills: { screen: PlaceholderScreen },
-    AiTasks: { screen: PlaceholderScreen },
-    SmartHome: { screen: PlaceholderScreen },
-    Menu: { screen: PlaceholderScreen },
+    Bills: {
+      screen: PlaceholderScreen,
+      options: {
+        tabBarIcon: ({ focused, color }) => (
+          <Icon
+            name={focused ? 'receipt' : 'receipt-outline'}
+            size={24}
+            color={color}
+          />
+        ),
+      },
+    },
+    AiTasks: {
+      screen: PlaceholderScreen,
+      options: {
+        tabBarIcon: ({ focused, color }) => (
+          <Icon
+            name={focused ? 'sparkles' : 'sparkles-outline'}
+            size={24}
+            color={color}
+          />
+        ),
+      },
+    },
+    SmartHome: {
+      screen: PlaceholderScreen,
+      options: {
+        tabBarIcon: ({ focused, color }) => (
+          <Icon
+            name={focused ? 'id-card' : 'id-card-outline'}
+            size={24}
+            color={color}
+          />
+        ),
+      },
+    },
+    Menu: {
+      screen: PlaceholderScreen,
+      options: {
+        tabBarIcon: ({ focused, color }) => (
+          <Icon
+            name={focused ? 'list' : 'list-outline'}
+            size={24}
+            color={color}
+          />
+        ),
+      },
+    },
   },
 });
 
@@ -79,10 +141,15 @@ const AppContent = () => {
 
   useEffect(() => {
     const startApp = async () => {
-      const db = await getDBConnection();
-      await createTable(db);
-      dispatch(fetchTasks());
-      setIsReady(true);
+      try {
+        const db = await getDBConnection();
+        await createTable(db);
+        dispatch(fetchTasks());
+        setIsReady(true);
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+        setIsReady(true); // Still set ready to show error UI or fallback
+      }
     };
     startApp();
   }, [dispatch]);
@@ -100,7 +167,7 @@ const AppContent = () => {
           headerShown: false,
           tabBarStyle: styles.tabBar,
           tabBarActiveTintColor: theme.activeTabBar,
-          tabBarInactiveTintColor: theme.inactiveTabBAr,
+          tabBarInactiveTintColor: theme.inactiveTabBar,
           tabBarLabel: ({ focused, color }) => (
             <Text
               style={[
@@ -112,52 +179,6 @@ const AppContent = () => {
               {route.name === 'AiTasks' ? 'Ai Task' : route.name}
             </Text>
           ),
-          tabBarIcon: ({ focused, color }) => {
-            let iconName;
-            if (route.name === 'Dashboard') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Bills') {
-              iconName = focused ? 'receipt' : 'receipt-outline';
-            } else if (route.name === 'AiTasks') {
-              iconName = focused ? 'sparkles' : 'sparkles-outline';
-            } else if (route.name === 'SmartHome') {
-              iconName = focused ? 'id-card' : 'id-card-outline';
-            } else if (route.name === 'Menu') {
-              iconName = focused ? 'list' : 'list-outline';
-            }
-
-            return (
-              <View style={styles.iconContainer}>
-                {focused && (
-                  <View style={styles.indicatorContainer}>
-                    <LinearGradient
-                      colors={['transparent', theme.blackSecondary]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.fadeLineLeft}
-                    />
-                    <View
-                      style={[
-                        styles.activeIndicatorDot,
-                        { backgroundColor: theme.blackPure },
-                      ]}
-                    />
-                    <LinearGradient
-                      colors={[theme.blackSecondary, 'transparent']}
-                      start={{ x: 0, y: 1 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.fadeLineRight}
-                    />
-                  </View>
-                )}
-                <Icon
-                  name={iconName}
-                  size={22}
-                  color={focused ? theme.blackSecondary : color}
-                />
-              </View>
-            );
-          },
         })}
       />
     </View>

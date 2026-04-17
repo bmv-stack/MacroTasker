@@ -10,7 +10,8 @@ import {
 import { lightTheme, darkTheme } from '../themes/color';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleTheme } from '../redux/slices/taskSlice';
 import React from 'react';
 
 const TaskDetailScreen = ({ route }) => {
@@ -18,11 +19,19 @@ const TaskDetailScreen = ({ route }) => {
   const theme = isDarkMode ? darkTheme : lightTheme;
   const styles = getStyles(theme);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const { task: initialTask } = route.params;
-  const task =
-    useSelector(state =>
-      state.tasks.items.find(t => t.id === initialTask.id),
-    ) || initialTask;
+  const task = useSelector(state =>
+    state.tasks.items.find(t => t.id === initialTask.id),
+  );
+
+  if (!task) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: theme.textPrimary }}>Task not found</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -30,7 +39,16 @@ const TaskDetailScreen = ({ route }) => {
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Task Detail</Text>
-        <View style={{ width: 30 }}></View>
+        <TouchableOpacity
+          onPress={() => dispatch(toggleTheme())}
+          hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
+        >
+          <Icon
+            name={isDarkMode ? 'sunny' : 'moon'}
+            size={24}
+            color={theme.textPrimary}
+          />
+        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View

@@ -6,7 +6,7 @@ import {
   deleteTask as deleteTaskFromDB,
   updateTaskStatus,
 } from '../../database/db';
-import { lightTheme } from '../../themes/color';
+import { lightTheme, darkTheme } from '../../themes/color';
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const db = await getDBConnection();
@@ -18,7 +18,8 @@ export const addNewTask = createAsyncThunk(
   async (task, { getState }) => {
     const state = getState();
     const existingTask = state.tasks.items.find(t => t.id === task.id);
-    const palette = lightTheme.taskCardPalette;
+    const theme = state.tasks.isDarkMode ? darkTheme : lightTheme;
+    const palette = theme.taskCardPalette;
 
     const taskWithColor = {
       ...task,
@@ -44,7 +45,9 @@ export const completeTask = createAsyncThunk(
   async (id, { getState }) => {
     const state = getState();
     const taskToUpdate = state.tasks.items.find(t => t.id === id);
-    if (!taskToUpdate) return;
+    if (!taskToUpdate) {
+      throw new Error('Task not found');
+    }
 
     const newStatus = taskToUpdate.completed ? 0 : 1;
     const db = await getDBConnection();
@@ -57,10 +60,9 @@ const taskSlice = createSlice({
   name: 'tasks',
   initialState: {
     items: [],
-    isDarkMode: false, // UI State stored in Redux
+    isDarkMode: false,
   },
   reducers: {
-    // Reducer to toggle the boolean
     toggleTheme: state => {
       state.isDarkMode = !state.isDarkMode;
     },
@@ -70,17 +72,29 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.items = action.payload;
       })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        console.error('Failed to fetch tasks:', action.error);
+      })
       .addCase(addNewTask.fulfilled, (state, action) => {
         state.items = action.payload;
       })
+      .addCase(addNewTask.rejected, (state, action) => {
+        console.error('Failed to add task:', action.error);
+      })
       .addCase(deleteTask.fulfilled, (state, action) => {
         state.items = state.items.filter(t => t.id !== action.payload);
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
+        console.error('Failed to delete task:', action.error);
       })
       .addCase(completeTask.fulfilled, (state, action) => {
         const task = state.items.find(t => t.id === action.payload.id);
         if (task) {
           task.completed = action.payload.completed;
         }
+      })
+      .addCase(completeTask.rejected, (state, action) => {
+        console.error('Failed to complete task:', action.error);
       });
   },
 });

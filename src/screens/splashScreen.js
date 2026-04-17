@@ -1,7 +1,6 @@
 import { StyleSheet, View, Image } from 'react-native';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useTheme } from '../themes/ThemeContext';
 import logo from '../../assets/final_logo.png';
 import { darkTheme, lightTheme } from '../themes/color';
 
