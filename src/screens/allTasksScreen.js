@@ -23,6 +23,7 @@ import { parseDate } from './createTaskScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { lightTheme, darkTheme } from '../themes/color';
+import CalendarComponent from '../components/calendarComponent';
 
 // -----DateList Generation function-----
 const generateDateList = () => {
@@ -39,6 +40,17 @@ const generateDateList = () => {
     });
   }
   return dates;
+};
+
+// -----Date Conversion Functions-----
+const convertToDDMMYYYY = dateString => {
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+};
+
+const convertToYYYYMMDD = dateString => {
+  const [day, month, year] = dateString.split('/');
+  return `${year}-${month}-${day}`;
 };
 
 const AllTasksScreen = () => {
@@ -92,6 +104,10 @@ const AllTasksScreen = () => {
   });
   // -----FILTER States-----
   const [sortOrder, setSortOrder] = useState(null);
+  const [startDateFilter, setStartDateFilter] = useState('');
+  const [endDateFilter, setEndDateFilter] = useState('');
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [calendarType, setCalendarType] = useState(null); // 'start' or 'end'
   // -----DATE LIST (On Top) States-----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
@@ -119,9 +135,22 @@ const AllTasksScreen = () => {
   };
 
   const filteredTasks = useMemo(() => {
-    const todayTasks = tasks.filter(task => task.date === selectedDate);
+    let tasksToFilter = tasks;
 
-    return [...todayTasks].sort((a, b) => {
+    if (startDateFilter && endDateFilter) {
+      const start = parseDate(startDateFilter);
+      const end = parseDate(endDateFilter);
+      if (start && end) {
+        tasksToFilter = tasks.filter(task => {
+          const taskDate = parseDate(task.date);
+          return taskDate && taskDate >= start && taskDate <= end;
+        });
+      }
+    } else {
+      tasksToFilter = tasks.filter(task => task.date === selectedDate);
+    }
+
+    return [...tasksToFilter].sort((a, b) => {
       if (a.completed !== b.completed) {
         return a.completed ? 1 : -1;
       }
@@ -133,7 +162,7 @@ const AllTasksScreen = () => {
       }
       return 0;
     });
-  }, [tasks, selectedDate, sortOrder]);
+  }, [tasks, selectedDate, sortOrder, startDateFilter, endDateFilter]);
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -175,7 +204,8 @@ const AllTasksScreen = () => {
         return taskDate != null && taskDate < now;
       }
     }).length;
-    const isFuture = parseDate(selectedDate) > now;
+    const isFuture =
+      startDateFilter && endDateFilter ? false : parseDate(selectedDate) > now;
 
     if (isFuture) {
       return [
@@ -294,116 +324,174 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* DATES Flatlist */}
-        <View style={styles.topSection}>
-          <FlatList
-            horizontal
-            ref={dateListRef}
-            data={dateList}
-            extraData={selectedDate}
-            keyExtractor={item => item.fullDate}
-            initialScrollIndex={30}
-            showsHorizontalScrollIndicator={false}
-            getItemLayout={(data, index) => ({
-              length: 55,
-              offset: 55 * index,
-              index,
-            })}
-            renderItem={({ item }) => {
-              const isSelected = item.fullDate === selectedDate;
-              const [monthName, dayName] = item.dayName.split(' ');
-              const backgroundColor = isSelected
-                ? isDarkMode
-                  ? theme.white
-                  : theme.blackSecondary
-                : isDarkMode
-                ? theme.surface
-                : theme.white;
-              const textColor = isSelected
-                ? isDarkMode
-                  ? '#000000'
-                  : theme.white
-                : isDarkMode
-                ? theme.textMuted
-                : theme.textMuted;
-              return (
-                <TouchableOpacity
-                  onPress={() => setSelectedDate(item.fullDate)}
-                  style={[styles.dateCard, { backgroundColor }]}
-                >
-                  <Text style={[styles.dateNumber, { color: textColor }]}>
-                    {item.dayNumber}
-                  </Text>
-                  <Text style={[styles.dateMonthName, { color: textColor }]}>
-                    {monthName}
-                  </Text>
-                  <Text style={[styles.dateDay, { color: textColor }]}>
-                    {dayName}
-                  </Text>
+        {/* DATES Flatlist - only show when not filtering by date range */}
+        {!(startDateFilter && endDateFilter) && (
+          <View style={styles.topSection}>
+            <FlatList
+              horizontal
+              ref={dateListRef}
+              data={dateList}
+              extraData={selectedDate}
+              keyExtractor={item => item.fullDate}
+              initialScrollIndex={30}
+              showsHorizontalScrollIndicator={false}
+              getItemLayout={(data, index) => ({
+                length: 55,
+                offset: 55 * index,
+                index,
+              })}
+              renderItem={({ item }) => {
+                const isSelected = item.fullDate === selectedDate;
+                const [monthName, dayName] = item.dayName.split(' ');
+                const backgroundColor = isSelected
+                  ? isDarkMode
+                    ? theme.white
+                    : theme.blackSecondary
+                  : isDarkMode
+                  ? theme.surface
+                  : theme.white;
+                const textColor = isSelected
+                  ? isDarkMode
+                    ? '#000000'
+                    : theme.white
+                  : isDarkMode
+                  ? theme.textMuted
+                  : theme.textMuted;
+                return (
+                  <TouchableOpacity
+                    onPress={() => setSelectedDate(item.fullDate)}
+                    style={[styles.dateCard, { backgroundColor }]}
+                  >
+                    <Text style={[styles.dateNumber, { color: textColor }]}>
+                      {item.dayNumber}
+                    </Text>
+                    <Text style={[styles.dateMonthName, { color: textColor }]}>
+                      {monthName}
+                    </Text>
+                    <Text style={[styles.dateDay, { color: textColor }]}>
+                      {dayName}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+            {/* -----Pie Chart----- */}
+            {filteredTasks.length > 0 && (
+              <View style={styles.chartContainer}>
+                <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
+                  <PieChart
+                    key={chartKey}
+                    donut
+                    focusOnPress
+                    sectionAutoFocus
+                    shadow
+                    radius={70}
+                    innerRadius={55}
+                    innerCircleColor={
+                      isDarkMode ? theme.background : theme.white
+                    }
+                    data={chartData}
+                    centerLabelComponent={() => (
+                      <View
+                        style={{
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            fontSize: 22,
+                            color: isDarkMode
+                              ? theme.white
+                              : theme.blackSecondary,
+                          }}
+                        >
+                          {selectedData.value}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: isDarkMode
+                              ? theme.white
+                              : theme.blackSecondary,
+                            fontWeight: '600',
+                          }}
+                        >
+                          {selectedData.label}
+                        </Text>
+                      </View>
+                    )}
+                  />
                 </TouchableOpacity>
-              );
-            }}
-          />
-          {/* -----Pie Chart----- */}
-          {filteredTasks.length > 0 && (
-            <View style={styles.chartContainer}>
-              <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
-                <PieChart
-                  key={chartKey}
-                  donut
-                  focusOnPress
-                  sectionAutoFocus
-                  shadow
-                  radius={70}
-                  innerRadius={55}
-                  innerCircleColor={isDarkMode ? theme.background : theme.white}
-                  data={chartData}
-                  centerLabelComponent={() => (
-                    <View
+
+                <View style={styles.dotContainer}>
+                  {chartData.map((item, index) => (
+                    <View key={index} style={styles.chartItem}>
+                      <View
+                        style={[styles.dot, { backgroundColor: item.color }]}
+                      />
+                      <Text style={styles.dotText}>{item.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* -----Pie Chart----- for date filtered tasks */}
+        {startDateFilter && endDateFilter && filteredTasks.length > 0 && (
+          <View style={styles.chartContainer}>
+            <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
+              <PieChart
+                key={chartKey}
+                donut
+                focusOnPress
+                sectionAutoFocus
+                shadow
+                radius={70}
+                innerRadius={55}
+                innerCircleColor={isDarkMode ? theme.background : theme.white}
+                data={chartData}
+                centerLabelComponent={() => (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text
                       style={{
-                        alignItems: 'center',
+                        fontWeight: 'bold',
+                        fontSize: 22,
+                        color: isDarkMode ? theme.white : theme.blackSecondary,
                       }}
                     >
-                      <Text
-                        style={{
-                          fontWeight: 'bold',
-                          fontSize: 22,
-                          color: isDarkMode
-                            ? theme.white
-                            : theme.blackSecondary,
-                        }}
-                      >
-                        {selectedData.value}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          color: isDarkMode
-                            ? theme.white
-                            : theme.blackSecondary,
-                          fontWeight: '600',
-                        }}
-                      >
-                        {selectedData.label}
-                      </Text>
-                    </View>
-                  )}
-                />
-              </TouchableOpacity>
-
-              <View style={styles.dotContainer}>
-                {chartData.map((item, index) => (
-                  <View key={index} style={styles.chartItem}>
-                    <View
-                      style={[styles.dot, { backgroundColor: item.color }]}
-                    />
-                    <Text style={styles.dotText}>{item.label}</Text>
+                      {selectedData.value}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: isDarkMode ? theme.white : theme.blackSecondary,
+                        fontWeight: '600',
+                      }}
+                    >
+                      {selectedData.label}
+                    </Text>
                   </View>
-                ))}
-              </View>
+                )}
+              />
+            </TouchableOpacity>
+
+            <View style={styles.dotContainer}>
+              {chartData.map((item, index) => (
+                <View key={index} style={styles.chartItem}>
+                  <View style={[styles.dot, { backgroundColor: item.color }]} />
+                  <Text style={styles.dotText}>{item.label}</Text>
+                </View>
+              ))}
             </View>
-          )}
-        </View>
+          </View>
+        )}
 
         <FlatList
           data={filteredTasks}
@@ -633,7 +721,7 @@ const AllTasksScreen = () => {
       )}
       {/* -----Filter Modal----- */}
       <Modal
-        transparent={false}
+        transparent={true}
         visible={filterVisible}
         animationType="slide"
         onRequestClose={() => setFilterVisible(false)}
@@ -649,6 +737,8 @@ const AllTasksScreen = () => {
                 onPress={() => {
                   setSortOrder(null);
                   setCurrentFilterTab('Type');
+                  setStartDateFilter('');
+                  setEndDateFilter('');
                 }}
               >
                 <Text style={styles.resetText}>RESET</Text>
@@ -709,21 +799,70 @@ const AllTasksScreen = () => {
                 ) : (
                   <View style={styles.tabSection}>
                     <Text style={styles.dateLabel}>Start Date</Text>
-                    <View style={styles.dateInputFake}>
-                      <Icon name="calendar" size={24} color={theme.textMuted} />
-                      <Text style={styles.dateInputText}>09/09/09</Text>
-                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCalendarType('start');
+                        setCalendarVisible(true);
+                      }}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <View style={styles.dateInputFake}>
+                        <Icon
+                          name="calendar"
+                          size={24}
+                          color={theme.textMuted}
+                        />
+                        <Text style={styles.dateInputText}>
+                          {startDateFilter || 'Select Start Date'}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
                     <Text style={[styles.dateLabel, { marginTop: 30 }]}>
                       End Date
                     </Text>
-                    <View style={styles.dateInputFake}>
-                      <Icon
-                        name="calendar-outline"
-                        size={20}
-                        color={theme.textMuted}
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCalendarType('end');
+                        setCalendarVisible(true);
+                      }}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                      <View style={styles.dateInputFake}>
+                        <Icon
+                          name="calendar-outline"
+                          size={20}
+                          color={theme.textMuted}
+                        />
+                        <Text style={styles.dateInputText}>
+                          {endDateFilter || 'Select End Date'}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                    {calendarVisible && (
+                      <CalendarComponent
+                        visible={true}
+                        useModal={false}
+                        onClose={() => setCalendarVisible(false)}
+                        onSelect={day => {
+                          const formatted = convertToDDMMYYYY(day.dateString);
+                          if (calendarType === 'start') {
+                            setStartDateFilter(formatted);
+                          } else {
+                            setEndDateFilter(formatted);
+                          }
+                          setCalendarVisible(false);
+                        }}
+                        initialDate={
+                          calendarType === 'start'
+                            ? startDateFilter
+                              ? convertToYYYYMMDD(startDateFilter)
+                              : undefined
+                            : endDateFilter
+                            ? convertToYYYYMMDD(endDateFilter)
+                            : undefined
+                        }
                       />
-                      <Text style={styles.dateInputText}>10/02/2024</Text>
-                    </View>
+                    )}
                   </View>
                 )}
               </View>
@@ -1041,8 +1180,11 @@ const getStyles = theme =>
       fontSize: 14,
     },
     drawerOverlay: {
-      flex: 1,
-      flexDirection: 'row',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       backgroundColor: theme.surface,
     },
     drawerDrop: {
@@ -1052,7 +1194,7 @@ const getStyles = theme =>
     drawerContent: {
       flex: 1,
       backgroundColor: theme.surface,
-      paddingTop: Platform.OS === 'ios' ? 50 : 20,
+      paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
     },
     drawerHeader: {
       flexDirection: 'row',

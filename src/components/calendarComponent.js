@@ -5,7 +5,13 @@ import Icon from 'react-native-vector-icons/Entypo';
 import { lightTheme, darkTheme } from '../themes/color';
 import { useSelector } from 'react-redux';
 
-const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
+const CalendarComponent = ({
+  visible,
+  onClose,
+  onSelect,
+  initialDate,
+  useModal = true,
+}) => {
   const isDarkMode = useSelector(state => state.tasks.isDarkMode);
   const theme = isDarkMode ? darkTheme : lightTheme;
   const styles = getStyles(theme);
@@ -38,68 +44,70 @@ const CalendarComponent = ({ visible, onClose, onSelect, initialDate }) => {
       onSelect({ dateString: tempSelectedDate });
     }
   };
-  return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <Calendar
-            //minDate={today}
-            current={initialDate || today}
-            onDayPress={day => setTempSelectedDate(day.dateString)}
-            markedDates={{
-              [tempSelectedDate]: {
-                selected: true,
-                selectedColor: theme.black,
-                selectedTextColor: theme.white,
-              },
-            }}
-            theme={{
-              backgroundColor: theme.surface,
-              calendarBackground: theme.surface,
-              textSectionTitleColor: theme.calendarHeader,
-              selectedDayBackgroundColor: theme.primary,
-              selectedDayTextColor: theme.white,
-              todayTextColor: theme.primary,
-              dayTextColor: theme.dayTextColor,
-              textDisabledColor: theme.calendarDisabled,
-              monthTextColor: theme.textPrimary,
-              textMonthFontWeight: 'bold',
-              textDayHeaderFontWeight: '600',
-              textDayFontSize: 14,
-              textMonthFontSize: 16,
-              textDayHeaderFontSize: 12,
-            }}
-            disableArrowLeft={minMonth}
-            onMonthChange={month => {
-              setCurrentVisibleMonth(month.dateString.substring(0, 7));
-            }}
-            hideExtraDays={true}
-            disableAllTouchEventsForDisabledDays={false}
-            renderArrow={direction => (
-              <Icon
-                name={
-                  direction === 'left'
-                    ? 'chevron-thin-left'
-                    : 'chevron-thin-right'
-                }
-              ></Icon>
-            )}
-          ></Calendar>
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.selectButton}
-              onPress={handleSelectPress}
-            >
-              <Text style={styles.selectText}>Select</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+  const content = (
+    <View style={styles.modalContainer}>
+      <Calendar
+        //minDate={today}
+        current={initialDate || today}
+        onDayPress={day => setTempSelectedDate(day.dateString)}
+        markedDates={{
+          [tempSelectedDate]: {
+            selected: true,
+            selectedColor: theme.black,
+            selectedTextColor: theme.white,
+          },
+        }}
+        theme={{
+          backgroundColor: theme.surface,
+          calendarBackground: theme.surface,
+          textSectionTitleColor: theme.calendarHeader,
+          selectedDayBackgroundColor: theme.primary,
+          selectedDayTextColor: theme.white,
+          todayTextColor: theme.primary,
+          dayTextColor: theme.dayTextColor,
+          textDisabledColor: theme.calendarDisabled,
+          monthTextColor: theme.textPrimary,
+          textMonthFontWeight: 'bold',
+          textDayHeaderFontWeight: '600',
+          textDayFontSize: 14,
+          textMonthFontSize: 16,
+          textDayHeaderFontSize: 12,
+        }}
+        disableArrowLeft={minMonth}
+        onMonthChange={month => {
+          setCurrentVisibleMonth(month.dateString.substring(0, 7));
+        }}
+        hideExtraDays={true}
+        disableAllTouchEventsForDisabledDays={false}
+        renderArrow={direction => (
+          <Icon
+            name={
+              direction === 'left' ? 'chevron-thin-left' : 'chevron-thin-right'
+            }
+          ></Icon>
+        )}
+      ></Calendar>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.selectButton}
+          onPress={handleSelectPress}
+        >
+          <Text style={styles.selectText}>Select</Text>
+        </TouchableOpacity>
       </View>
-    </Modal>
+    </View>
   );
+
+  return useModal ? (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={styles.overlay}>{content}</View>
+    </Modal>
+  ) : visible ? (
+    content
+  ) : null;
 };
 
 export default CalendarComponent;
