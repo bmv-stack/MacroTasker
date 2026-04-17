@@ -801,6 +801,7 @@ const AllTasksScreen = () => {
                     <Text style={styles.dateLabel}>Start Date</Text>
                     <TouchableOpacity
                       onPress={() => {
+                        setFilterVisible(false);
                         setCalendarType('start');
                         setCalendarVisible(true);
                       }}
@@ -822,6 +823,7 @@ const AllTasksScreen = () => {
                     </Text>
                     <TouchableOpacity
                       onPress={() => {
+                        setFilterVisible(false);
                         setCalendarType('end');
                         setCalendarVisible(true);
                       }}
@@ -838,31 +840,6 @@ const AllTasksScreen = () => {
                         </Text>
                       </View>
                     </TouchableOpacity>
-                    {calendarVisible && (
-                      <CalendarComponent
-                        visible={true}
-                        useModal={false}
-                        onClose={() => setCalendarVisible(false)}
-                        onSelect={day => {
-                          const formatted = convertToDDMMYYYY(day.dateString);
-                          if (calendarType === 'start') {
-                            setStartDateFilter(formatted);
-                          } else {
-                            setEndDateFilter(formatted);
-                          }
-                          setCalendarVisible(false);
-                        }}
-                        initialDate={
-                          calendarType === 'start'
-                            ? startDateFilter
-                              ? convertToYYYYMMDD(startDateFilter)
-                              : undefined
-                            : endDateFilter
-                            ? convertToYYYYMMDD(endDateFilter)
-                            : undefined
-                        }
-                      />
-                    )}
                   </View>
                 )}
               </View>
@@ -876,6 +853,29 @@ const AllTasksScreen = () => {
           </View>
         </View>
       </Modal>
+      {/* Calendar Modal */}
+      <CalendarComponent
+        visible={calendarVisible}
+        onClose={() => setCalendarVisible(false)}
+        onSelect={day => {
+          const formatted = convertToDDMMYYYY(day.dateString);
+          if (calendarType === 'start') {
+            setStartDateFilter(formatted);
+          } else {
+            setEndDateFilter(formatted);
+          }
+          setCalendarVisible(false);
+        }}
+        initialDate={
+          calendarType === 'start'
+            ? startDateFilter
+              ? convertToYYYYMMDD(startDateFilter)
+              : undefined
+            : endDateFilter
+            ? convertToYYYYMMDD(endDateFilter)
+            : undefined
+        }
+      />
     </View>
   );
 };
