@@ -296,6 +296,17 @@ const AllTasksScreen = () => {
       clearTimeout(undoTimer.current);
     }
   };
+  const isFiltered =
+    selectedDate !== new Date().toISOString().split('T')[0] ||
+    sortOrder !== 'asc' ||
+    (startDateFilter && endDateFilter);
+
+  function handleReset() {
+    setSortOrder('asc');
+    setCurrentFilterTab('Type');
+    setStartDateFilter('');
+    setEndDateFilter('');
+  }
 
   return (
     <View style={styles.container}>
@@ -326,10 +337,14 @@ const AllTasksScreen = () => {
           </View>
 
           <TouchableOpacity
-            onPress={() => setFilterVisible(true)}
+            onPress={isFiltered ? handleReset : () => setFilterVisible(true)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Icon name="filter" size={24} color={theme.textPrimary} />
+            <Icon
+              name={isFiltered ? 'reload' : 'filter'}
+              size={24}
+              color={theme.textPrimary}
+            />
           </TouchableOpacity>
         </View>
 
@@ -680,12 +695,7 @@ const AllTasksScreen = () => {
         onTabChange={setCurrentFilterTab}
         sortOrder={sortOrder}
         onSortChange={setSortOrder}
-        onReset={() => {
-          setSortOrder(null);
-          setCurrentFilterTab('Type');
-          setStartDateFilter('');
-          setEndDateFilter('');
-        }}
+        onReset={handleReset}
         startDateFilter={startDateFilter}
         endDateFilter={endDateFilter}
         onOpenCalendar={type => {
