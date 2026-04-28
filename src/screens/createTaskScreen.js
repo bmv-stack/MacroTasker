@@ -84,27 +84,6 @@ const CreateTaskScreen = () => {
 
   const [timeModalVisible, setTimeModalVisible] = useState(false);
 
-  const [picker, setPicker] = useState({
-    open: false,
-    mode: 'date',
-    field: null,
-  });
-
-  const onPickerChange = selectedVal => {
-    setPicker(prev => ({ ...prev, open: false }));
-
-    let formattedValue = '';
-    if (picker.mode === 'date') {
-      formattedValue = selectedVal.toISOString().split('T')[0];
-    } else {
-      formattedValue = selectedVal.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      });
-    }
-    handleInputChange(picker.field, formattedValue);
-  };
   const [showSuccess, setShowSuccess] = useState(false);
 
   const now = new Date();
@@ -319,20 +298,6 @@ const CreateTaskScreen = () => {
               }
             }}
           ></CalendarComponent>
-          {picker.open && (
-            <DatePicker
-              modal
-              open={picker.open}
-              date={new Date()}
-              mode={picker.mode}
-              theme="light"
-              onConfirm={onPickerChange}
-              onCancel={() => setPicker(prev => ({ ...prev, open: false }))}
-              confirmText="Select"
-              cancelText="Cancel"
-              title="Set Time"
-            />
-          )}
           <SuccessModal
             visible={showSuccess}
             message={

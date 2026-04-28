@@ -72,19 +72,19 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.items = action.payload;
       })
-      .addCase(fetchTasks.rejected, (state, action) => {
+      .addCase(fetchTasks.rejected, action => {
         console.error('Failed to fetch tasks:', action.error);
       })
       .addCase(addNewTask.fulfilled, (state, action) => {
         state.items = action.payload;
       })
-      .addCase(addNewTask.rejected, (state, action) => {
+      .addCase(addNewTask.rejected, action => {
         console.error('Failed to add task:', action.error);
       })
-      .addCase(deleteTask.fulfilled, (state, action) => {
+      .addCase(deleteTask.fulfilled, action => {
         state.items = state.items.filter(t => t.id !== action.payload);
       })
-      .addCase(deleteTask.rejected, (state, action) => {
+      .addCase(deleteTask.rejected, action => {
         console.error('Failed to delete task:', action.error);
       })
       .addCase(completeTask.fulfilled, (state, action) => {
@@ -93,7 +93,7 @@ const taskSlice = createSlice({
           task.completed = action.payload.completed;
         }
       })
-      .addCase(completeTask.rejected, (state, action) => {
+      .addCase(completeTask.rejected, action => {
         console.error('Failed to complete task:', action.error);
       });
   },
