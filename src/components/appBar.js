@@ -25,20 +25,20 @@ const AppBar = ({ title = 'APP NAME', onIconPress }) => {
       <View style={styles.right}>
         <TouchableOpacity
           onPress={handleToggleTheme}
-          hitSlop={{ top: 10, bottom: 10, right: 10, left: 2 }}
+          hitSlop={{ top: 10, bottom: 10, right: 5, left: 2 }}
         >
           <View style={styles.themeToggleBox}>
             <Icon
               name={isDarkMode ? 'sunny' : 'moon'}
               size={22}
-              color={theme.white}
+              color={theme.textInverted}
             />
           </View>
         </TouchableOpacity>
         {onIconPress && (
           <TouchableOpacity
             onPress={onIconPress}
-            hitSlop={{ top: 10, bottom: 10, right: 10, left: 5 }}
+            hitSlop={{ top: 10, bottom: 10, right: 10 }}
           >
             <View style={styles.createTaskBox}>
               <Icon name="add" size={22} color={theme.white}></Icon>
@@ -104,11 +104,11 @@ const getStyles = theme =>
     themeToggleBox: {
       height: 31,
       width: 31,
-      backgroundColor: theme.blackCharcol,
+      backgroundColor: theme.primary,
       borderRadius: 8,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: theme.blackCharcol,
+      shadowColor: theme.primary,
       shadowOffset: { height: 5 },
       shadowOpacity: 0.3,
       shadowRadius: 4,

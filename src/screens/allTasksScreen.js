@@ -55,7 +55,7 @@ const formatDate = dateString => {
 };
 
 const AllTasksScreen = () => {
-  // -----THEME Data-----
+  // -----THEME-----
   const isDarkMode = useSelector(state => state.tasks.isDarkMode);
   const theme = isDarkMode ? darkTheme : lightTheme;
   const styles = getStyles(theme);
@@ -189,7 +189,7 @@ const AllTasksScreen = () => {
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
-    setChartKey(chartKey + 1);
+    setChartKey(chartKey + 1); // Forced re-render
   };
 
   const now = new Date();
@@ -352,20 +352,19 @@ const AllTasksScreen = () => {
               renderItem={({ item }) => {
                 const isSelected = item.fullDate === selectedDate;
                 const [monthName, dayName] = item.dayName.split(' ');
-                const backgroundColor = isSelected
-                  ? isDarkMode
+                let backgroundColor;
+                if (isSelected) {
+                  backgroundColor = isDarkMode
                     ? theme.white
-                    : theme.blackSecondary
-                  : isDarkMode
-                  ? theme.surface
-                  : theme.white;
-                const textColor = isSelected
-                  ? isDarkMode
-                    ? '#000000'
-                    : theme.white
-                  : isDarkMode
-                  ? theme.textMuted
-                  : theme.textMuted;
+                    : theme.blackSecondary;
+                }
+                let textColor;
+                if (isSelected) {
+                  textColor = isDarkMode ? '#000' : theme.white;
+                } else {
+                  textColor = theme.textMuted;
+                }
+
                 return (
                   <TouchableOpacity
                     onPress={() => setSelectedDate(item.fullDate)}

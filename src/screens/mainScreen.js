@@ -35,7 +35,7 @@ const MainScreen = () => {
   const [activeTab, setActiveTab] = useState(
     route.params?.openScreen || 'Focus',
   );
-  const today = new Date().toLocaleDateString('en-GB');
+  const today = new Date().toISOString().split('T')[0];
   const activeTasks = tasks.filter(t => !t.completed && t.date === today);
   const activeTaskCount = activeTasks.length;
   const [expanded, setExpanded] = useState(false);

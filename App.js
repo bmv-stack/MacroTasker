@@ -4,7 +4,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from './src/redux/store';
 import { fetchTasks } from './src/redux/slices/taskSlice';
@@ -69,7 +68,7 @@ const TabNavigator = () => {
             style={[
               styles.tabLabel,
               { color },
-              focused && { fontWeight: '700', color: theme.blackSecondary },
+              focused && { fontWeight: '700', color: theme.textLabel },
             ]}
           >
             {route.name === 'AiTasks' ? 'Ai Task' : route.name}

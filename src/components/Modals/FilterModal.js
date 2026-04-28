@@ -210,14 +210,14 @@ const getStyles = theme =>
       paddingHorizontal: 15,
     },
     activeSidebarTab: {
-      backgroundColor: theme.accent,
+      backgroundColor: theme.primary,
     },
     sidebarTabText: {
       color: theme.textMuted,
       fontWeight: '600',
     },
     activeSidebarTabText: {
-      color: theme.primary,
+      color: theme.textInverted,
     },
     drawerTabContent: {
       flex: 1,
