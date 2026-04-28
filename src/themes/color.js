@@ -73,7 +73,7 @@ export const darkTheme = {
 
   primary: '#FFF',
   textInput: '#FFFFFF',
-  textLabel: '#E0E0E0',
+  textLabel: '#f9f6f6',
   black: '#000000d1',
   blackPure: '#000',
   blackCharcol: '#000000e7',

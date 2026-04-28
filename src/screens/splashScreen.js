@@ -2,11 +2,10 @@ import { StyleSheet, View, Image } from 'react-native';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import logo from '../../assets/final_logo.png';
-import { darkTheme, lightTheme } from '../themes/color';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SplashScreen = () => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   return (
     <View style={styles.container}>

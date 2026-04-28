@@ -1,11 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { lightTheme, darkTheme } from '../themes/color';
-import { useSelector } from 'react-redux';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SwitchTabs = ({ activeTab, onTabChange }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   return (
     <View style={styles.container}>

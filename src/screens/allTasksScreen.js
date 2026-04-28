@@ -21,8 +21,7 @@ import { PieChart } from 'react-native-gifted-charts';
 import { parseDate } from './createTaskScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import { lightTheme, darkTheme } from '../themes/color';
-import CalendarComponent from '../components/calendarComponent';
+import { useTheme } from '../contexts/ThemeContext';
 import PriorityModal from '../components/Modals/PriorityModal';
 import DeleteModal from '../components/Modals/DeleteModal';
 import FilterModal from '../components/Modals/FilterModal';
@@ -56,8 +55,7 @@ const formatDate = dateString => {
 
 const AllTasksScreen = () => {
   // -----THEME-----
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme, isDarkMode } = useTheme();
   const styles = getStyles(theme);
   // --------------------------------------------------
   const dateListRef = useRef(null);

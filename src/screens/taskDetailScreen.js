@@ -7,11 +7,10 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { lightTheme, darkTheme } from '../themes/color';
+import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useSelector, useDispatch } from 'react-redux';
-import { toggleTheme } from '../redux/slices/taskSlice';
+import { useTheme } from '../contexts/ThemeContext';
 import React from 'react';
 
 const formatDate = dateString => {
@@ -24,11 +23,9 @@ const formatDate = dateString => {
 };
 
 const TaskDetailScreen = ({ route }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme, isDarkMode, toggleTheme } = useTheme();
   const styles = getStyles(theme);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const { task: initialTask } = route.params;
   const task = useSelector(state =>
     state.tasks.items.find(t => t.id === initialTask.id),
@@ -49,7 +46,7 @@ const TaskDetailScreen = ({ route }) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Task Detail</Text>
         <TouchableOpacity
-          onPress={() => dispatch(toggleTheme())}
+          onPress={toggleTheme}
           hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
         >
           <Icon

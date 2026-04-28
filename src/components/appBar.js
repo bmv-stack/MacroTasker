@@ -1,19 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { lightTheme, darkTheme } from '../themes/color';
 import Icon from 'react-native-vector-icons/Ionicons';
 import logo from '../../assets/final_logo.png';
-import { useSelector, useDispatch } from 'react-redux';
-import { toggleTheme } from '../redux/slices/taskSlice';
+import { useTheme } from '../contexts/ThemeContext';
 
 const AppBar = ({ title = 'APP NAME', onIconPress }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme, isDarkMode, toggleTheme } = useTheme();
   const styles = getStyles(theme);
-  const dispatch = useDispatch();
 
   const handleToggleTheme = () => {
-    dispatch(toggleTheme());
+    toggleTheme();
   };
 
   return (

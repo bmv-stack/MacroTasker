@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
-import { lightTheme, darkTheme } from '../themes/color';
-import { useSelector } from 'react-redux';
+import { useTheme } from '../contexts/ThemeContext';
 
 const FormInput = ({
   label,
@@ -11,8 +10,7 @@ const FormInput = ({
   error,
   ...props
 }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   return (
     <View style={styles.container}>

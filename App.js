@@ -14,10 +14,11 @@ import MainScreen from './src/screens/mainScreen';
 import CreateTaskScreen from './src/screens/createTaskScreen';
 import TaskDetailScreen from './src/screens/taskDetailScreen';
 import SplashScreen from './src/screens/splashScreen';
+import { ThemeProvider } from './src/contexts/ThemeContext';
+import { useTheme } from './src/contexts/ThemeContext';
 
 const PlaceholderScreen = ({ route }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   return (
     <View style={styles.center}>
@@ -52,8 +53,7 @@ const DashboardStackScreen = () => (
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
 
   return (
@@ -120,8 +120,7 @@ const AppContent = () => {
   const dispatch = useDispatch();
   const [isReady, setIsReady] = useState(false);
 
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme, isDarkMode } = useTheme();
   const styles = getStyles(theme);
 
   useEffect(() => {
@@ -157,7 +156,9 @@ const AppContent = () => {
 export default function App() {
   return (
     <Provider store={store}>
-      <AppContent />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </Provider>
   );
 }

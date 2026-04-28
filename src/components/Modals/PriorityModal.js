@@ -1,11 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
-import { lightTheme, darkTheme } from '../../themes/color';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const PriorityModal = ({ visible, onClose, onSelect }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
 
   const priorityStyles = {
@@ -54,7 +52,7 @@ const getStyles = theme =>
       alignItems: 'center',
     },
     priorityMenu: {
-      backgroundColor: theme.white,
+      backgroundColor: theme.surface,
       width: '70%',
       borderRadius: 24,
       padding: 16,

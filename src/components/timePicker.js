@@ -8,13 +8,11 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
-import { lightTheme, darkTheme } from '../themes/color';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useSelector } from 'react-redux';
+import { useTheme } from '../contexts/ThemeContext';
 
 const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   const [selectedHours, setSelectedHours] = useState('12');
   const [selectedMinutes, setSelectedMinutes] = useState('00');

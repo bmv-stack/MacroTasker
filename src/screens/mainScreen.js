@@ -12,7 +12,7 @@ import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { darkTheme, lightTheme } from '../themes/color';
+import { useTheme } from '../contexts/ThemeContext';
 
 const formatTime = timeString => {
   if (!timeString || !timeString.includes(':')) return timeString;
@@ -26,8 +26,7 @@ const formatTime = timeString => {
 };
 
 const MainScreen = () => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   const navigation = useNavigation();
   const route = useRoute();

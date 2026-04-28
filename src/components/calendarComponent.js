@@ -2,8 +2,7 @@ import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Entypo';
-import { lightTheme, darkTheme } from '../themes/color';
-import { useSelector } from 'react-redux';
+import { useTheme } from '../contexts/ThemeContext';
 
 const CalendarComponent = ({
   visible,
@@ -13,8 +12,7 @@ const CalendarComponent = ({
   allowPastDates = false,
   useModal = true,
 }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
   const todayDate = (date = new Date()) => {
     const year = date.getFullYear();

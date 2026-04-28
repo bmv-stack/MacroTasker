@@ -17,7 +17,7 @@ import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
 import SuccessModal from '../components/Modals/SuccessModal';
-import { lightTheme, darkTheme } from '../themes/color';
+import { useTheme } from '../contexts/ThemeContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const getMinute = stringTime => {
@@ -55,8 +55,7 @@ const formatDate = dateString => {
 };
 
 const CreateTaskScreen = () => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme, isDarkMode, toggleTheme } = useTheme();
   const styles = getStyles(theme);
   const scrollRef = useRef(null);
   const navigation = useNavigation();
@@ -108,8 +107,12 @@ const CreateTaskScreen = () => {
     setForm({ ...form, [field]: value });
   };
   const handleFinalSubmit = () => {
+    const palette = theme.taskCardPalette;
+    const randomColor = palette[Math.floor(Math.random() * palette.length)];
     const taskData = {
       ...form,
+
+      color: existingTask?.color || randomColor,
       id:
         existingTask?.id ||
         `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -150,7 +153,7 @@ const CreateTaskScreen = () => {
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create Task</Text>
             <TouchableOpacity
-              onPress={() => dispatch(toggleTheme())}
+              onPress={toggleTheme}
               hitSlop={{ top: 10, bottom: 10, right: 10, left: 10 }}
             >
               <Icon

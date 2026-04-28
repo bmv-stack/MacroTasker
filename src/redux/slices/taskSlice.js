@@ -6,33 +6,17 @@ import {
   deleteTask as deleteTaskFromDB,
   updateTaskStatus,
 } from '../../database/db';
-import { lightTheme, darkTheme } from '../../themes/color';
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const db = await getDBConnection();
   return await getTask(db);
 });
 
-export const addNewTask = createAsyncThunk(
-  'tasks/addNewTask',
-  async (task, { getState }) => {
-    const state = getState();
-    const existingTask = state.tasks.items.find(t => t.id === task.id);
-    const theme = state.tasks.isDarkMode ? darkTheme : lightTheme;
-    const palette = theme.taskCardPalette;
-
-    const taskWithColor = {
-      ...task,
-      color:
-        existingTask?.color ||
-        palette[Math.floor(Math.random() * palette.length)],
-    };
-
-    const db = await getDBConnection();
-    await saveTask(db, taskWithColor);
-    return await getTask(db);
-  },
-);
+export const addNewTask = createAsyncThunk('tasks/addNewTask', async task => {
+  const db = await getDBConnection();
+  await saveTask(db, task);
+  return await getTask(db);
+});
 
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async id => {
   const db = await getDBConnection();
@@ -60,12 +44,6 @@ const taskSlice = createSlice({
   name: 'tasks',
   initialState: {
     items: [],
-    isDarkMode: false,
-  },
-  reducers: {
-    toggleTheme: state => {
-      state.isDarkMode = !state.isDarkMode;
-    },
   },
   extraReducers: builder => {
     builder
@@ -99,5 +77,4 @@ const taskSlice = createSlice({
   },
 });
 
-export const { toggleTheme } = taskSlice.actions;
 export default taskSlice.reducer;

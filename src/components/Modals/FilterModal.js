@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { lightTheme, darkTheme } from '../../themes/color';
+import { useTheme } from '../../contexts/ThemeContext';
 import CalendarComponent from '../calendarComponent';
 
 const FilterModal = ({
@@ -31,8 +31,7 @@ const FilterModal = ({
   onCalendarClose,
   onApply,
 }) => {
-  const isDarkMode = useSelector(state => state.tasks.isDarkMode);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const styles = getStyles(theme);
 
   return (
