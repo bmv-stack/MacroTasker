@@ -12,15 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
 import React from 'react';
-
-const formatDate = dateString => {
-  if (!dateString) return '';
-  if (dateString.includes('/')) {
-    return dateString; // Already DD/MM/YYYY
-  }
-  const [year, month, day] = dateString.split('-');
-  return `${day}/${month}/${year}`;
-};
+import { formatDate } from '../utils/formatDate';
 
 const TaskDetailScreen = ({ route }) => {
   const { theme, isDarkMode, toggleTheme } = useTheme();

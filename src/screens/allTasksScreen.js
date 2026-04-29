@@ -25,6 +25,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import PriorityModal from '../components/Modals/PriorityModal';
 import DeleteModal from '../components/Modals/DeleteModal';
 import FilterModal from '../components/Modals/FilterModal';
+import { formatDate } from '../utils/formatDate';
+import { formatTime } from '../utils/formatTime';
 
 // -----DateList Generation function-----
 const generateDateList = () => {
@@ -41,16 +43,6 @@ const generateDateList = () => {
     });
   }
   return dates;
-};
-
-// -----Date Conversion Functions-----
-const formatDate = dateString => {
-  if (!dateString) return '';
-  if (dateString.includes('/')) {
-    return dateString;
-  }
-  const [year, month, day] = dateString.split('-');
-  return `${day}/${month}/${year}`;
 };
 
 const AllTasksScreen = () => {
@@ -79,7 +71,7 @@ const AllTasksScreen = () => {
   });
   const [deletedTask, setDeletedTask] = useState(null);
   // --------------------------------------------------
-  const undoTimer = useRef(null);
+  const undoTimer = useRef(null); // useRef doesn't trigger a re-render if .current value changes
   // --------------------------------------------------
 
   // ----- UNDO Timer Function -----
@@ -102,11 +94,12 @@ const AllTasksScreen = () => {
     taskId: null,
   });
   // -----FILTER States-----
-  const [sortOrder, setSortOrder] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
   const [startDateFilter, setStartDateFilter] = useState('');
   const [endDateFilter, setEndDateFilter] = useState('');
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [calendarType, setCalendarType] = useState(null); // 'start' or 'end'
+
   // -----DATE LIST (On Top) States-----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
@@ -276,16 +269,6 @@ const AllTasksScreen = () => {
     }
     setPriorityModal({ visible: false, taskId: null });
   };
-  const formatTime = timeString => {
-    if (!timeString || !timeString.includes(':')) return timeString;
-
-    const [hours24, m] = timeString.split(':');
-    let hours = parseInt(hours24, 10);
-    const meridiem = hours >= 12 ? 'PM' : 'AM';
-
-    hours = hours % 12 || 12;
-    return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
-  };
 
   const handleUndo = () => {
     if (deletedTask) {
@@ -346,7 +329,7 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* DATES Flatlist - only show when not filtering by date range */}
+        {/* DATES Flatlist - only show when not filtering by date */}
         {!(startDateFilter && endDateFilter) && (
           <View style={styles.topSection}>
             <FlatList

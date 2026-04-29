@@ -11,6 +11,7 @@ const commonColors = {
   transparent: 'transparent',
   completedBg: '#34C759',
   buttonDisabled: '#acacb1',
+  textError: '#FF3B30',
 };
 export const lightTheme = {
   ...commonColors,

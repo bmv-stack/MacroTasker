@@ -8,7 +8,6 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../../contexts/ThemeContext';
 import CalendarComponent from '../calendarComponent';
@@ -25,7 +24,6 @@ const FilterModal = ({
   endDateFilter,
   onOpenCalendar,
   calendarVisible,
-  calendarType,
   calendarInitialDate,
   onCalendarSelect,
   onCalendarClose,

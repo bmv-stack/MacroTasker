@@ -1,6 +1,5 @@
 import { StyleSheet, View, Image } from 'react-native';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import logo from '../../assets/final_logo.png';
 import { useTheme } from '../contexts/ThemeContext';
 

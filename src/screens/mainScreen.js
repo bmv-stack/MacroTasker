@@ -13,17 +13,7 @@ import SwitchTabs from '../components/tabPills';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
-
-const formatTime = timeString => {
-  if (!timeString || !timeString.includes(':')) return timeString;
-
-  const [hours24, m] = timeString.split(':');
-  let hours = parseInt(hours24, 10);
-  const meridiem = hours >= 12 ? 'PM' : 'AM';
-
-  hours = hours % 12 || 12;
-  return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
-};
+import { formatTime } from '../utils/formatTime';
 
 const MainScreen = () => {
   const { theme } = useTheme();

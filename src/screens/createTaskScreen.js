@@ -11,48 +11,16 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux';
-import { addNewTask, toggleTheme } from '../redux/slices/taskSlice';
+import { useDispatch } from 'react-redux';
+import { addNewTask } from '../redux/slices/taskSlice';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
 import SuccessModal from '../components/Modals/SuccessModal';
 import { useTheme } from '../contexts/ThemeContext';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-const getMinute = stringTime => {
-  if (!stringTime || !stringTime.includes(' ')) return 0;
-  const [time, meridiem] = stringTime.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
-
-  if (meridiem === 'PM' && hours !== 12) {
-    hours += 12;
-  }
-  if (meridiem === 'AM' && hours === 12) {
-    hours = 0;
-  }
-  return hours * 60 + minutes;
-};
-
-const formatTime = timeString => {
-  if (!timeString || !timeString.includes(':')) return timeString;
-
-  const [hours24, m] = timeString.split(':');
-  let hours = parseInt(hours24, 10);
-  const meridiem = hours >= 12 ? 'PM' : 'AM';
-
-  hours = hours % 12 || 12;
-  return `${hours.toString().padStart(2, '0')}:${m} ${meridiem}`;
-};
-
-const formatDate = dateString => {
-  if (!dateString) return '';
-  if (dateString.includes('/')) {
-    return dateString; // Already DD/MM/YYYY
-  }
-  const [year, month, day] = dateString.split('-');
-  return `${day}/${month}/${year}`;
-};
+import { formatTime } from '../utils/formatTime';
+import { formatDate } from '../utils/formatDate';
 
 const CreateTaskScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
@@ -173,7 +141,7 @@ const CreateTaskScreen = () => {
             <TouchableOpacity onPress={() => handleOpenCalendar('date')}>
               <View pointerEvents="none">
                 <FormInput
-                  label="Date"
+                  label="Start Date"
                   placeholder="Add Date"
                   value={formatDate(form.date)}
                 ></FormInput>
@@ -187,7 +155,7 @@ const CreateTaskScreen = () => {
             >
               <View pointerEvents="none">
                 <FormInput
-                  label="Time"
+                  label="Start Time"
                   placeholder="Add Time"
                   value={formatTime(form.time)}
                 ></FormInput>
@@ -200,7 +168,7 @@ const CreateTaskScreen = () => {
                   currentField === 'time' ? form.time : form.endTime;
                 if (timeStr) {
                   const [h, m, s] = timeStr.split(':').map(Number);
-                  return new Date(2000, 0, 1, h, m, s || 0);
+                  return new Date(2004, 0, 1, h, m, s || 0);
                 }
                 return new Date();
               })()}
