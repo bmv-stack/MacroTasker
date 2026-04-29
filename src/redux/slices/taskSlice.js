@@ -59,7 +59,7 @@ const taskSlice = createSlice({
       .addCase(addNewTask.rejected, action => {
         console.error('Failed to add task:', action.error);
       })
-      .addCase(deleteTask.fulfilled, action => {
+      .addCase(deleteTask.fulfilled, (state, action) => {
         state.items = state.items.filter(t => t.id !== action.payload);
       })
       .addCase(deleteTask.rejected, action => {

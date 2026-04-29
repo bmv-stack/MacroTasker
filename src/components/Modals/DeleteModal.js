@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
+
 const DeleteModal = ({ visible, taskTitle, onCancel, onConfirm }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);

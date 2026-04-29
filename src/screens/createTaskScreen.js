@@ -63,35 +63,43 @@ const CreateTaskScreen = () => {
     return endDate >= startDate;
   };
   const isTimeValid = () => {
-    if (!form.endDate || !form.endTime || form.date !== form.endDate)
-      return true;
+    if (!form.endDate || !form.endTime) return true;
+    if (form.date === form.endDate) {
+      return form.endTime >= form.time;
+    }
+    return true;
   };
 
   const isFormValid =
-    form.title.length > 0 && form.date.length > 0 && form.time.length > 0;
-  isDateValid() && isTimeValid();
+    form.title.length > 0 &&
+    form.date.length > 0 &&
+    form.time.length > 0 &&
+    isDateValid() &&
+    isTimeValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });
   };
   const handleFinalSubmit = () => {
-    const palette = theme.taskCardPalette;
-    const randomColor = palette[Math.floor(Math.random() * palette.length)];
-    const taskData = {
-      ...form,
+    if (isFormValid) {
+      const palette = theme.taskCardPalette;
+      const randomColor = palette[Math.floor(Math.random() * palette.length)];
+      const taskData = {
+        ...form,
 
-      color: existingTask?.color || randomColor,
-      id:
-        existingTask?.id ||
-        `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    };
-    dispatch(addNewTask(taskData));
+        color: existingTask?.color || randomColor,
+        id:
+          existingTask?.id ||
+          `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      };
+      dispatch(addNewTask(taskData));
 
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      navigation.goBack();
-    }, 1500);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigation.goBack();
+      }, 1500);
+    }
   };
 
   const todayDate = (date = new Date()) => {
