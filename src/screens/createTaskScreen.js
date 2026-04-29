@@ -208,7 +208,7 @@ const CreateTaskScreen = () => {
                 ></FormInput>
               </View>
             </TouchableOpacity>
-            {!isTimeValid() && form.date === form.endDate && (
+            {!isTimeValid() && (
               <Text
                 style={{
                   color: theme.textError,
