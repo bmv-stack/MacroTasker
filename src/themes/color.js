@@ -12,6 +12,7 @@ const commonColors = {
   completedBg: '#34C759',
   buttonDisabled: '#acacb1',
   textError: '#FF3B30',
+  taskCardPalette: ['#7ea8d9', '#e7d8aa', '#a6c290', '#d7a3c5'],
 };
 export const lightTheme = {
   ...commonColors,
@@ -53,7 +54,6 @@ export const lightTheme = {
   chartOverdue: '#FF3B30',
   chartCompleted: '#34C759',
   textChartLabel: '#000',
-  taskCardPalette: ['#FF3B30', '#007AFF', '#34C759', '#1E40AF'],
 };
 export const darkTheme = {
   ...commonColors,
@@ -95,5 +95,4 @@ export const darkTheme = {
   chartOverdue: '#FF3B30',
   chartCompleted: '#34C759',
   textChartLabel: '#FFF',
-  taskCardPalette: ['#FF3B30', '#007AFF', '#34C759', '#1E40AF'],
 };
