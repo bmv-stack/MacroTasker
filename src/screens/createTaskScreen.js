@@ -62,13 +62,20 @@ const CreateTaskScreen = () => {
     return endDate >= startDate;
   };
   const isTimeValid = () => {
-    if (!form.endDate || !form.endTime || form.date !== form.endDate)
-      return true;
+    if (!form.endDate || form.endTime) return true;
+    if (form.endDate > form.date) return true;
+    if (form.endDate === form.date) {
+      return form.endTime > form.time;
+    }
+    return false;
   };
 
   const isFormValid =
-    form.title.length > 0 && form.date.length > 0 && form.time.length > 0;
-  isDateValid() && isTimeValid();
+    form.title.length > 0 &&
+    form.date.length > 0 &&
+    form.time.length > 0 &&
+    isDateValid() &&
+    isTimeValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -187,18 +194,6 @@ const CreateTaskScreen = () => {
                 ></FormInput>
               </View>
             </TouchableOpacity>
-            {form.endDate && !isDateValid() && (
-              <Text
-                style={{
-                  color: theme.textError,
-                  fontSize: 12,
-                  marginBottom: 10,
-                  marginTop: -5,
-                }}
-              >
-                End Date cannot be before 'Date'
-              </Text>
-            )}
             <TouchableOpacity
               onPress={() => {
                 setCurrentField('endTime');

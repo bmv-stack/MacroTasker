@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 import { lightTheme, darkTheme } from '../themes/color';
 
-export const storage = new MMKV();
+export const storage = createMMKV();
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    return storage.getBoolean('userTheme') ?? false;
+    const saved = storage.getBoolean('userTheme');
+    if (saved === undefined) {
+      return false;
+    } else {
+      return saved;
+    }
   });
 
   const toggleTheme = () => {
