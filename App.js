@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -58,6 +59,7 @@ const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        animation: 'fade',
         headerShown: false,
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: theme.activeTabBar,
@@ -86,8 +88,28 @@ const TabNavigator = () => {
           } else if (route.name === 'Menu') {
             iconName = focused ? 'list' : 'list-outline';
           }
-
-          return <Icon name={iconName} size={24} color={color} />;
+          return (
+            <View style={styles.iconContainer}>
+              {focused && (
+                <View style={styles.indicatorContainer}>
+                  <LinearGradient
+                    colors={['transparent', theme.primary]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.fadeLineLeft}
+                  />
+                  <View style={styles.activeIndicatorDot}></View>
+                  <LinearGradient
+                    colors={[theme.primary, 'transparent']}
+                    start={{ x: 0, y: 1 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.fadeLineRight}
+                  ></LinearGradient>
+                </View>
+              )}
+              <Icon name={iconName} size={22} color={color}></Icon>
+            </View>
+          );
         },
       })}
     >
@@ -185,7 +207,12 @@ const getStyles = theme =>
       paddingHorizontal: 20,
     },
     tabLabel: { fontSize: 10, fontWeight: '600', marginTop: 5 },
-    activeIndicatorDot: { width: 6.5, height: 6.5, borderRadius: 4 },
+    activeIndicatorDot: {
+      width: 6.5,
+      height: 6.5,
+      borderRadius: 4,
+      backgroundColor: theme.primary,
+    },
     iconContainer: {
       alignItems: 'center',
       justifyContent: 'center',
