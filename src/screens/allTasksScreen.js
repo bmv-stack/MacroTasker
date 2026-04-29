@@ -22,9 +22,7 @@ import { parseDate } from './createTaskScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { useTheme } from '../contexts/ThemeContext';
-import PriorityModal from '../components/Modals/PriorityModal';
-import DeleteModal from '../components/Modals/DeleteModal';
-import FilterModal from '../components/Modals/FilterModal';
+import { FilterModal, DeleteModal, PriorityModal } from '../components/Modals';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
 
@@ -278,9 +276,8 @@ const AllTasksScreen = () => {
     }
   };
   const isFiltered =
-    selectedDate !== new Date().toISOString().split('T')[0] ||
-    sortOrder !== 'asc' ||
-    (startDateFilter && endDateFilter);
+    //selectedDate !== new Date().toISOString().split('T')[0] ||
+    sortOrder !== 'asc' || (startDateFilter && endDateFilter);
 
   function handleReset() {
     setSortOrder('asc');
@@ -344,7 +341,7 @@ const AllTasksScreen = () => {
                 length: 55,
                 offset: 55 * index,
                 index,
-              })}
+              })} // Fixed width so the FaltList doesn't have to calculate for each item render
               renderItem={({ item }) => {
                 const isSelected = item.fullDate === selectedDate;
                 const [monthName, dayName] = item.dayName.split(' ');

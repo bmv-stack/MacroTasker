@@ -26,6 +26,8 @@
     "react-native-drawer-layout": "^4.2.2",
     "react-native-gifted-charts": "^1.4.74",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-mmkv": "^3.3.3",
+    "react-native-nitro-modules": "^0.35.6",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.24.0",
     "react-native-sqlite-storage": "^6.0.1",

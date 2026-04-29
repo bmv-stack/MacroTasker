@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import DatePicker from 'react-native-date-picker';
 import {
   View,
   TouchableOpacity,
@@ -16,7 +15,7 @@ import { addNewTask } from '../redux/slices/taskSlice';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
-import SuccessModal from '../components/Modals/SuccessModal';
+import { SuccessModal } from '../components/Modals';
 import { useTheme } from '../contexts/ThemeContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { formatTime } from '../utils/formatTime';
@@ -167,7 +166,9 @@ const CreateTaskScreen = () => {
                 const timeStr =
                   currentField === 'time' ? form.time : form.endTime;
                 if (timeStr) {
-                  const [h, m, s] = timeStr.split(':').map(Number);
+                  const [h, m, s] = timeStr
+                    .split(':')
+                    .map(item => parseInt(item));
                   return new Date(2004, 0, 1, h, m, s || 0);
                 }
                 return new Date();

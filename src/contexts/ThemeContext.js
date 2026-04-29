@@ -1,26 +1,19 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useState } from 'react';
+import { MMKV } from 'react-native-mmkv';
 import { lightTheme, darkTheme } from '../themes/color';
 
+export const storage = new MMKV();
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return storage.getBoolean('userTheme') ?? false;
+  });
 
-  useEffect(() => {
-    const loadTheme = async () => {
-      const savedTheme = await AsyncStorage.getItem('userTheme');
-      if (savedTheme !== null) {
-        setIsDarkMode(JSON.parse(savedTheme));
-      }
-    };
-    loadTheme();
-  }, []);
-
-  const toggleTheme = async () => {
+  const toggleTheme = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    await AsyncStorage.setItem('userTheme', JSON.stringify(newMode));
+    storage.set('userTheme', newMode);
   };
   const theme = isDarkMode ? darkTheme : lightTheme;
 

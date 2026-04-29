@@ -9,11 +9,13 @@ import { Provider, useDispatch } from 'react-redux';
 import { store } from './src/redux/store';
 import { fetchTasks } from './src/redux/slices/taskSlice';
 import { getDBConnection, createTable } from './src/database/db';
-import AllTasksScreen from './src/screens/allTasksScreen';
-import MainScreen from './src/screens/mainScreen';
-import CreateTaskScreen from './src/screens/createTaskScreen';
-import TaskDetailScreen from './src/screens/taskDetailScreen';
-import SplashScreen from './src/screens/splashScreen';
+import {
+  AllTasksScreen,
+  MainScreen,
+  SplashScreen,
+  TaskDetailScreen,
+  CreateTaskScreen,
+} from './src/screens';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 import { useTheme } from './src/contexts/ThemeContext';
 
