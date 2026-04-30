@@ -15,11 +15,12 @@ import { addNewTask } from '../redux/slices/taskSlice';
 import FormInput from '../components/formInput';
 import CalendarComponent from '../components/calendarComponent';
 import TimePicker from '../components/timePicker';
-import { SuccessModal } from '../components/Modals';
+import SuccessModal from '../components/Modals/SuccessModal';
 import { useTheme } from '../contexts/ThemeContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { formatTime } from '../utils/formatTime';
 import { formatDate } from '../utils/formatDate';
+import { getMinute } from '../utils/getMinutes';
 
 const CreateTaskScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
@@ -55,17 +56,17 @@ const CreateTaskScreen = () => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  const isDateValid = () => {
-    if (!form.endDate) return true;
-    const startDate = parseDate(form.date);
-    const endDate = parseDate(form.endDate);
-    return endDate >= startDate;
-  };
   const isTimeValid = () => {
-    if (!form.endDate || form.endTime) return true;
+    if (!form.endDate || !form.endTime) return true;
     if (form.endDate > form.date) return true;
     if (form.endDate === form.date) {
-      return form.endTime > form.time;
+      const startMinutes = getMinute(form.time);
+      console.log('Time: ', form.time);
+      console.log('startTime: ', startMinutes);
+      const endMinutes = getMinute(form.endTime);
+      console.log('End Time from form: ', form.endTime);
+      console.log('endMinutes: ', endMinutes);
+      return endMinutes > startMinutes;
     }
     return false;
   };
@@ -74,7 +75,6 @@ const CreateTaskScreen = () => {
     form.title.length > 0 &&
     form.date.length > 0 &&
     form.time.length > 0 &&
-    isDateValid() &&
     isTimeValid();
 
   const handleInputChange = (field, value) => {
@@ -85,7 +85,6 @@ const CreateTaskScreen = () => {
     const randomColor = palette[Math.floor(Math.random() * palette.length)];
     const taskData = {
       ...form,
-
       color: existingTask?.color || randomColor,
       id:
         existingTask?.id ||
@@ -181,9 +180,9 @@ const CreateTaskScreen = () => {
                 return new Date();
               })()}
               onClose={() => setTimeModalVisible(false)}
-              onSelect={formattedTime =>
-                handleInputChange(currentField, formattedTime)
-              }
+              onSelect={formattedTime => {
+                handleInputChange(currentField, formattedTime);
+              }}
             ></TimePicker>
             <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
               <View pointerEvents="none">
