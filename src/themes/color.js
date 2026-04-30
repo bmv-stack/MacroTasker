@@ -12,7 +12,22 @@ const commonColors = {
   completedBg: '#34C759',
   buttonDisabled: '#acacb1',
   textError: '#FF3B30',
-  taskCardPalette: ['#7ea8d9', '#e7d8aa', '#a6c290', '#d7a3c5'],
+  taskCardPalette: [
+    '#7ea8d9',
+    '#e7d8aa',
+    '#a6c290',
+    '#d7a3c5',
+    '#C1E1C1',
+    '#FDFD96',
+    '#9192F3',
+    '#AEC6CF',
+    '#F9BBB7',
+    '#DE97F7',
+    '#8CF7D7',
+    '#7DECFF',
+    '#F3E65E',
+    '#ffae62',
+  ],
 };
 export const lightTheme = {
   ...commonColors,

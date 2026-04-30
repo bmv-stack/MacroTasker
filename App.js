@@ -148,15 +148,10 @@ const AppContent = () => {
 
   useEffect(() => {
     const startApp = async () => {
-      try {
-        const db = await getDBConnection();
-        await createTable(db);
-        dispatch(fetchTasks());
-        setIsReady(true);
-      } catch (error) {
-        console.error('Failed to initialize app:', error);
-        setIsReady(true);
-      }
+      const db = await getDBConnection();
+      await createTable(db);
+      dispatch(fetchTasks());
+      setIsReady(true);
     };
     startApp();
   }, [dispatch]);

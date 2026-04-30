@@ -35,7 +35,7 @@ const generateDateList = () => {
     const d = new Date();
     d.setDate(d.getDate() + i);
     dates.push({
-      fullDate: d.toISOString().split('T')[0], // ISO String returns YYYY-MM-DDTHH:mm:ss.ss
+      fullDate: d.toISOString().split('T')[0],
       dayNumber: d.getDate().toString(),
       dayName: d
         .toLocaleDateString('en-GB', { month: 'short', weekday: 'short' })
@@ -228,8 +228,7 @@ const AllTasksScreen = () => {
       if (t.endDate) {
         const endDate = parseDate(t.endDate);
         return endDate != null && endDate >= now;
-      }
-      // If no end date, task is ongoing
+      } // If no end date, task is ongoing
       return true;
     }).length;
 
@@ -285,10 +284,7 @@ const AllTasksScreen = () => {
       clearTimeout(undoTimer.current);
     }
   };
-  const isFiltered =
-    selectedDate !== new Date().toISOString().split('T')[0] ||
-    sortOrder !== 'asc' ||
-    (startDateFilter && endDateFilter);
+  const isFiltered = sortOrder !== 'asc' || (startDateFilter && endDateFilter);
 
   function handleReset() {
     setSortOrder('asc');
