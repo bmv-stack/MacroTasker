@@ -199,10 +199,8 @@ const AllTasksScreen = () => {
       if (t.endDate) {
         const endDate = parseDate(t.endDate);
         return endDate != null && endDate < now;
-      } else {
-        const taskDate = parseDate(t.date);
-        return taskDate != null && taskDate < now;
       }
+      return false;
     }).length;
     const isFuture =
       startDateFilter && endDateFilter ? false : parseDate(selectedDate) > now;
@@ -222,8 +220,18 @@ const AllTasksScreen = () => {
         },
       ];
     }
-    const ongoingCount =
-      filteredTasks.length - completedCount - overdueCount - pendingCount;
+    const ongoingCount = filteredTasks.filter(t => {
+      if (t.completed) return false;
+      // Exclude pending tasks
+      const taskDate = parseDate(t.date);
+      if (taskDate != null && taskDate > now) return false;
+      if (t.endDate) {
+        const endDate = parseDate(t.endDate);
+        return endDate != null && endDate >= now;
+      }
+      // If no end date, task is ongoing
+      return true;
+    }).length;
 
     return [
       {
@@ -525,6 +533,7 @@ const AllTasksScreen = () => {
                     activeOpacity={0.5}
                     hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
                     onPress={() => navigation.navigate('TaskDetail', { task })}
+                    style={{ flex: 1, minWidth: 100 }}
                   >
                     <Text
                       style={[

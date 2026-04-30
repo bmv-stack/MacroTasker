@@ -45,7 +45,9 @@ const DashboardStackScreen = () => (
     <DashboardStack.Screen
       name="TaskDetail"
       component={TaskDetailScreen}
-      options={{ animation: 'ios_from_right' }}
+      options={{
+        animation: Platform.OS == 'ios' ? 'ios_from_right' : 'slide_from_right',
+      }}
     />
   </DashboardStack.Navigator>
 );
