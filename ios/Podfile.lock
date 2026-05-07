@@ -1451,7 +1451,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-  - react-native-date-picker (5.0.13):
+  - react-native-date-picker (5.0.12):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2394,7 +2394,7 @@ SPEC CHECKSUMS:
   React-logger: 9e51e01455f15cb3ef87a09a1ec773cdb22d56c1
   React-Mapbuffer: 92b99e450e8ff598b27d6e4db3a75e04fd45e9a9
   React-microtasksnativemodule: 2fe0f2bd2840dedbd66c0ac249c64f977f39cc18
-  react-native-date-picker: 72dddb0a4b6019b11af8bf0ceefe636685921a79
+  react-native-date-picker: 6caa72f23a695814d3fa843872ec995c5035dfb5
   react-native-safe-area-context: 37e680fc4cace3c0030ee46e8987d24f5d3bdab2
   react-native-sqlite-storage: 0c84826214baaa498796c7e46a5ccc9a82e114ed
   React-NativeModulesApple: 44a9474594566cd03659f92e38f42599c6b9dee4
