@@ -27,23 +27,7 @@ import DeleteModal from '../components/Modals/DeleteModal';
 import FilterModal from '../components/Modals/FilterModal';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
-
-// -----DateList Generation function-----
-const generateDateList = () => {
-  const dates = [];
-  for (let i = -30; i < 355; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    dates.push({
-      fullDate: d.toISOString().split('T')[0],
-      dayNumber: d.getDate().toString(),
-      dayName: d
-        .toLocaleDateString('en-GB', { month: 'short', weekday: 'short' })
-        .toUpperCase(),
-    });
-  }
-  return dates;
-};
+import { generateDateList } from '../utils/dateListGeneration';
 
 const AllTasksScreen = () => {
   // -----THEME-----
@@ -180,7 +164,7 @@ const AllTasksScreen = () => {
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
-    setChartKey(chartKey + 1); // Forced re-render
+    //setChartKey(chartKey + 1); // Forced re-render
   };
 
   const now = new Date();

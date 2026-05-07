@@ -98,14 +98,14 @@ const TabNavigator = () => {
                     colors={['transparent', theme.primary]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={styles.fadeLineLeft}
+                    style={styles.fadeLine}
                   />
                   <View style={styles.activeIndicatorDot}></View>
                   <LinearGradient
                     colors={[theme.primary, 'transparent']}
-                    start={{ x: 0, y: 1 }}
+                    start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={styles.fadeLineRight}
+                    style={styles.fadeLine}
                   ></LinearGradient>
                 </View>
               )}
@@ -144,7 +144,6 @@ const AppContent = () => {
   const [isReady, setIsReady] = useState(false);
 
   const { theme, isDarkMode } = useTheme();
-  const styles = getStyles(theme);
 
   useEffect(() => {
     const startApp = async () => {
@@ -221,6 +220,5 @@ const getStyles = theme =>
       flexDirection: 'row',
       alignItems: 'center',
     },
-    fadeLineLeft: { height: 1, width: 40 },
-    fadeLineRight: { height: 1, width: 40 },
+    fadeLine: { height: 1, width: 40 },
   });
