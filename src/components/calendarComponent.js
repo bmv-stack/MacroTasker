@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Entypo';
 import { useTheme } from '../contexts/ThemeContext';
+import { todayDate } from '../utils/getTodayDate';
 
 const CalendarComponent = ({
   visible,
@@ -14,12 +15,6 @@ const CalendarComponent = ({
 }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const todayDate = (date = new Date()) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const today = todayDate();
 
@@ -84,6 +79,7 @@ const CalendarComponent = ({
             name={
               direction === 'left' ? 'chevron-thin-left' : 'chevron-thin-right'
             }
+            color={theme.primary}
           ></Icon>
         )}
       ></Calendar>
