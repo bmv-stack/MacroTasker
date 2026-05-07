@@ -460,22 +460,10 @@ const AllTasksScreen = () => {
                       alignItems: 'center',
                     }}
                   >
-                    <Text
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: 22,
-                        color: isDarkMode ? theme.white : theme.blackSecondary,
-                      }}
-                    >
+                    <Text style={styles.centerChartCount}>
                       {selectedData.value}
                     </Text>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: isDarkMode ? theme.white : theme.blackSecondary,
-                        fontWeight: '600',
-                      }}
-                    >
+                    <Text style={styles.centerChartLabel}>
                       {selectedData.label}
                     </Text>
                   </View>
@@ -891,6 +879,16 @@ const getStyles = theme =>
     chartItem: {
       flexDirection: 'row',
       alignItems: 'center',
+    },
+    centerChartCount: {
+      fontSize: 24,
+      color: theme.primary,
+      fontWeight: '600',
+    },
+    centerChartLabel: {
+      fontSize: 12,
+      color: theme.primary,
+      fontWeight: '600',
     },
     dotText: {
       fontSize: 11,

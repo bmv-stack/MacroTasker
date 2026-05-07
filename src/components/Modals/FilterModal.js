@@ -22,7 +22,7 @@ const FilterModal = ({
   onReset,
   startDateFilter,
   endDateFilter,
-  onOpenCalendar,
+  openCalendar,
   calendarVisible,
   calendarInitialDate,
   onCalendarSelect,
@@ -104,7 +104,7 @@ const FilterModal = ({
                 <View style={styles.tabSection}>
                   <Text style={styles.dateLabel}>Start Date</Text>
                   <TouchableOpacity
-                    onPress={() => onOpenCalendar('start')}
+                    onPress={() => openCalendar('start')}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <View style={styles.dateInputFake}>
@@ -118,7 +118,7 @@ const FilterModal = ({
                     End Date
                   </Text>
                   <TouchableOpacity
-                    onPress={() => onOpenCalendar('end')}
+                    onPress={() => openCalendar('end')}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <View style={styles.dateInputFake}>

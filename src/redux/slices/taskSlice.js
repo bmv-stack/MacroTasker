@@ -29,10 +29,6 @@ export const completeTask = createAsyncThunk(
   async (id, { getState }) => {
     const state = getState();
     const taskToUpdate = state.tasks.items.find(t => t.id === id);
-    if (!taskToUpdate) {
-      throw new Error('Task not found');
-    }
-
     const newStatus = taskToUpdate.completed ? 0 : 1;
     const db = await getDBConnection();
     await updateTaskStatus(db, id, newStatus);
@@ -50,29 +46,17 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.items = action.payload;
       })
-      .addCase(fetchTasks.rejected, action => {
-        console.error('Failed to fetch tasks:', action.error);
-      })
       .addCase(addNewTask.fulfilled, (state, action) => {
         state.items = action.payload;
       })
-      .addCase(addNewTask.rejected, action => {
-        console.error('Failed to add task:', action.error);
-      })
       .addCase(deleteTask.fulfilled, action => {
         state.items = state.items.filter(t => t.id !== action.payload);
-      })
-      .addCase(deleteTask.rejected, action => {
-        console.error('Failed to delete task:', action.error);
       })
       .addCase(completeTask.fulfilled, (state, action) => {
         const task = state.items.find(t => t.id === action.payload.id);
         if (task) {
           task.completed = action.payload.completed;
         }
-      })
-      .addCase(completeTask.rejected, action => {
-        console.error('Failed to complete task:', action.error);
       });
   },
 });
