@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,10 @@ const FilterModal = ({
   onCalendarSelect,
   onCalendarClose,
   onApply,
+  showStatus,
+  setShowStatus,
+  selectedStatus,
+  onStatusSelect,
 }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -52,7 +56,7 @@ const FilterModal = ({
           </View>
           <View style={styles.drawerBody}>
             <View style={styles.drawerSideBar}>
-              {['Type', 'Date'].map(tab => (
+              {['Sort', 'Date'].map(tab => (
                 <TouchableOpacity
                   key={tab}
                   style={[
@@ -73,7 +77,7 @@ const FilterModal = ({
               ))}
             </View>
             <View style={styles.drawerTabContent}>
-              {currentFilterTab === 'Type' ? (
+              {currentFilterTab === 'Sort' ? (
                 <View style={styles.tabSection}>
                   <TouchableOpacity
                     style={styles.checkboxRow}
@@ -99,6 +103,64 @@ const FilterModal = ({
                     />
                     <Text style={styles.checkboxLabel}>Z-a Sorting</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.checkboxRow}
+                    onPress={() => {
+                      setShowStatus(!showStatus);
+                      if (!showStatus) {
+                        onSortChange('status');
+                      }
+                    }}
+                  >
+                    <Icon
+                      name={
+                        sortOrder === 'status' ||
+                        ['Ongoing', 'Overdue', 'Completed'].includes(sortOrder)
+                          ? 'checkbox'
+                          : 'square-outline'
+                      }
+                      size={24}
+                      color={theme.accent}
+                    />
+                    <Text style={styles.checkboxLabel}>Task Status</Text>
+                    <Icon
+                      name={showStatus ? 'chevron-up' : 'chevron-down'}
+                      size={18}
+                      style={{ marginLeft: 'auto' }}
+                      color={theme.textMuted}
+                    />
+                  </TouchableOpacity>
+                  {showStatus && (
+                    <View style={{ marginLeft: 30 }}>
+                      {['Ongoing', 'Overdue', 'Completed'].map(item => {
+                        const isSelected = selectedStatus === item;
+                        return (
+                          <TouchableOpacity
+                            key={item}
+                            style={[styles.checkboxRow, { marginBottom: 15 }]}
+                            onPress={() => onStatusSelect(item)}
+                          >
+                            <Icon
+                              name={
+                                isSelected
+                                  ? 'radio-button-on'
+                                  : 'radio-button-off'
+                              }
+                              size={18}
+                              color={
+                                isSelected ? theme.accent : theme.textMuted
+                              }
+                            />
+                            <Text
+                              style={[styles.checkboxLabel, { fontSize: 14 }]}
+                            >
+                              {item}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  )}
                 </View>
               ) : (
                 <View style={styles.tabSection}>

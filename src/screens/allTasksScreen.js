@@ -43,7 +43,9 @@ const AllTasksScreen = () => {
   // --------------------------------------------------
   // -----FILTER TASKS States-----
   const [filterVisible, setFilterVisible] = useState(false);
-  const [currentFilterTab, setCurrentFilterTab] = useState('Type');
+  const [currentFilterTab, setCurrentFilterTab] = useState('Sort');
+  const [showStatus, setShowStatus] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   // -----UNDO States-----
   const [undoVisible, setUndoVisible] = useState(false);
@@ -132,6 +134,26 @@ const AllTasksScreen = () => {
           );
         });
       }
+    }
+    if (['Ongoing', 'Overdue', 'Completed'].includes(sortOrder)) {
+      tasksToFilter = tasksToFilter.filter(t => {
+        const isEndDate = !!t.endDate;
+        const endDate = isEndDate ? parseDate(t.endDate) : null;
+        const taskDate = parseDate(t.date);
+
+        if (sortOrder === 'Completed') return t.completed;
+
+        if (sortOrder === 'Overdue') {
+          return !t.completed && isEndDate && endDate < now;
+        }
+
+        if (sortOrder === 'Ongoing') {
+          const isOverdue = isEndDate && endDate < now;
+          const isFuture = taskDate != null && taskDate > now;
+          return !t.completed && !isOverdue && !isFuture;
+        }
+        return true;
+      });
     }
 
     return [...tasksToFilter].sort((a, b) => {
@@ -268,13 +290,18 @@ const AllTasksScreen = () => {
       clearTimeout(undoTimer.current);
     }
   };
-  const isFiltered = sortOrder !== 'asc' || (startDateFilter && endDateFilter);
+  const isFiltered =
+    sortOrder !== 'asc' ||
+    (startDateFilter && endDateFilter) ||
+    selectedStatus !== null;
 
   function handleReset() {
     setSortOrder('asc');
-    setCurrentFilterTab('Type');
+    setCurrentFilterTab('Sort');
     setStartDateFilter('');
     setEndDateFilter('');
+    setSelectedStatus(null);
+    setShowStatus(false);
   }
 
   return (
@@ -653,6 +680,15 @@ const AllTasksScreen = () => {
         onTabChange={setCurrentFilterTab}
         sortOrder={sortOrder}
         onSortChange={setSortOrder}
+        showStatus={showStatus}
+        setShowStatus={setShowStatus}
+        selectedStatus={selectedStatus}
+        onStatusSelect={status => {
+          setSelectedStatus(status);
+          if (status) {
+            setSortOrder(status);
+          }
+        }}
         onReset={handleReset}
         startDateFilter={startDateFilter}
         endDateFilter={endDateFilter}
