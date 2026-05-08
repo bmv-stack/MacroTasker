@@ -88,7 +88,7 @@ const CreateTaskScreen = () => {
     form.date.length > 0 &&
     form.time.length > 0 &&
     isTimeValid();
-  //&&isStartValid();
+  //&& isStartValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });

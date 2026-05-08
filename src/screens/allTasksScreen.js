@@ -177,6 +177,9 @@ const AllTasksScreen = () => {
     }
     // ----- Alphabetical sorting logic -----
     return [...tasksToFilter].sort((a, b) => {
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
       if (sortOrder === 'asc') {
         return a.title.localeCompare(b.title);
       }
@@ -434,7 +437,6 @@ const AllTasksScreen = () => {
               <Icon
                 name="bookmark"
                 size={20}
-                color={statusColor}
                 color={statusColor}
                 style={{ marginLeft: 8 }}
               ></Icon>
