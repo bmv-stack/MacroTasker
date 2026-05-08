@@ -182,9 +182,6 @@ const AllTasksScreen = () => {
     }
     // ----- Alphabetical sorting logic -----
     return [...tasksToFilter].sort((a, b) => {
-      if (a.completed !== b.completed) {
-        return a.completed ? 1 : -1;
-      }
       if (sortOrder === 'asc') {
         return a.title.localeCompare(b.title);
       }
@@ -336,12 +333,22 @@ const AllTasksScreen = () => {
     setSelectedStatus(null);
     setShowStatus(false);
   }
+  const getStatusColor = task => {
+    if (task.completed) return theme.chartCompleted;
+
+    const isEndDate = !!task.endDate;
+    const endDate = isEndDate ? parseDate(task.endDate) : null;
+
+    if (isEndDate && endDate < now) {
+      return theme.chartOverdue;
+    }
+    return theme.chartOngoing;
+  };
   const renderItem = task => {
     const isEndDate = !!task.endDate;
     const taskDate = isEndDate ? parseDate(task.endDate) : null;
     const isOverdue = !task.completed && isEndDate && taskDate < now;
-    const stylePriority =
-      priorityStyles[task.priority] || priorityStyles.Normal;
+    const statusColor = getStatusColor(task);
     return (
       <View
         key={task.id}
@@ -416,7 +423,7 @@ const AllTasksScreen = () => {
               <Icon
                 name="bookmark"
                 size={20}
-                color={stylePriority.iconColor}
+                color={statusColor}
                 style={{ marginLeft: 8 }}
               ></Icon>
             </View>
@@ -487,16 +494,27 @@ const AllTasksScreen = () => {
             )}
           </View>
 
-          <TouchableOpacity
-            onPress={isFiltered ? handleReset : () => setFilterVisible(true)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Icon
-              name={isFiltered ? 'reload' : 'filter'}
-              size={24}
-              color={theme.textPrimary}
-            />
-          </TouchableOpacity>
+          <View style={styles.filterIconContainer}>
+            <TouchableOpacity
+              onPress={() => setFilterVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
+            >
+              <Icon name="filter" size={24} color={theme.textPrimary} />
+            </TouchableOpacity>
+            {isFiltered && (
+              <TouchableOpacity
+                onPress={handleReset}
+                hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
+              >
+                <Icon
+                  name="reload"
+                  size={24}
+                  color={theme.textPrimary}
+                  style={{ marginLeft: 15 }}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* DATES Flatlist - only show when not filtering by date */}
@@ -1194,6 +1212,9 @@ const getStyles = theme =>
       color: theme.textMuted,
       fontWeight: 'bold',
       textAlign: 'center',
+    },
+    filterIconContainer: {
+      flexDirection: 'row',
     },
   });
 
