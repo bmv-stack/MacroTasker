@@ -177,9 +177,6 @@ const AllTasksScreen = () => {
     }
     // ----- Alphabetical sorting logic -----
     return [...tasksToFilter].sort((a, b) => {
-      if (a.completed !== b.completed) {
-        return a.completed ? 1 : -1;
-      }
       if (sortOrder === 'asc') {
         return a.title.localeCompare(b.title);
       }
@@ -438,6 +435,7 @@ const AllTasksScreen = () => {
                 name="bookmark"
                 size={20}
                 color={statusColor}
+                color={statusColor}
                 style={{ marginLeft: 8 }}
               ></Icon>
             </View>
@@ -508,6 +506,27 @@ const AllTasksScreen = () => {
             )}
           </View>
 
+          <View style={styles.filterIconContainer}>
+            <TouchableOpacity
+              onPress={() => setFilterVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
+            >
+              <Icon name="filter" size={24} color={theme.textPrimary} />
+            </TouchableOpacity>
+            {isFiltered && (
+              <TouchableOpacity
+                onPress={handleReset}
+                hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
+              >
+                <Icon
+                  name="reload"
+                  size={24}
+                  color={theme.textPrimary}
+                  style={{ marginLeft: 15 }}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
           <View style={styles.filterIconContainer}>
             <TouchableOpacity
               onPress={() => setFilterVisible(true)}
@@ -1226,6 +1245,9 @@ const getStyles = theme =>
       color: theme.textMuted,
       fontWeight: 'bold',
       textAlign: 'center',
+    },
+    filterIconContainer: {
+      flexDirection: 'row',
     },
     filterIconContainer: {
       flexDirection: 'row',
