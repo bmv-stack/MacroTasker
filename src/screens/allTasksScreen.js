@@ -7,6 +7,7 @@ import {
   Platform,
   StatusBar,
   FlatList,
+  SectionList,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -22,10 +23,13 @@ import { parseDate } from './createTaskScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { useTheme } from '../contexts/ThemeContext';
-import { FilterModal, DeleteModal, PriorityModal } from '../components/Modals';
+import PriorityModal from '../components/Modals/PriorityModal';
+import DeleteModal from '../components/Modals/DeleteModal';
+import FilterModal from '../components/Modals/FilterModal';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
 import { generateDateList } from '../utils/dateListGeneration';
+import { getMinute } from '../utils/getMinutes';
 
 const AllTasksScreen = () => {
   // -----THEME-----
@@ -41,7 +45,9 @@ const AllTasksScreen = () => {
   // --------------------------------------------------
   // -----FILTER TASKS States-----
   const [filterVisible, setFilterVisible] = useState(false);
-  const [currentFilterTab, setCurrentFilterTab] = useState('Type');
+  const [currentFilterTab, setCurrentFilterTab] = useState('Sort');
+  const [showStatus, setShowStatus] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   // -----UNDO States-----
   const [undoVisible, setUndoVisible] = useState(false);
@@ -88,12 +94,6 @@ const AllTasksScreen = () => {
     value: tasks.length,
     color: theme.blackSecondary,
   });
-
-  const priorityStyles = {
-    High: { iconColor: theme.high },
-    Normal: { iconColor: theme.normal },
-    Low: { iconColor: theme.low },
-  };
   // -----DateList Memoization-----
   const dateList = useMemo(() => generateDateList(), []);
 
@@ -107,7 +107,30 @@ const AllTasksScreen = () => {
       viewPosition: 0.5,
     });
   };
+  // ----- Data for Section List -----
 
+  const sectionListGroup = tasks => {
+    const groups = {};
+    tasks.forEach(task => {
+      const date = task.date;
+
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(task);
+    });
+    const arraySection = Object.keys(groups)
+      .sort()
+      .map(date => {
+        return {
+          title: date,
+          data: groups[date],
+        };
+      });
+    return arraySection;
+  };
+
+  // ----- Filtered Tasks For Date Filtering -----
   const filteredTasks = useMemo(() => {
     let tasksToFilter = tasks;
 
@@ -131,7 +154,28 @@ const AllTasksScreen = () => {
         });
       }
     }
+    // ----- Filtering for 'Task Status' -----
+    if (['Ongoing', 'Overdue', 'Completed'].includes(sortOrder)) {
+      tasksToFilter = tasksToFilter.filter(t => {
+        const isEndDate = !!t.endDate;
+        const endDate = isEndDate ? parseDate(t.endDate) : null;
+        const taskDate = parseDate(t.date);
 
+        if (sortOrder === 'Completed') return t.completed;
+
+        if (sortOrder === 'Overdue') {
+          return !t.completed && isEndDate && endDate < now;
+        }
+
+        if (sortOrder === 'Ongoing') {
+          const isOverdue = isEndDate && endDate < now;
+          const isFuture = taskDate != null && taskDate > now;
+          return !t.completed && !isOverdue && !isFuture;
+        }
+        return true;
+      });
+    }
+    // ----- Alphabetical sorting logic -----
     return [...tasksToFilter].sort((a, b) => {
       if (a.completed !== b.completed) {
         return a.completed ? 1 : -1;
@@ -145,6 +189,13 @@ const AllTasksScreen = () => {
       return 0;
     });
   }, [tasks, selectedDate, sortOrder, startDateFilter, endDateFilter]);
+  // ----- Sections for Date Filtering -----
+  const groupedSections = useMemo(() => {
+    if (startDateFilter && endDateFilter && filteredTasks) {
+      return sectionListGroup(filteredTasks);
+    }
+    return [];
+  }, [filteredTasks, startDateFilter, endDateFilter]);
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -162,12 +213,15 @@ const AllTasksScreen = () => {
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
-    setChartKey(chartKey + 1); // Forced re-render
+    //setChartKey(chartKey + 1); // Forced re-render
   };
 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
+  const currentMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+
+  // ----- Chart Data function -----
   const chartData = useMemo(() => {
     if (filteredTasks.length === 0) return [];
 
@@ -180,11 +234,12 @@ const AllTasksScreen = () => {
       if (t.completed) return false;
       if (t.endDate) {
         const endDate = parseDate(t.endDate);
-        return endDate != null && endDate < now;
-      } else {
-        const taskDate = parseDate(t.date);
-        return taskDate != null && taskDate < now;
+        if (endDate < now) return true;
+        if (endDate.getTime() === now.getTime() && t.endTime) {
+          return getMinute(t.endTime) < currentMinutes;
+        }
       }
+      return false;
     }).length;
     const isFuture =
       startDateFilter && endDateFilter ? false : parseDate(selectedDate) > now;
@@ -204,8 +259,17 @@ const AllTasksScreen = () => {
         },
       ];
     }
-    const ongoingCount =
-      filteredTasks.length - completedCount - overdueCount - pendingCount;
+    const ongoingCount = filteredTasks.filter(t => {
+      if (t.completed) return false;
+      // Exclude pending tasks
+      const taskDate = parseDate(t.date);
+      if (taskDate != null && taskDate > now) return false;
+      if (t.endDate) {
+        const endDate = parseDate(t.endDate);
+        return endDate != null && endDate >= now;
+      } // If no end date, task is ongoing
+      return true;
+    }).length;
 
     return [
       {
@@ -260,15 +324,161 @@ const AllTasksScreen = () => {
     }
   };
   const isFiltered =
-    //selectedDate !== new Date().toISOString().split('T')[0] ||
-    sortOrder !== 'asc' || (startDateFilter && endDateFilter);
+    sortOrder !== 'asc' ||
+    (startDateFilter && endDateFilter) ||
+    selectedStatus !== null;
 
   function handleReset() {
     setSortOrder('asc');
-    setCurrentFilterTab('Type');
+    setCurrentFilterTab('Sort');
     setStartDateFilter('');
     setEndDateFilter('');
+    setSelectedStatus(null);
+    setShowStatus(false);
   }
+  const getStatusColor = task => {
+    if (task.completed) return theme.chartCompleted;
+
+    const isEndDate = !!task.endDate;
+    const endDate = isEndDate ? parseDate(task.endDate) : null;
+
+    if (isEndDate) {
+      if (endDate < now) return theme.chartOverdue;
+
+      if (endDate.getTime() === now.getTime() && task.endTime) {
+        const taskEndMinutes = getMinute(task.endTime);
+        if (taskEndMinutes < currentMinutes) return theme.chartOverdue;
+      }
+    }
+    return theme.chartOngoing;
+  };
+  const renderItem = task => {
+    const isEndDate = !!task.endDate;
+    const endDate = isEndDate ? parseDate(task.endDate) : null;
+    const isOverdue =
+      !task.completed &&
+      isEndDate &&
+      (endDate < now ||
+        (endDate.getTime() === now.getTime() &&
+          task.endTime &&
+          getMinute(task.endTime) < currentMinutes));
+    const statusColor = getStatusColor(task);
+    return (
+      <View
+        key={task.id}
+        style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
+      >
+        <View style={styles.cardTopRow}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+            onPress={() => navigation.navigate('TaskDetail', { task })}
+            style={{ flex: 1, minWidth: 100 }}
+          >
+            <Text
+              style={[
+                styles.taskTitle,
+                task.completed && {
+                  textDecorationLine: 'line-through',
+                  color: theme.textMuted,
+                },
+              ]}
+              numberOfLines={1}
+            >
+              {task.title}
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[
+                styles.iconCircle,
+                task.completed && styles.checkedCircle,
+              ]}
+              disabled={task.completed}
+              onPress={() =>
+                navigation.navigate('CreateTask', {
+                  existingTask: task,
+                })
+              }
+            >
+              <FeatherIcon
+                name="edit-3"
+                size={18}
+                color={theme.editIcon}
+              ></FeatherIcon>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.iconCircle,
+                task.completed && styles.checkedCircle,
+              ]}
+              onPress={() =>
+                setDeleteModal({
+                  visible: true,
+                  taskId: task.id,
+                  taskTitle: task.title,
+                })
+              }
+            >
+              <Icon
+                name="trash-outline"
+                size={18}
+                color={theme.deleteIcon}
+              ></Icon>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.cardBottomRow}>
+          <View style={styles.leftInfoGroup}>
+            <Text style={styles.dateTimeText}>
+              {formatDate(task.date)} | {formatTime(task.time)}
+            </Text>
+            <View>
+              <Icon
+                name="bookmark"
+                size={20}
+                color={statusColor}
+                style={{ marginLeft: 8 }}
+              ></Icon>
+            </View>
+          </View>
+          <View style={styles.rightActionsGroup}>
+            <TouchableOpacity
+              style={styles.textPriorityBadge}
+              onPress={() =>
+                setPriorityModal({ visible: true, taskId: task.id })
+              }
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              disabled={task.completed}
+            >
+              <Text style={styles.badgeText}>{task.priority || 'Normal'}</Text>
+              <Icon
+                name="chevron-down"
+                size={12}
+                color={theme.textBadge}
+                style={{ marginLeft: 4 }}
+              ></Icon>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.completeCheckCircle,
+                task.completed && styles.checkCompleted,
+              ]}
+              onPress={() => dispatch(completeTask(task.id))}
+            >
+              <Icon
+                name="checkmark-sharp"
+                size={18}
+                color={task.completed ? theme.white : theme.completeTaskIcon}
+                opacity={0.5}
+              ></Icon>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {isOverdue && <View style={styles.overdueIndicator} />}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -298,16 +508,48 @@ const AllTasksScreen = () => {
             )}
           </View>
 
-          <TouchableOpacity
-            onPress={isFiltered ? handleReset : () => setFilterVisible(true)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Icon
-              name={isFiltered ? 'reload' : 'filter'}
-              size={24}
-              color={theme.textPrimary}
-            />
-          </TouchableOpacity>
+          <View style={styles.filterIconContainer}>
+            <TouchableOpacity
+              onPress={() => setFilterVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
+            >
+              <Icon name="filter" size={24} color={theme.textPrimary} />
+            </TouchableOpacity>
+            {isFiltered && (
+              <TouchableOpacity
+                onPress={handleReset}
+                hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
+              >
+                <Icon
+                  name="reload"
+                  size={24}
+                  color={theme.textPrimary}
+                  style={{ marginLeft: 15 }}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={styles.filterIconContainer}>
+            <TouchableOpacity
+              onPress={() => setFilterVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
+            >
+              <Icon name="filter" size={24} color={theme.textPrimary} />
+            </TouchableOpacity>
+            {isFiltered && (
+              <TouchableOpacity
+                onPress={handleReset}
+                hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
+              >
+                <Icon
+                  name="reload"
+                  size={24}
+                  color={theme.textPrimary}
+                  style={{ marginLeft: 15 }}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* DATES Flatlist - only show when not filtering by date */}
@@ -325,7 +567,7 @@ const AllTasksScreen = () => {
                 length: 55,
                 offset: 55 * index,
                 index,
-              })} // Fixed width so the FaltList doesn't have to calculate for each item render
+              })}
               renderItem={({ item }) => {
                 const isSelected = item.fullDate === selectedDate;
                 const [monthName, dayName] = item.dayName.split(' ');
@@ -466,144 +708,43 @@ const AllTasksScreen = () => {
           </View>
         )}
 
-        <FlatList
-          data={filteredTasks}
-          keyExtractor={item => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ marginBottom: 20 }}
-          ListEmptyComponent={() => (
-            <View style={{ alignItems: 'center', marginTop: 50 }}>
-              <Text style={{ color: theme.textMuted }}>
-                No tasks for this day.
-              </Text>
-            </View>
-          )}
-          renderItem={({ item: task }) => {
-            const isEndDate = !!task.endDate;
-            const taskDate = isEndDate ? parseDate(task.endDate) : null;
-            const isOverdue = !task.completed && isEndDate && taskDate < now;
-            const stylePriority =
-              priorityStyles[task.priority] || priorityStyles.Normal;
-            return (
-              <View
-                key={task.id}
-                style={[styles.taskCard, task.completed && { opacity: 0.7 }]}
-              >
-                <View style={styles.cardTopRow}>
-                  <TouchableOpacity
-                    activeOpacity={0.5}
-                    hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-                    onPress={() => navigation.navigate('TaskDetail', { task })}
-                  >
-                    <Text
-                      style={[
-                        styles.taskTitle,
-                        task.completed && {
-                          textDecorationLine: 'line-through',
-                          color: theme.textMuted,
-                        },
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {task.title}
-                    </Text>
-                  </TouchableOpacity>
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={[
-                        styles.iconCircle,
-                        task.completed && styles.checkedCircle,
-                      ]}
-                      disabled={task.completed}
-                      onPress={() =>
-                        navigation.navigate('CreateTask', {
-                          existingTask: task,
-                        })
-                      }
-                    >
-                      <FeatherIcon
-                        name="edit-3"
-                        size={18}
-                        color={theme.editIcon}
-                      ></FeatherIcon>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.iconCircle,
-                        task.completed && styles.checkedCircle,
-                      ]}
-                      onPress={() =>
-                        setDeleteModal({
-                          visible: true,
-                          taskId: task.id,
-                          taskTitle: task.title,
-                        })
-                      }
-                    >
-                      <Icon
-                        name="trash-outline"
-                        size={18}
-                        color={theme.deleteIcon}
-                      ></Icon>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={styles.cardBottomRow}>
-                  <View style={styles.leftInfoGroup}>
-                    <Text style={styles.dateTimeText}>
-                      {formatDate(task.date)} | {formatTime(task.time)}
-                    </Text>
-                    <View>
-                      <Icon
-                        name="bookmark"
-                        size={20}
-                        color={stylePriority.iconColor}
-                        style={{ marginLeft: 8 }}
-                      ></Icon>
-                    </View>
-                  </View>
-                  <View style={styles.rightActionsGroup}>
-                    <TouchableOpacity
-                      style={styles.textPriorityBadge}
-                      onPress={() =>
-                        setPriorityModal({ visible: true, taskId: task.id })
-                      }
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                      disabled={task.completed}
-                    >
-                      <Text style={styles.badgeText}>
-                        {task.priority || 'Normal'}
-                      </Text>
-                      <Icon
-                        name="chevron-down"
-                        size={12}
-                        color={theme.textBadge}
-                        style={{ marginLeft: 4 }}
-                      ></Icon>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.completeCheckCircle,
-                        task.completed && styles.checkCompleted,
-                      ]}
-                      onPress={() => dispatch(completeTask(task.id))}
-                    >
-                      <Icon
-                        name="checkmark-sharp"
-                        size={18}
-                        color={
-                          task.completed ? theme.white : theme.completeTaskIcon
-                        }
-                        opacity={0.5}
-                      ></Icon>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                {isOverdue && <View style={styles.overdueIndicator} />}
+        {startDateFilter && endDateFilter ? (
+          <SectionList
+            sections={groupedSections}
+            keyExtractor={item => item.id}
+            stickySectionHeadersEnabled={true}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
+            renderSectionHeader={({ section: { title, data } }) => (
+              <View style={styles.sectionHeaderContainer}>
+                <Text style={styles.sectionHeaderText}>
+                  {formatDate(title)} ({data.length})
+                </Text>
               </View>
-            );
-          }}
-        ></FlatList>
+            )}
+            renderItem={({ item }) => renderItem(item)}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyTaskContainer}>
+                <Text style={styles.emptyTaskText}>
+                  No tasks for this range!
+                </Text>
+              </View>
+            )}
+          />
+        ) : (
+          <FlatList
+            data={filteredTasks}
+            keyExtractor={item => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ marginBottom: 70, flexGrow: 1 }}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyTaskContainer}>
+                <Text style={styles.emptyTaskText}>No tasks for this day!</Text>
+              </View>
+            )}
+            renderItem={({ item }) => renderItem(item)}
+          />
+        )}
         <PriorityModal
           visible={priorityModal.visible}
           onClose={() => setPriorityModal({ visible: false, taskId: null })}
@@ -645,10 +786,19 @@ const AllTasksScreen = () => {
         onTabChange={setCurrentFilterTab}
         sortOrder={sortOrder}
         onSortChange={setSortOrder}
+        showStatus={showStatus}
+        setShowStatus={setShowStatus}
+        selectedStatus={selectedStatus}
+        onStatusSelect={status => {
+          setSelectedStatus(status);
+          if (status) {
+            setSortOrder(status);
+          }
+        }}
         onReset={handleReset}
         startDateFilter={startDateFilter}
         endDateFilter={endDateFilter}
-        onOpenCalendar={type => {
+        openCalendar={type => {
           setCalendarType(type);
           setCalendarVisible(true);
         }}
@@ -1075,6 +1225,34 @@ const getStyles = theme =>
       fontWeight: 'bold',
       fontSize: 16,
       color: theme.textInverted,
+    },
+    sectionHeaderContainer: {
+      backgroundColor: theme.background,
+      paddingVertical: 12,
+      paddingHorizontal: 4,
+    },
+    sectionHeaderText: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: theme.primary,
+      letterSpacing: 1,
+      textAlign: 'center',
+    },
+    emptyTaskContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    emptyTaskText: {
+      color: theme.textMuted,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    filterIconContainer: {
+      flexDirection: 'row',
+    },
+    filterIconContainer: {
+      flexDirection: 'row',
     },
   });
 
