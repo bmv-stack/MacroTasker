@@ -82,7 +82,7 @@ const CreateTaskScreen = () => {
     }
     return false;
   };
-
+  // ----- Form Validation -----
   const isFormValid =
     form.title.length > 0 &&
     form.date.length > 0 &&

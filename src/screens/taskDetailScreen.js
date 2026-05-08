@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
 import React from 'react';
 import { formatDate } from '../utils/formatDate';
+import { formatTime } from '../utils/formatTime';
 
 const TaskDetailScreen = ({ route }) => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
@@ -62,13 +63,14 @@ const TaskDetailScreen = ({ route }) => {
             color={theme.textMuted}
           ></Icon>
           <Text style={styles.infoText}>
-            Created At: {formatDate(task.date)} at {task.time}
+            Created At: {formatDate(task.date)} at {formatTime(task.time)}
           </Text>
         </View>
         <View style={styles.infoRow}>
           <Icon name="skull" size={20} color={theme.textMuted}></Icon>
           <Text style={styles.infoText}>
-            Ending At: {task.endDate || 'Not set'} {task.endTime || ''}
+            Ending At: {formatDate(task.endDate) || 'Not set'} at{' '}
+            {formatTime(task.endTime) || ''}
           </Text>
         </View>
         <View style={styles.divider}></View>

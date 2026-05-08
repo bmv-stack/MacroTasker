@@ -29,6 +29,7 @@ import FilterModal from '../components/Modals/FilterModal';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
 import { generateDateList } from '../utils/dateListGeneration';
+import { getMinute } from '../utils/getMinutes';
 
 const AllTasksScreen = () => {
   // -----THEME-----
@@ -93,12 +94,6 @@ const AllTasksScreen = () => {
     value: tasks.length,
     color: theme.blackSecondary,
   });
-
-  const priorityStyles = {
-    High: { iconColor: theme.high },
-    Normal: { iconColor: theme.normal },
-    Low: { iconColor: theme.low },
-  };
   // -----DateList Memoization-----
   const dateList = useMemo(() => generateDateList(), []);
 
@@ -182,6 +177,9 @@ const AllTasksScreen = () => {
     }
     // ----- Alphabetical sorting logic -----
     return [...tasksToFilter].sort((a, b) => {
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
       if (sortOrder === 'asc') {
         return a.title.localeCompare(b.title);
       }
@@ -221,6 +219,8 @@ const AllTasksScreen = () => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
+  const currentMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+
   // ----- Chart Data function -----
   const chartData = useMemo(() => {
     if (filteredTasks.length === 0) return [];
@@ -234,7 +234,10 @@ const AllTasksScreen = () => {
       if (t.completed) return false;
       if (t.endDate) {
         const endDate = parseDate(t.endDate);
-        return endDate != null && endDate < now;
+        if (endDate < now) return true;
+        if (endDate.getTime() === now.getTime() && t.endTime) {
+          return getMinute(t.endTime) < currentMinutes;
+        }
       }
       return false;
     }).length;
@@ -339,15 +342,26 @@ const AllTasksScreen = () => {
     const isEndDate = !!task.endDate;
     const endDate = isEndDate ? parseDate(task.endDate) : null;
 
-    if (isEndDate && endDate < now) {
-      return theme.chartOverdue;
+    if (isEndDate) {
+      if (endDate < now) return theme.chartOverdue;
+
+      if (endDate.getTime() === now.getTime() && task.endTime) {
+        const taskEndMinutes = getMinute(task.endTime);
+        if (taskEndMinutes < currentMinutes) return theme.chartOverdue;
+      }
     }
     return theme.chartOngoing;
   };
   const renderItem = task => {
     const isEndDate = !!task.endDate;
-    const taskDate = isEndDate ? parseDate(task.endDate) : null;
-    const isOverdue = !task.completed && isEndDate && taskDate < now;
+    const endDate = isEndDate ? parseDate(task.endDate) : null;
+    const isOverdue =
+      !task.completed &&
+      isEndDate &&
+      (endDate < now ||
+        (endDate.getTime() === now.getTime() &&
+          task.endTime &&
+          getMinute(task.endTime) < currentMinutes));
     const statusColor = getStatusColor(task);
     return (
       <View

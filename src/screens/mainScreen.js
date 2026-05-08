@@ -27,8 +27,7 @@ const MainScreen = () => {
   const today = new Date().toISOString().split('T')[0];
   const activeTasks = tasks.filter(t => !t.completed && t.date === today);
   const activeTaskCount = activeTasks.length;
-  const [expanded, setExpanded] = useState(false);
-  const displyedTasks = expanded ? activeTasks : activeTasks.slice(0, 4);
+  const displyedTasks = activeTasks;
   return (
     <View style={styles.safeArea}>
       <View style={styles.content}>
@@ -49,27 +48,15 @@ const MainScreen = () => {
         <View>
           <Text style={styles.userGreetings}>Welcome User,</Text>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={styles.taskCountContainer}>
           <Text style={styles.taskText}>{activeTaskCount} tasks today</Text>
-
-          {activeTasks.length > 4 && (
-            <TouchableOpacity
-              style={{ padding: 5 }}
-              onPress={() => setExpanded(!expanded)}
-            >
-              <Text style={styles.viewallText}>
-                {expanded ? 'View Less' : 'View All'}
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
-        <View
-          style={[styles.whiteContainer, expanded && styles.expandedContainer]}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContainer}
+          alwaysBounceVertical={false}
         >
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ padding: 15 }}
-          >
+          <View style={styles.taskContainer}>
             {displyedTasks.length > 0 ? (
               displyedTasks.map(item => {
                 return (
@@ -115,8 +102,8 @@ const MainScreen = () => {
                 <Text style={styles.emptyTaskText}>No Tasks available!</Text>
               </View>
             )}
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -128,19 +115,6 @@ const getStyles = theme =>
       backgroundColor: theme.background,
       paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
     },
-    whiteContainer: {
-      flexDirection: 'column',
-      backgroundColor: theme.surface,
-      borderRadius: 30,
-      padding: 1,
-      marginVertical: 10,
-      shadowOpacity: 0.1,
-      elevation: 2,
-      shadowRadius: 20,
-    },
-    expandedContainer: {
-      maxHeight: '70%',
-    },
     container: {
       flex: 1,
       backgroundColor: theme.surface,
@@ -149,23 +123,18 @@ const getStyles = theme =>
       flex: 1,
       paddingHorizontal: 16,
     },
-    greetingContainer: {
-      marginTop: 20,
-      marginBottom: 20,
-    },
     userGreetings: {
       fontSize: 14,
       color: theme.textTertiary,
       fontWeight: '500',
     },
-    viewallText: {
-      color: theme.accent,
-      fontWeight: '600',
-      fontSize: 14,
+    taskCountContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
     },
     taskRow: {
       flexDirection: 'row',
-      paddingVertical: 10,
+      paddingVertical: 14,
       paddingHorizontal: 25,
       borderRadius: 50,
       marginBottom: 10,
@@ -219,15 +188,6 @@ const getStyles = theme =>
     activePillText: {
       color: theme.white,
     },
-    taskListContainer: {
-      flex: 1,
-      marginTop: 10,
-      minHeight: 50,
-    },
-    taskListCard: {
-      borderRadius: 30,
-      padding: 20,
-    },
     emptyTaskContainer: {
       alignItems: 'center',
       justifyContent: 'center',
@@ -238,6 +198,12 @@ const getStyles = theme =>
       fontWeight: 'bold',
       fontSize: 16,
       color: theme.textMuted,
+    },
+    scrollContainer: {
+      paddingBottom: 20,
+    },
+    taskContainer: {
+      marginTop: 5,
     },
   });
 export default MainScreen;
