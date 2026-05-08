@@ -188,6 +188,7 @@ const CreateTaskScreen = () => {
               <View pointerEvents="none">
                 <FormInput
                   label="End Date"
+                  isOptional={true}
                   placeholder="Add end date"
                   value={formatDate(form.endDate)}
                 ></FormInput>
@@ -202,6 +203,7 @@ const CreateTaskScreen = () => {
               <View pointerEvents="none">
                 <FormInput
                   label="End Time"
+                  isOptional={true}
                   placeholder="Add end time"
                   value={formatTime(form.endTime)}
                 ></FormInput>
@@ -243,6 +245,7 @@ const CreateTaskScreen = () => {
             </View>
             <FormInput
               label="Note"
+              isOptional={true}
               placeholder="Add note"
               value={form.notes}
               onChangeText={val => handleInputChange('notes', val)}
