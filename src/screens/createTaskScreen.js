@@ -61,12 +61,24 @@ const CreateTaskScreen = () => {
     if (form.endDate > form.date) return true;
     if (form.endDate === form.date) {
       const startMinutes = getMinute(form.time);
-      console.log('Time: ', form.time);
-      console.log('startTime: ', startMinutes);
       const endMinutes = getMinute(form.endTime);
-      console.log('End Time from form: ', form.endTime);
-      console.log('endMinutes: ', endMinutes);
       return endMinutes > startMinutes;
+    }
+    return false;
+  };
+
+  const isStartValid = () => {
+    if (!form.date || !form.time) return true;
+    const selectedDate = parseDate(form.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate > today) return true;
+
+    if (selectedDate.getTime() === today.getTime()) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const selectedMinutes = getMinute(form.time);
+      return selectedMinutes >= currentMinutes;
     }
     return false;
   };
@@ -75,7 +87,8 @@ const CreateTaskScreen = () => {
     form.title.length > 0 &&
     form.date.length > 0 &&
     form.time.length > 0 &&
-    isTimeValid();
+    isTimeValid() &&
+    isStartValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -166,6 +179,11 @@ const CreateTaskScreen = () => {
                 ></FormInput>
               </View>
             </TouchableOpacity>
+            {!isStartValid() && (
+              <Text style={styles.errorText}>
+                Start Time cannot be a past time
+              </Text>
+            )}
             <TimePicker
               visible={timeModalVisible}
               initialTime={(() => {
@@ -210,14 +228,7 @@ const CreateTaskScreen = () => {
               </View>
             </TouchableOpacity>
             {!isTimeValid() && (
-              <Text
-                style={{
-                  color: theme.textError,
-                  fontSize: 12,
-                  marginBottom: 10,
-                  marginTop: -5,
-                }}
-              >
+              <Text style={styles.errorText}>
                 End Time must be after 'Time'
               </Text>
             )}
@@ -421,6 +432,12 @@ const getStyles = theme =>
       fontWeight: 'bold',
       marginTop: 15,
       color: theme.textLabel,
+    },
+    errorText: {
+      color: theme.textError,
+      fontSize: 12,
+      marginBottom: 10,
+      marginTop: -5,
     },
   });
 
