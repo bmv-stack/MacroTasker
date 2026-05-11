@@ -21,6 +21,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { formatTime } from '../utils/formatTime';
 import { formatDate } from '../utils/formatDate';
 import { getMinute } from '../utils/getMinutes';
+import { currentTime } from '../utils/getCurrentTime';
 
 const CreateTaskScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
@@ -186,47 +187,70 @@ const CreateTaskScreen = () => {
             )}
             <TimePicker
               visible={timeModalVisible}
-              initialTime={(() => {
-                const timeStr =
-                  currentField === 'time' ? form.time : form.endTime;
-                if (timeStr) {
-                  const [h, m, s] = timeStr
-                    .split(':')
-                    .map(item => parseInt(item));
-                  return new Date(2004, 0, 1, h, m, s || 0);
-                }
-                return new Date();
-              })()}
+              initialTime={currentTime}
               onClose={() => setTimeModalVisible(false)}
               onSelect={formattedTime => {
                 handleInputChange(currentField, formattedTime);
               }}
             ></TimePicker>
-            <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
-              <View pointerEvents="none">
-                <FormInput
-                  label="End Date"
-                  isOptional={true}
-                  placeholder="Add end date"
-                  value={formatDate(form.endDate)}
-                ></FormInput>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentField('endTime');
-                setTimeModalVisible(true);
-              }}
-            >
-              <View pointerEvents="none">
-                <FormInput
-                  label="End Time"
-                  isOptional={true}
-                  placeholder="Add end time"
-                  value={formatTime(form.endTime)}
-                ></FormInput>
-              </View>
-            </TouchableOpacity>
+
+            <View>
+              <TouchableOpacity
+                onPress={() => handleOpenCalendar('endDate')}
+                style={{ flex: 1 }}
+              >
+                <View pointerEvents="none">
+                  <FormInput
+                    label="End Date"
+                    isOptional={true}
+                    placeholder="Add end date"
+                    value={formatDate(form.endDate)}
+                  ></FormInput>
+                </View>
+              </TouchableOpacity>
+              {form.endDate !== '' && (
+                <TouchableOpacity
+                  style={styles.clearIcon}
+                  onPress={() => handleInputChange('endDate', '')}
+                >
+                  <Icon
+                    name="close-circle"
+                    size={20}
+                    color={theme.buttonCancelText}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+            <View>
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentField('endTime');
+                  setTimeModalVisible(true);
+                }}
+                style={{ flex: 1 }}
+              >
+                <View pointerEvents="none">
+                  <FormInput
+                    label="End Time"
+                    isOptional={true}
+                    placeholder="Add end time"
+                    value={formatTime(form.endTime)}
+                  ></FormInput>
+                </View>
+              </TouchableOpacity>
+              {form.endTime !== '' && (
+                <TouchableOpacity
+                  style={styles.clearIcon}
+                  onPress={() => handleInputChange('endTime', '')}
+                >
+                  <Icon
+                    name="close-circle"
+                    size={20}
+                    color={theme.buttonCancelText}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
             {!isTimeValid() && (
               <Text style={styles.errorText}>
                 End Time must be after 'Time'
@@ -267,7 +291,6 @@ const CreateTaskScreen = () => {
               }}
             ></FormInput>
           </View>
-          {/* TODO: User should be able to remove the field inputs for Date and Time */}
           <CalendarComponent
             visible={isCalendarVisible}
             initialDate={getInitialDate()}
@@ -439,6 +462,18 @@ const getStyles = theme =>
       fontSize: 12,
       marginBottom: 10,
       marginTop: -5,
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      position: 'relative',
+    },
+    clearIcon: {
+      position: 'absolute',
+      right: 10,
+      top: 35,
+      padding: 10,
+      zIndex: 10,
     },
   });
 
