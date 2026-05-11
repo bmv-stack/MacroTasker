@@ -21,7 +21,6 @@ const FilterScreen = () => {
 
   const [currentTab, setCurrentTab] = useState('Sort');
   const [draft, setDraft] = useState(currentFilters);
-  const [showStatus, setShowStatus] = useState(false);
   const [calendar, setCalendar] = useState({ visible: false, type: null });
 
   const handleApply = () => {
@@ -67,7 +66,8 @@ const FilterScreen = () => {
           ))}
         </View>
         <View style={styles.drawerTabContent}>
-          {currentTab === 'Sort' ? (
+          {/* SORT */}
+          {currentTab === 'Sort' && (
             <View style={styles.tabSection}>
               <TouchableOpacity
                 style={styles.checkboxRow}
@@ -82,6 +82,7 @@ const FilterScreen = () => {
                 />
                 <Text style={styles.checkboxLabel}>A-z Sorting</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.checkboxRow}
                 onPress={() => setDraft({ ...draft, sortOrder: 'desc' })}
@@ -95,67 +96,77 @@ const FilterScreen = () => {
                 />
                 <Text style={styles.checkboxLabel}>Z-a Sorting</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.checkboxRow}
-                onPress={() => setShowStatus(!showStatus)}
+                onPress={() =>
+                  setDraft({ ...draft, sortOrder: 'priorityHigh' })
+                }
               >
                 <Icon
                   name={
-                    draft.status === 'status' ? 'checkbox' : 'square-outline'
+                    draft.sortOrder === 'priorityHigh'
+                      ? 'checkbox'
+                      : 'square-outline'
                   }
                   size={24}
                   color={theme.accent}
                 />
-                <Text style={styles.checkboxLabel}>Task Status</Text>
-                <Icon
-                  name={showStatus ? 'chevron-up' : 'chevron-down'}
-                  size={18}
-                  style={{ marginLeft: 'auto' }}
-                  color={theme.textMuted}
-                />
+                <Text style={styles.checkboxLabel}>Priority: High To Low</Text>
               </TouchableOpacity>
-              {showStatus &&
-                currentTab ===
-                  'Type'(
-                    <View style={{ marginLeft: 30 }}>
-                      {['Ongoing', 'Overdue', 'Completed'].map(status => {
-                        const isSelected = showStatus !== status;
-                        return (
-                          <TouchableOpacity
-                            key={status}
-                            style={[styles.checkboxRow, { marginBottom: 15 }]}
-                            onPress={() => setDraft({ ...draft, status })}
-                          >
-                            <Icon
-                              name={
-                                draft.status === status
-                                  ? 'radio-button-on'
-                                  : 'radio-button-off'
-                              }
-                              size={18}
-                              color={
-                                isSelected ? theme.accent : theme.textMuted
-                              }
-                            />
-                            <Text
-                              style={[styles.checkboxLabel, { fontSize: 14 }]}
-                            >
-                              {status}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>,
-                  )}
+
+              <TouchableOpacity
+                style={styles.checkboxRow}
+                onPress={() => setDraft({ ...draft, sortOrder: 'priorityLow' })}
+              >
+                <Icon
+                  name={
+                    draft.sortOrder === 'priorityLow'
+                      ? 'checkbox'
+                      : 'square-outline'
+                  }
+                  size={24}
+                  color={theme.accent}
+                />
+                <Text style={styles.checkboxLabel}>Priority: Low To High</Text>
+              </TouchableOpacity>
             </View>
-          ) : (
+          )}
+
+          {/* TYPE */}
+          {currentTab === 'Type' && (
+            <View style={styles.tabSection}>
+              <Text style={styles.dateLabel}>Filter by Status</Text>
+              {['All', 'Ongoing', 'Overdue', 'Completed'].map(statusItem => {
+                const isSelected = draft.status === statusItem;
+                return (
+                  <TouchableOpacity
+                    key={statusItem}
+                    style={[styles.checkboxRow, { marginBottom: 15 }]}
+                    onPress={() => setDraft({ ...draft, status: statusItem })}
+                  >
+                    <Icon
+                      name={isSelected ? 'radio-button-on' : 'radio-button-off'}
+                      size={20}
+                      color={isSelected ? theme.accent : theme.textMuted}
+                    />
+                    <Text style={[styles.checkboxLabel, { fontSize: 16 }]}>
+                      {statusItem}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+
+          {/* DATE */}
+          {currentTab === 'Date' && (
             <View style={styles.tabSection}>
               <Text style={styles.dateLabel}>Start Date</Text>
               <TouchableOpacity
                 onPress={() =>
                   setCalendar({ visible: true, type: 'startDate' })
                 }
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <View style={styles.dateInputFake}>
                   <Icon name="calendar" size={24} color={theme.textMuted} />
@@ -164,12 +175,12 @@ const FilterScreen = () => {
                   </Text>
                 </View>
               </TouchableOpacity>
+
               <Text style={[styles.dateLabel, { marginTop: 30 }]}>
                 End Date
               </Text>
               <TouchableOpacity
                 onPress={() => setCalendar({ visible: true, type: 'endDate' })}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <View style={styles.dateInputFake}>
                   <Icon

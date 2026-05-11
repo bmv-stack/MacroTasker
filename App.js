@@ -51,13 +51,6 @@ const DashboardStackScreen = () => (
           Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_right',
       }}
     />
-    <DashboardStack.Screen
-      name="FilterScreen"
-      component={FilterScreen}
-      options={{
-        animation: Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_left',
-      }}
-    />
   </DashboardStack.Navigator>
 );
 
@@ -144,6 +137,13 @@ const RootStackScreen = () => (
       name="CreateTask"
       component={CreateTaskScreen}
       options={{ headerShown: false, animation: 'fade' }}
+    />
+    <RootStack.Screen
+      name="FilterScreen"
+      component={FilterScreen}
+      options={{
+        animation: Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_left',
+      }}
     />
   </RootStack.Navigator>
 );

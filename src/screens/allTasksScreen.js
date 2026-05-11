@@ -101,6 +101,9 @@ const AllTasksScreen = () => {
       viewPosition: 0.5,
     });
   };
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
   // ----- Data for Section List -----
 
   const sectionListGroup = tasks => {
@@ -176,8 +179,27 @@ const AllTasksScreen = () => {
     }
     // ----- Alphabetical sorting logic -----
     return [...tasksToFilter].sort((a, b) => {
-      if (a.completed !== b.completed) {
-        return a.completed ? 1 : -1;
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+
+      const priorityOrder = { High: 3, Normal: 2, Low: 1 };
+
+      switch (sortOrder) {
+        case 'priorityHigh':
+          return (
+            priorityOrder[b.priority || 'Normal'] -
+            priorityOrder[a.priority || 'Normal']
+          );
+        case 'priorityLow':
+          return (
+            priorityOrder[a.priority || 'Normal'] -
+            priorityOrder[b.priority || 'Normal']
+          );
+        case 'desc':
+          return b.title.localeCompare(a.title);
+        case 'asc':
+          return a.title.localeCompare(b.title);
+        default:
+          return a.title.localeCompare(a.title);
       }
       if (sortOrder === 'asc') {
         return a.title.localeCompare(b.title);
@@ -214,9 +236,6 @@ const AllTasksScreen = () => {
     });
     //setChartKey(chartKey + 1); // Forced re-render
   };
-
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
 
   const currentMinutes = new Date().getHours() * 60 + new Date().getMinutes();
 
