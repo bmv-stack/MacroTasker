@@ -111,7 +111,7 @@ const CreateTaskScreen = () => {
       navigation.goBack();
     }, 1500);
   };
-
+  // TODO: Move getInitialDate() into a separate utility file
   const todayDate = (date = new Date()) => {
     return date.toISOString().split('T')[0];
   };
@@ -267,6 +267,7 @@ const CreateTaskScreen = () => {
               }}
             ></FormInput>
           </View>
+          {/* TODO: User should be able to remove the field inputs for Date and Time */}
           <CalendarComponent
             visible={isCalendarVisible}
             initialDate={getInitialDate()}

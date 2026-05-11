@@ -12,6 +12,7 @@ const commonColors = {
   completedBg: '#34C759',
   buttonDisabled: '#acacb1',
   textError: '#FF3B30',
+  activeDotFilterScreen: '#34C759',
   taskCardPalette: [
     '#7ea8d9',
     '#e7d8aa',

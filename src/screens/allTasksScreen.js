@@ -160,27 +160,25 @@ const AllTasksScreen = () => {
 
         if (status === 'Completed') return t.completed;
 
-        if (status === 'Overdue') {
-          return (
-            (!t.completed && isEndDate && endDate < now) ||
-            (endDate.getTime() === now.getTime() &&
-              t.endTime &&
-              getMinute(t.endTime) < currentMinutes)
-          );
-        }
+        const isOverdue =
+          !t.completed &&
+          isEndDate &&
+          (endDate < now ||
+            (endDate().getTime() === now.getTime() &&
+              getMinute(t.endTime) < currentMinutes));
+
+        if (status === 'Overdue') return isOverdue;
 
         if (status === 'Ongoing') {
-          const isOverdue = isEndDate && endDate < now;
           const isFuture = taskDate != null && taskDate > now;
           return !t.completed && !isOverdue && !isFuture;
         }
         return true;
       });
     }
-    // ----- Alphabetical sorting logic -----
-    return [...tasksToFilter].sort((a, b) => {
+    // ----- Sorting logic -----
+    return tasksToFilter.sort((a, b) => {
       if (a.completed !== b.completed) return a.completed ? 1 : -1;
-
       const priorityOrder = { High: 3, Normal: 2, Low: 1 };
 
       switch (sortOrder) {
@@ -201,13 +199,6 @@ const AllTasksScreen = () => {
         default:
           return a.title.localeCompare(a.title);
       }
-      if (sortOrder === 'asc') {
-        return a.title.localeCompare(b.title);
-      }
-      if (sortOrder === 'desc') {
-        return b.title.localeCompare(a.title);
-      }
-      return 0;
     });
   }, [tasks, selectedDate, status, sortOrder, startDate, endDate]);
   // ----- Sections for Date Filtering -----
@@ -341,7 +332,7 @@ const AllTasksScreen = () => {
       clearTimeout(undoTimer.current);
     }
   };
-  const isFiltered = sortOrder === 'asc' || status !== 'All' || !!startDate;
+  const isFiltered = sortOrder === 'asc' || status === 'All' || !!startDate;
 
   function handleReset() {
     dispatch(resetFilters());
@@ -525,7 +516,7 @@ const AllTasksScreen = () => {
             >
               <Icon name="filter" size={24} color={theme.textPrimary} />
             </TouchableOpacity>
-            {isFiltered && (
+            {!isFiltered && (
               <TouchableOpacity
                 onPress={handleReset}
                 hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
@@ -591,72 +582,11 @@ const AllTasksScreen = () => {
                 );
               }}
             />
-            {/* -----Pie Chart----- */}
-            {filteredTasks.length > 0 && (
-              <View style={styles.chartContainer}>
-                <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
-                  <PieChart
-                    key={chartKey}
-                    donut
-                    focusOnPress
-                    sectionAutoFocus
-                    shadow
-                    radius={70}
-                    innerRadius={55}
-                    innerCircleColor={
-                      isDarkMode ? theme.background : theme.white
-                    }
-                    data={chartData}
-                    centerLabelComponent={() => (
-                      <View
-                        style={{
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontWeight: 'bold',
-                            fontSize: 22,
-                            color: isDarkMode
-                              ? theme.white
-                              : theme.blackSecondary,
-                          }}
-                        >
-                          {selectedData.value}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 10,
-                            color: isDarkMode
-                              ? theme.white
-                              : theme.blackSecondary,
-                            fontWeight: '600',
-                          }}
-                        >
-                          {selectedData.label}
-                        </Text>
-                      </View>
-                    )}
-                  />
-                </TouchableOpacity>
-
-                <View style={styles.dotContainer}>
-                  {chartData.map((item, index) => (
-                    <View key={index} style={styles.chartItem}>
-                      <View
-                        style={[styles.dot, { backgroundColor: item.color }]}
-                      />
-                      <Text style={styles.dotText}>{item.label}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
           </View>
         )}
 
-        {/* -----Pie Chart----- for date filtered tasks */}
-        {startDate && endDate && filteredTasks.length > 0 && (
+        {/* -----Pie Chart----- */}
+        {filteredTasks.length > 0 && (
           <View style={styles.chartContainer}>
             <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
               <PieChart
@@ -670,22 +600,43 @@ const AllTasksScreen = () => {
                 innerCircleColor={isDarkMode ? theme.background : theme.white}
                 data={chartData}
                 centerLabelComponent={() => (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text style={styles.centerChartCount}>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text
+                      style={
+                        startDate && endDate
+                          ? styles.centerChartCount // Range Mode Style
+                          : {
+                              // Daily Mode Style
+                              fontWeight: 'bold',
+                              fontSize: 22,
+                              color: isDarkMode
+                                ? theme.white
+                                : theme.blackSecondary,
+                            }
+                      }
+                    >
                       {selectedData.value}
                     </Text>
-                    <Text style={styles.centerChartLabel}>
+                    <Text
+                      style={
+                        startDate && endDate
+                          ? styles.centerChartLabel // Range Mode Style
+                          : {
+                              // Daily Mode Style
+                              fontSize: 10,
+                              color: isDarkMode
+                                ? theme.white
+                                : theme.blackSecondary,
+                              fontWeight: '600',
+                            }
+                      }
+                    >
                       {selectedData.label}
                     </Text>
                   </View>
                 )}
               />
             </TouchableOpacity>
-
             <View style={styles.dotContainer}>
               {chartData.map((item, index) => (
                 <View key={index} style={styles.chartItem}>
@@ -876,10 +827,6 @@ const getStyles = theme =>
     leftInfoGroup: {
       flexDirection: 'row',
       alignItems: 'center',
-    },
-    medalIcon: {
-      fontSize: 22,
-      marginRight: 8,
     },
     dateTimeText: {
       fontSize: 12,

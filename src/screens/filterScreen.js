@@ -30,8 +30,21 @@ const FilterScreen = () => {
   const handleReset = () => {
     dispatch(resetFilters());
     setDraft(initialState);
-    navigation.goBack();
   };
+  const activeFilterCount = () => {
+    let count = 0;
+
+    if (draft.sortOrder !== 'asc') count++;
+
+    if (draft.status !== 'All') count++;
+
+    if (draft.startDate || draft.endDate) count++;
+
+    return count;
+  };
+
+  const activeCount = activeFilterCount();
+  // TODO: Implement filtering by Task Status and Date Range, along with SectionList
   return (
     <View style={styles.drawerContent}>
       <View style={styles.drawerHeader}>
@@ -45,26 +58,34 @@ const FilterScreen = () => {
       </View>
       <View style={styles.drawerBody}>
         <View style={styles.drawerSideBar}>
-          {['Sort', 'Type', 'Date'].map(tab => (
-            <TouchableOpacity
-              key={tab}
-              style={[
-                styles.sidebarTab,
-                currentTab === tab && styles.activeSidebarTab,
-              ]}
-              onPress={() => setCurrentTab(tab)}
-            >
-              <Text
+          {['Sort', 'Type', 'Date'].map(tab => {
+            const activeFilter =
+              (tab === 'Sort' && draft.sortOrder !== 'asc') ||
+              (tab === 'Type' && draft.status !== 'All') ||
+              (tab === 'Date' && (draft.startDate || draft.endDate));
+            return (
+              <TouchableOpacity
+                key={tab}
                 style={[
-                  styles.sidebarTabText,
-                  currentTab === tab && styles.activeSidebarTabText,
+                  styles.sidebarTab,
+                  currentTab === tab && styles.activeSidebarTab,
                 ]}
+                onPress={() => setCurrentTab(tab)}
               >
-                {tab}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.sidebarTabText,
+                    currentTab === tab && styles.activeSidebarTabText,
+                  ]}
+                >
+                  {tab}
+                </Text>
+                {activeFilter && <View style={styles.activeDot} />}
+              </TouchableOpacity>
+            );
+          })}
         </View>
+        {/* TODO: Implement Due Date (Earliest First) sorting option */}
         <View style={styles.drawerTabContent}>
           {/* SORT */}
           {currentTab === 'Sort' && (
@@ -197,8 +218,16 @@ const FilterScreen = () => {
           )}
         </View>
       </View>
-      <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
-        <Text style={styles.applyBtnText}>APPLY</Text>
+      <TouchableOpacity
+        style={[
+          styles.applyBtn,
+          activeCount === 0 && { backgroundColor: theme.textMuted },
+        ]}
+        onPress={handleApply}
+      >
+        <Text style={styles.applyBtnText}>
+          {activeCount > 0 ? `APPLY (${activeCount})` : `APPLY`}
+        </Text>
       </TouchableOpacity>
       <CalendarComponent
         visible={calendar.visible}
@@ -317,5 +346,13 @@ const getStyles = theme =>
       fontWeight: 'bold',
       fontSize: 16,
       color: theme.textInverted,
+    },
+    activeDot: {
+      backgroundColor: theme.activeDotFilterScreen,
+      width: 6.5,
+      height: 6.5,
+      borderRadius: 4,
+      marginRight: 8,
+      marginLeft: 8,
     },
   });
