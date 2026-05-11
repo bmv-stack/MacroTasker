@@ -25,11 +25,11 @@ import FeatherIcon from 'react-native-vector-icons/Feather';
 import { useTheme } from '../contexts/ThemeContext';
 import PriorityModal from '../components/Modals/PriorityModal';
 import DeleteModal from '../components/Modals/DeleteModal';
-import FilterModal from '../components/Modals/FilterModal';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
 import { generateDateList } from '../utils/dateListGeneration';
 import { getMinute } from '../utils/getMinutes';
+import { resetFilters } from '../redux/slices/filterSlice';
 
 const AllTasksScreen = () => {
   // -----THEME-----
@@ -44,10 +44,9 @@ const AllTasksScreen = () => {
   const navigation = useNavigation();
   // --------------------------------------------------
   // -----FILTER TASKS States-----
-  const [filterVisible, setFilterVisible] = useState(false);
-  const [currentFilterTab, setCurrentFilterTab] = useState('Sort');
-  const [showStatus, setShowStatus] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const { sortOrder, status, endDate, startDate } = useSelector(
+    state => state.filters,
+  );
 
   // -----UNDO States-----
   const [undoVisible, setUndoVisible] = useState(false);
@@ -82,11 +81,6 @@ const AllTasksScreen = () => {
     taskId: null,
   });
   // -----FILTER States-----
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [startDateFilter, setStartDateFilter] = useState('');
-  const [endDateFilter, setEndDateFilter] = useState('');
-  const [calendarVisible, setCalendarVisible] = useState(false);
-  const [calendarType, setCalendarType] = useState(null); // 'start' or 'end'
 
   // -----DATE LIST (On Top) States-----
   const [selectedData, setSelectedData] = useState({
@@ -132,11 +126,11 @@ const AllTasksScreen = () => {
 
   // ----- Filtered Tasks For Date Filtering -----
   const filteredTasks = useMemo(() => {
-    let tasksToFilter = tasks;
+    let tasksToFilter = [...tasks];
 
-    if (startDateFilter && endDateFilter) {
-      const start = parseDate(startDateFilter);
-      const end = parseDate(endDateFilter);
+    if (startDate && endDate) {
+      const start = parseDate(startDate);
+      const end = parseDate(endDate);
       if (start && end) {
         tasksToFilter = tasks.filter(task => {
           const taskDate = parseDate(task.date);
@@ -155,19 +149,24 @@ const AllTasksScreen = () => {
       }
     }
     // ----- Filtering for 'Task Status' -----
-    if (['Ongoing', 'Overdue', 'Completed'].includes(sortOrder)) {
+    if (status !== 'All') {
       tasksToFilter = tasksToFilter.filter(t => {
         const isEndDate = !!t.endDate;
         const endDate = isEndDate ? parseDate(t.endDate) : null;
         const taskDate = parseDate(t.date);
 
-        if (sortOrder === 'Completed') return t.completed;
+        if (status === 'Completed') return t.completed;
 
-        if (sortOrder === 'Overdue') {
-          return !t.completed && isEndDate && endDate < now;
+        if (status === 'Overdue') {
+          return (
+            (!t.completed && isEndDate && endDate < now) ||
+            (endDate.getTime() === now.getTime() &&
+              t.endTime &&
+              getMinute(t.endTime) < currentMinutes)
+          );
         }
 
-        if (sortOrder === 'Ongoing') {
+        if (status === 'Ongoing') {
           const isOverdue = isEndDate && endDate < now;
           const isFuture = taskDate != null && taskDate > now;
           return !t.completed && !isOverdue && !isFuture;
@@ -188,14 +187,14 @@ const AllTasksScreen = () => {
       }
       return 0;
     });
-  }, [tasks, selectedDate, sortOrder, startDateFilter, endDateFilter]);
+  }, [tasks, selectedDate, status, sortOrder, startDate, endDate]);
   // ----- Sections for Date Filtering -----
   const groupedSections = useMemo(() => {
-    if (startDateFilter && endDateFilter && filteredTasks) {
+    if (startDate && endDate && filteredTasks) {
       return sectionListGroup(filteredTasks);
     }
     return [];
-  }, [filteredTasks, startDateFilter, endDateFilter]);
+  }, [filteredTasks, startDate, endDate]);
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -242,7 +241,7 @@ const AllTasksScreen = () => {
       return false;
     }).length;
     const isFuture =
-      startDateFilter && endDateFilter ? false : parseDate(selectedDate) > now;
+      startDate && endDate ? false : parseDate(selectedDate) > now;
 
     if (isFuture) {
       return [
@@ -323,18 +322,10 @@ const AllTasksScreen = () => {
       clearTimeout(undoTimer.current);
     }
   };
-  const isFiltered =
-    sortOrder !== 'asc' ||
-    (startDateFilter && endDateFilter) ||
-    selectedStatus !== null;
+  const isFiltered = sortOrder === 'asc' || status !== 'All' || !!startDate;
 
   function handleReset() {
-    setSortOrder('asc');
-    setCurrentFilterTab('Sort');
-    setStartDateFilter('');
-    setEndDateFilter('');
-    setSelectedStatus(null);
-    setShowStatus(false);
+    dispatch(resetFilters());
   }
   const getStatusColor = task => {
     if (task.completed) return theme.chartCompleted;
@@ -510,28 +501,7 @@ const AllTasksScreen = () => {
 
           <View style={styles.filterIconContainer}>
             <TouchableOpacity
-              onPress={() => setFilterVisible(true)}
-              hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
-            >
-              <Icon name="filter" size={24} color={theme.textPrimary} />
-            </TouchableOpacity>
-            {isFiltered && (
-              <TouchableOpacity
-                onPress={handleReset}
-                hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
-              >
-                <Icon
-                  name="reload"
-                  size={24}
-                  color={theme.textPrimary}
-                  style={{ marginLeft: 15 }}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={styles.filterIconContainer}>
-            <TouchableOpacity
-              onPress={() => setFilterVisible(true)}
+              onPress={() => navigation.navigate('FilterScreen')}
               hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
             >
               <Icon name="filter" size={24} color={theme.textPrimary} />
@@ -553,7 +523,7 @@ const AllTasksScreen = () => {
         </View>
 
         {/* DATES Flatlist - only show when not filtering by date */}
-        {!(startDateFilter && endDateFilter) && (
+        {!(startDate && endDate) && (
           <View style={styles.topSection}>
             <FlatList
               horizontal
@@ -667,7 +637,7 @@ const AllTasksScreen = () => {
         )}
 
         {/* -----Pie Chart----- for date filtered tasks */}
-        {startDateFilter && endDateFilter && filteredTasks.length > 0 && (
+        {startDate && endDate && filteredTasks.length > 0 && (
           <View style={styles.chartContainer}>
             <TouchableOpacity activeOpacity={1} onPress={resetTotal}>
               <PieChart
@@ -708,7 +678,7 @@ const AllTasksScreen = () => {
           </View>
         )}
 
-        {startDateFilter && endDateFilter ? (
+        {startDate && endDate ? (
           <SectionList
             sections={groupedSections}
             keyExtractor={item => item.id}
@@ -779,47 +749,6 @@ const AllTasksScreen = () => {
           </TouchableOpacity>
         </View>
       )}
-      <FilterModal
-        visible={filterVisible}
-        onClose={() => setFilterVisible(false)}
-        currentFilterTab={currentFilterTab}
-        onTabChange={setCurrentFilterTab}
-        sortOrder={sortOrder}
-        onSortChange={setSortOrder}
-        showStatus={showStatus}
-        setShowStatus={setShowStatus}
-        selectedStatus={selectedStatus}
-        onStatusSelect={status => {
-          setSelectedStatus(status);
-          if (status) {
-            setSortOrder(status);
-          }
-        }}
-        onReset={handleReset}
-        startDateFilter={startDateFilter}
-        endDateFilter={endDateFilter}
-        openCalendar={type => {
-          setCalendarType(type);
-          setCalendarVisible(true);
-        }}
-        calendarVisible={calendarVisible}
-        calendarType={calendarType}
-        calendarInitialDate={
-          calendarType === 'start'
-            ? startDateFilter || undefined
-            : endDateFilter || undefined
-        }
-        onCalendarSelect={day => {
-          if (calendarType === 'start') {
-            setStartDateFilter(day.dateString);
-          } else {
-            setEndDateFilter(day.dateString);
-          }
-          setCalendarVisible(false);
-        }}
-        onCalendarClose={() => setCalendarVisible(false)}
-        onApply={() => setFilterVisible(false)}
-      />
     </View>
   );
 };
@@ -1133,104 +1062,6 @@ const getStyles = theme =>
       fontWeight: 'bold',
       fontSize: 14,
     },
-    drawerOverlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: theme.surface,
-    },
-    drawerDrop: {
-      flex: 0.2,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    drawerContent: {
-      flex: 1,
-      backgroundColor: theme.surface,
-      paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
-    },
-    drawerHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingBottom: 20,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.borderLight,
-    },
-    drawerHeaderText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: theme.primary,
-    },
-    resetText: { color: theme.accent, fontWeight: 'bold' },
-    drawerBody: { flex: 1, flexDirection: 'row' },
-    drawerSideBar: {
-      width: 100,
-      backgroundColor: theme.surface,
-      borderRightWidth: 1,
-      borderRightColor: theme.borderLight,
-    },
-    tabSection: {
-      flex: 1,
-      paddingTop: 10,
-    },
-    sidebarTab: {
-      paddingVertical: 20,
-      paddingHorizontal: 15,
-    },
-    activeSidebarTab: {
-      backgroundColor: theme.accent,
-    },
-    sidebarTabText: { color: theme.textMuted, fontWeight: '600' },
-    activeSidebarTabText: { color: theme.primary },
-    drawerTabContent: { flex: 1, padding: 20 },
-    checkboxRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    checkboxLabel: {
-      marginLeft: 15,
-      fontSize: 16,
-      color: theme.primary,
-    },
-    emptyCheckbox: {
-      width: 22,
-      height: 22,
-      borderWidth: 2,
-      borderColor: theme.borderLight,
-      borderRadius: 4,
-    },
-    dateLabel: { color: theme.textMuted, fontSize: 14, marginBottom: 10 },
-    dateInputFake: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderBottomWidth: 1,
-      borderBottomColor: theme.borderLight,
-      paddingVertical: 8,
-    },
-    dateInputText: {
-      marginLeft: 10,
-      fontSize: 16,
-      color: theme.primary,
-    },
-    applyBtn: {
-      backgroundColor: theme.primary,
-      paddingVertical: 20,
-      alignItems: 'center',
-    },
-    applyBtnText: {
-      fontWeight: 'bold',
-      fontSize: 16,
-      color: theme.textInverted,
-    },
-    sectionHeaderContainer: {
-      backgroundColor: theme.background,
-      paddingVertical: 12,
-      paddingHorizontal: 4,
-    },
     sectionHeaderText: {
       fontSize: 14,
       fontWeight: 'bold',
@@ -1247,9 +1078,6 @@ const getStyles = theme =>
       color: theme.textMuted,
       fontWeight: 'bold',
       textAlign: 'center',
-    },
-    filterIconContainer: {
-      flexDirection: 'row',
     },
     filterIconContainer: {
       flexDirection: 'row',

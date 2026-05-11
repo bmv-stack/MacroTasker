@@ -13,6 +13,7 @@ import AllTasksScreen from './src/screens/allTasksScreen';
 import MainScreen from './src/screens/mainScreen';
 import CreateTaskScreen from './src/screens/createTaskScreen';
 import TaskDetailScreen from './src/screens/taskDetailScreen';
+import FilterScreen from './src/screens/filterScreen';
 import SplashScreen from './src/screens/splashScreen';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 import { useTheme } from './src/contexts/ThemeContext';
@@ -46,7 +47,15 @@ const DashboardStackScreen = () => (
       name="TaskDetail"
       component={TaskDetailScreen}
       options={{
-        animation: Platform.OS == 'ios' ? 'ios_from_right' : 'slide_from_right',
+        animation:
+          Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_right',
+      }}
+    />
+    <DashboardStack.Screen
+      name="FilterScreen"
+      component={FilterScreen}
+      options={{
+        animation: Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_left',
       }}
     />
   </DashboardStack.Navigator>
