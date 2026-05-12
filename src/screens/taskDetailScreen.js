@@ -49,7 +49,10 @@ const TaskDetailScreen = ({ route }) => {
           />
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        alwaysBounceVertical={false}
+      >
         <View
           style={[styles.badge, { backgroundColor: theme.badgeBackground }]}
         >
@@ -85,7 +88,7 @@ const TaskDetailScreen = ({ route }) => {
           navigation.navigate('CreateTask', { existingTask: task })
         }
       >
-        <Icon name="pencil" size={24} color={theme.white}></Icon>
+        <Icon name="pencil" size={24} color={theme.textInverted}></Icon>
       </TouchableOpacity>
     </View>
   );
@@ -134,7 +137,7 @@ const getStyles = theme =>
       position: 'absolute',
       bottom: 30,
       right: 20,
-      backgroundColor: theme.blackSecondary,
+      backgroundColor: theme.textPrimary,
       width: 56,
       height: 56,
       borderRadius: 28,

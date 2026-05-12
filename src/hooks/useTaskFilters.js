@@ -5,8 +5,8 @@ import { getMinute } from '../utils/getMinutes';
 export const useTaskFilters = (tasks, filters, selectedDate) => {
   const { sortOrder, status, startDate, endDate } = filters;
   const now = new Date();
-  now.setHours(0, 0, 0, 0);
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  now.setHours(0, 0, 0, 0);
 
   // ----- Filtering and Sorting -----
   const filteredTasks = useMemo(() => {
@@ -33,7 +33,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
       }
     }
 
-    if (status !== 'All') {
+    if (status !== '') {
       tasksToFilter = tasksToFilter.filter(t => {
         const isEndDate = !!t.endDate;
         const endD = isEndDate ? parseDate(t.endDate) : null;

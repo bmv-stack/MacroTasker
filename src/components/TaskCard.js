@@ -14,8 +14,8 @@ const TaskCard = ({ task, onEdit, onDelete, onComplete, onPriority }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
   now.setHours(0, 0, 0, 0);
-  const currentMinutes = new Date().getHours * 60 + new Date().getMinutes();
   const getStatusColor = task => {
     if (task.completed) return theme.chartCompleted;
 

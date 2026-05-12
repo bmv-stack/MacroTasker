@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const initialState = {
-  sortOrder: 'asc',
-  status: 'All',
+  sortOrder: '',
+  status: '',
   startDate: '',
   endDate: '',
 };

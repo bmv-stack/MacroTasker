@@ -6,7 +6,6 @@ import {
   FlatList,
   SectionList,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   deleteTask,
@@ -26,20 +25,12 @@ import { useTaskFilters } from '../hooks/useTaskFilters';
 import { getStyles } from './AllTasksScreen.styles';
 import TaskCard from '../components/TaskCard';
 import TaskChart from '../components/TaskChart';
+import DateList from '../components/DateList';
 
-const AllTasksScreen = () => {
+const AllTasksScreen = ({ navigation }) => {
   // -----THEME-----
   const { theme, isDarkMode } = useTheme();
   const screenStyles = getStyles(theme);
-  console.log('DEBUG: theme object exists?', !!theme);
-  console.log(
-    'DEBUG: getStyles is a function?',
-    typeof getStyles === 'function',
-  );
-  console.log(
-    'DEBUG: screenStyles object keys:',
-    Object.keys(screenStyles || {}),
-  );
   // --------------------------------------------------
   const dateListRef = useRef(null);
   // --------------------------------------------------
@@ -49,14 +40,12 @@ const AllTasksScreen = () => {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0],
   );
-  // --------------------------------------------------
-  const navigation = useNavigation();
-  // --------------------------------------------------
   // -----FILTER TASKS States-----
   const { sortOrder, status, endDate, startDate } = filters;
 
   // -----UNDO States-----
   const [undoVisible, setUndoVisible] = useState(false);
+
   // -----DELETE Modal States-----
   const [deleteModal, setDeleteModal] = useState({
     visible: false,
@@ -76,17 +65,14 @@ const AllTasksScreen = () => {
   }, []);
   // -----ACTIVE TAB States-----
   const [activeTab, setActiveTab] = useState('All');
-  // -----CHART States-----
-  const [chartKey, setChartKey] = useState(0);
-  // -----DATE States-----
+
   // -----PRIORITY States-----
   const [priorityModal, setPriorityModal] = useState({
     visible: false,
     taskId: null,
   });
-  // -----FILTER States-----
 
-  // -----DATE LIST (On Top) States-----
+  // ----- Chart Data -----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
     value: tasks.length,
@@ -116,12 +102,13 @@ const AllTasksScreen = () => {
     selectedDate,
   );
 
+  // ----- Chart Data in array form -----
   const chartDataRaw = useMemo(
     () => [
       {
         value: chartData.ongoingCount,
         color: theme.chartOngoing,
-        label: 'Ongoing',
+        label: 'Ongoing Tasks',
         onPress: () =>
           setSelectedData({
             label: 'Ongoing',
@@ -132,7 +119,7 @@ const AllTasksScreen = () => {
       {
         value: chartData.overdueCount,
         color: theme.chartOverdue,
-        label: 'Overdue',
+        label: 'Overdue Tasks',
         onPress: () =>
           setSelectedData({
             label: 'Overdue',
@@ -143,7 +130,7 @@ const AllTasksScreen = () => {
       {
         value: chartData.completedCount,
         color: theme.chartCompleted,
-        label: 'Completed',
+        label: 'Completed Tasks',
         onPress: () =>
           setSelectedData({
             label: 'Completed',
@@ -171,7 +158,6 @@ const AllTasksScreen = () => {
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
-    //setChartKey(chartKey + 1); // Forced re-render
   };
 
   const handlePriorityChange = (taskId, newPriority) => {
@@ -189,7 +175,7 @@ const AllTasksScreen = () => {
       clearTimeout(undoTimer.current);
     }
   };
-  const isFiltered = sortOrder === 'asc' || status === 'All' || !!startDate;
+  const isFiltered = sortOrder !== '' || status !== '' || !!startDate;
 
   function handleReset() {
     dispatch(resetFilters());
@@ -229,7 +215,7 @@ const AllTasksScreen = () => {
             >
               <Icon name="filter" size={24} color={theme.textPrimary} />
             </TouchableOpacity>
-            {!isFiltered && (
+            {isFiltered && (
               <TouchableOpacity
                 onPress={handleReset}
                 hitSlop={{ top: 10, bottom: 10, left: 0, right: 10 }}
@@ -261,43 +247,13 @@ const AllTasksScreen = () => {
                 offset: 55 * index,
                 index,
               })}
-              renderItem={({ item }) => {
-                const isSelected = item.fullDate === selectedDate;
-                const [monthName, dayName] = item.dayName.split(' ');
-                let backgroundColor;
-                if (isSelected) {
-                  backgroundColor = isDarkMode
-                    ? theme.white
-                    : theme.blackSecondary;
-                }
-                let textColor;
-                if (isSelected) {
-                  textColor = isDarkMode ? '#000' : theme.white;
-                } else {
-                  textColor = theme.textMuted;
-                }
-
-                return (
-                  <TouchableOpacity
-                    onPress={() => setSelectedDate(item.fullDate)}
-                    style={[screenStyles.dateCard, { backgroundColor }]}
-                  >
-                    <Text
-                      style={[screenStyles.dateNumber, { color: textColor }]}
-                    >
-                      {item.dayNumber}
-                    </Text>
-                    <Text
-                      style={[screenStyles.dateMonthName, { color: textColor }]}
-                    >
-                      {monthName}
-                    </Text>
-                    <Text style={[screenStyles.dateDay, { color: textColor }]}>
-                      {dayName}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }}
+              renderItem={({ item }) => (
+                <DateList
+                  item={item}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
+              )}
             />
           </View>
         )}
@@ -361,6 +317,7 @@ const AllTasksScreen = () => {
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ marginBottom: 70, flexGrow: 1 }}
+            alwaysBounceVertical={false}
             ListEmptyComponent={() => (
               <View style={screenStyles.emptyTaskContainer}>
                 <Text style={screenStyles.emptyTaskText}>
@@ -427,5 +384,4 @@ const AllTasksScreen = () => {
     </View>
   );
 };
-
 export default AllTasksScreen;

@@ -1,4 +1,4 @@
-import { StyleSheet, Platform, StatusBar } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 
 export const getStyles = theme => {
   return {
@@ -72,7 +72,7 @@ export const getStyles = theme => {
       width: '100%',
     },
     dotContainer: {
-      justifyContent: 'space-evenly',
+      justifyContent: 'space-between',
       flexDirection: 'row',
       width: '107%',
       marginTop: 20,
@@ -94,7 +94,7 @@ export const getStyles = theme => {
     dotText: {
       fontSize: 11,
       color: theme.textChartLabel,
-      fontWeight: '400',
+      fontWeight: '600',
     },
     dot: {
       width: 6.5,
@@ -198,6 +198,14 @@ export const getStyles = theme => {
       shadowOpacity: 0.1,
       shadowRadius: 2,
       elevation: 2,
+    },
+    overdueIndicator: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      width: 4,
+      backgroundColor: theme.chartOverdue,
     },
 
     modalOverlay: {
