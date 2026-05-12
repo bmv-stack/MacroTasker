@@ -1,0 +1,109 @@
+import { useMemo } from 'react';
+import { parseDate } from '../screens/createTaskScreen';
+import { getMinute } from '../utils/getMinutes';
+
+export const useTaskFilters = (tasks, filters, selectedDate) => {
+  const { sortOrder, status, startDate, endDate } = filters;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // ----- Filtering and Sorting -----
+  const filteredTasks = useMemo(() => {
+    let tasksToFilter = [...tasks];
+
+    if (startDate && endDate) {
+      const start = parseDate(startDate);
+      const end = parseDate(endDate);
+      if (start && end) {
+        tasksToFilter = tasksToFilter.filter(task => {
+          const taskDate = parseDate(task.date);
+          return taskDate && taskDate >= start && taskDate <= end;
+        });
+      }
+    } else {
+      const selected = parseDate(selectedDate);
+      if (selected) {
+        tasksToFilter = tasksToFilter.filter(task => {
+          const taskDate = parseDate(task.date);
+          return (
+            taskDate && taskDate.toDateString() === selected.toDateString()
+          );
+        });
+      }
+    }
+
+    if (status !== 'All') {
+      tasksToFilter = tasksToFilter.filter(t => {
+        const isEndDate = !!t.endDate;
+        const endD = isEndDate ? parseDate(t.endDate) : null;
+        if (status === 'Completed') return t.completed;
+
+        const isOverdue =
+          !t.completed &&
+          isEndDate &&
+          (endD < now ||
+            (endD.getTime() === now.getTime() &&
+              getMinute(t.endTime) < currentMinutes));
+
+        if (status === 'Overdue') return isOverdue;
+        if (status === 'Ongoing') {
+          return !t.completed && !isOverdue && !(parseDate(t.date) > now);
+        }
+        return true;
+      });
+    }
+
+    return tasksToFilter.sort((a, b) => {
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+      const priorityOrder = { High: 3, Normal: 2, Low: 1 };
+      switch (sortOrder) {
+        case 'priorityHigh':
+          return (
+            priorityOrder[b.priority || 'Normal'] -
+            priorityOrder[a.priority || 'Normal']
+          );
+        case 'priorityLow':
+          return (
+            priorityOrder[a.priority || 'Normal'] -
+            priorityOrder[b.priority || 'Normal']
+          );
+        case 'desc':
+          return b.title.localeCompare(a.title);
+        default:
+          return a.title.localeCompare(b.title);
+      }
+    });
+  }, [tasks, selectedDate, status, sortOrder, startDate, endDate]);
+
+  // ----- Section List -----
+  const groupedSections = useMemo(() => {
+    if (!startDate || !endDate) return [];
+    const groups = {};
+    filteredTasks.forEach(task => {
+      if (!groups[task.date]) groups[task.date] = [];
+      groups[task.date].push(task);
+    });
+    return Object.keys(groups)
+      .sort()
+      .map(date => ({ title: date, data: groups[date] }));
+  }, [filteredTasks, startDate, endDate]);
+
+  // ----- Chart Data -----
+  const chartData = useMemo(() => {
+    const completedCount = filteredTasks.filter(t => t.completed).length;
+    const overdueCount = filteredTasks.filter(t => {
+      if (t.completed || !t.endDate) return false;
+      const d = parseDate(t.endDate);
+      return (
+        d < now ||
+        (d.getTime() === now.getTime() && getMinute(t.endTime) < currentMinutes)
+      );
+    }).length;
+    const ongoingCount = filteredTasks.length - completedCount - overdueCount;
+
+    return { ongoingCount, overdueCount, completedCount };
+  }, [filteredTasks]);
+
+  return { filteredTasks, groupedSections, chartData };
+};

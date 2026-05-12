@@ -195,10 +195,7 @@ const CreateTaskScreen = () => {
             ></TimePicker>
 
             <View>
-              <TouchableOpacity
-                onPress={() => handleOpenCalendar('endDate')}
-                style={{ flex: 1 }}
-              >
+              <TouchableOpacity onPress={() => handleOpenCalendar('endDate')}>
                 <View pointerEvents="none">
                   <FormInput
                     label="End Date"
@@ -227,7 +224,6 @@ const CreateTaskScreen = () => {
                   setCurrentField('endTime');
                   setTimeModalVisible(true);
                 }}
-                style={{ flex: 1 }}
               >
                 <View pointerEvents="none">
                   <FormInput
