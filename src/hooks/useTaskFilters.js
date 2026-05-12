@@ -16,13 +16,14 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
       tasksToFilter = tasksToFilter.filter(task => !task.completed);
     }
 
-    if (startDate && endDate) {
+    if (startDate) {
       const start = parseDate(startDate);
-      const end = parseDate(endDate);
+      const end = endDate ? parseDate(endDate) : now;
       if (start && end) {
         tasksToFilter = tasksToFilter.filter(task => {
           const taskDate = parseDate(task.date);
-          return taskDate && taskDate >= start && taskDate <= end;
+          const actualEndDate = start > end ? start : end;
+          return taskDate && taskDate >= start && taskDate <= actualEndDate;
         });
       }
     } else {
@@ -98,7 +99,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
 
   // ----- Section List -----
   const groupedSections = useMemo(() => {
-    if (!startDate || !endDate) return [];
+    if (!startDate) return [];
     const groups = {};
     filteredTasks.forEach(task => {
       if (!groups[task.date]) groups[task.date] = [];
@@ -121,8 +122,19 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
       );
     }).length;
     const ongoingCount = filteredTasks.length - completedCount - overdueCount;
+    const isFuture = startDate ? false : parseDate(selectedDate) > now;
+    const pendingCount = filteredTasks.filter(t => {
+      const taskDate = parseDate(t.date);
+      return !t.completed && taskDate > now;
+    }).length;
 
-    return { ongoingCount, overdueCount, completedCount };
+    return {
+      ongoingCount,
+      overdueCount,
+      completedCount,
+      pendingCount,
+      isFuture,
+    };
   }, [filteredTasks]);
 
   return { filteredTasks, groupedSections, chartData };

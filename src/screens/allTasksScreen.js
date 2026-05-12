@@ -29,7 +29,7 @@ import DateList from '../components/DateList';
 
 const AllTasksScreen = ({ navigation }) => {
   // -----THEME-----
-  const { theme, isDarkMode } = useTheme();
+  const { theme } = useTheme();
   const screenStyles = getStyles(theme);
   // --------------------------------------------------
   const dateListRef = useRef(null);
@@ -95,7 +95,6 @@ const AllTasksScreen = ({ navigation }) => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  // ----- Filtered Tasks For Date Filtering -----
   const { filteredTasks, groupedSections, chartData } = useTaskFilters(
     tasks,
     filters,
@@ -103,8 +102,24 @@ const AllTasksScreen = ({ navigation }) => {
   );
 
   // ----- Chart Data in array form -----
-  const chartDataRaw = useMemo(
-    () => [
+  const chartDataRaw = useMemo(() => {
+    const { isFuture } = chartData;
+    if (isFuture) {
+      return [
+        {
+          value: chartData.pendingCount,
+          color: theme.chartPending,
+          label: 'Pending Tasks',
+          onPress: () =>
+            setSelectedData({
+              label: 'Pending',
+              value: chartData.pendingCount,
+              color: theme.chartPending,
+            }),
+        },
+      ];
+    }
+    return [
       {
         value: chartData.ongoingCount,
         color: theme.chartOngoing,
@@ -138,9 +153,19 @@ const AllTasksScreen = ({ navigation }) => {
             color: theme.chartCompleted,
           }),
       },
-    ],
-    [theme, chartData],
-  );
+      {
+        value: chartData.pendingCount,
+        color: theme.chartPending,
+        label: 'Pending Tasks',
+        onPress: () =>
+          setSelectedData({
+            label: 'Pending',
+            value: chartData.pendingCount,
+            color: theme.chartPending,
+          }),
+      },
+    ];
+  }, [theme, chartData]);
 
   useEffect(() => {
     if (selectedData.label === 'Total') {
@@ -269,7 +294,7 @@ const AllTasksScreen = ({ navigation }) => {
           />
         )}
 
-        {startDate && endDate ? (
+        {startDate ? (
           <SectionList
             sections={groupedSections}
             keyExtractor={item => item.id}

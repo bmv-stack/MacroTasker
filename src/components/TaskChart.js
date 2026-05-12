@@ -61,12 +61,17 @@ const TaskChart = ({
         />
       </TouchableOpacity>
       <View style={styles.dotContainer}>
-        {chartData.map((item, index) => (
-          <View key={index} style={styles.chartItem}>
-            <View style={[styles.dot, { backgroundColor: item.color }]} />
-            <Text style={styles.dotText}>{item.label}</Text>
-          </View>
-        ))}
+        {chartData.map((item, index) => {
+          if (item.label === 'Pending Tasks' && item.value === 0) {
+            return null;
+          }
+          return (
+            <View key={index} style={styles.chartItem}>
+              <View style={[styles.dot, { backgroundColor: item.color }]} />
+              <Text style={styles.dotText}>{item.label}</Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );

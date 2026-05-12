@@ -72,7 +72,7 @@ export const getStyles = theme => {
       width: '100%',
     },
     dotContainer: {
-      justifyContent: 'space-between',
+      justifyContent: 'space-evenly',
       flexDirection: 'row',
       width: '107%',
       marginTop: 20,
