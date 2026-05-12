@@ -8,17 +8,18 @@ import {
   StatusBar,
 } from 'react-native';
 import { useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
 import React from 'react';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
+import { getStyles } from './TaskDetailScreen.styles';
 
-const TaskDetailScreen = ({ route }) => {
+const TaskDetailScreen = ({ navigation, route }) => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const styles = getStyles(theme);
-  const navigation = useNavigation();
+
   const { task: initialTask } = route.params;
   const task = useSelector(state =>
     state.tasks.items.find(t => t.id === initialTask.id),
@@ -95,69 +96,3 @@ const TaskDetailScreen = ({ route }) => {
 };
 
 export default TaskDetailScreen;
-
-const getStyles = theme =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.background,
-      paddingTop: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
-    },
-    scrollContent: { padding: 20 },
-    badge: {
-      alignSelf: 'flex-start',
-      paddingHorizontal: 12,
-      paddingVertical: 4,
-      borderRadius: 8,
-      marginBottom: 15,
-    },
-    badgeText: { fontWeight: 'bold', color: theme.textBadge, fontSize: 12 },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: theme.textPrimary,
-      marginBottom: 20,
-    },
-    infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-    infoText: { marginLeft: 10, color: theme.textPrimary, fontSize: 16 },
-    divider: {
-      height: 1,
-      backgroundColor: theme.borderLight,
-      marginVertical: 20,
-    },
-    sectionLabel: {
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: theme.textMuted,
-      marginBottom: 10,
-      textTransform: 'uppercase',
-    },
-    notesText: { fontSize: 16, color: theme.textPrimary, lineHeight: 24 },
-    editBtn: {
-      position: 'absolute',
-      bottom: 30,
-      right: 20,
-      backgroundColor: theme.textPrimary,
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      justifyContent: 'center',
-      alignItems: 'center',
-      elevation: 5,
-    },
-    backArrow: {
-      color: theme.textPrimary,
-      fontSize: 30,
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: theme.textPrimary,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 20,
-    },
-  });
