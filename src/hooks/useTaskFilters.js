@@ -55,24 +55,29 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
     }
 
     return tasksToFilter.sort((a, b) => {
-      if (a.completed !== b.completed) return a.completed ? 1 : -1;
-      const priorityOrder = { High: 3, Normal: 2, Low: 1 };
-      switch (sortOrder) {
-        case 'priorityHigh':
-          return (
-            priorityOrder[b.priority || 'Normal'] -
-            priorityOrder[a.priority || 'Normal']
-          );
-        case 'priorityLow':
-          return (
-            priorityOrder[a.priority || 'Normal'] -
-            priorityOrder[b.priority || 'Normal']
-          );
-        case 'desc':
-          return b.title.localeCompare(a.title);
-        default:
-          return a.title.localeCompare(b.title);
+      if (sortOrder !== '') {
+        const priorityOrder = { High: 3, Normal: 2, Low: 1 };
+        switch (sortOrder) {
+          case 'priorityHigh':
+            return (
+              priorityOrder[b.priority || 'Normal'] -
+              priorityOrder[a.priority || 'Normal']
+            );
+          case 'priorityLow':
+            return (
+              priorityOrder[a.priority || 'Normal'] -
+              priorityOrder[b.priority || 'Normal']
+            );
+          case 'desc':
+            return b.title.localeCompare(a.title);
+          default:
+            return a.title.localeCompare(b.title);
+        }
       }
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+      return a.title.localeCompare(b.title);
     });
   }, [tasks, selectedDate, status, sortOrder, startDate, endDate]);
 
