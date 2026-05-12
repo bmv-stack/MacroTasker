@@ -12,6 +12,10 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
   const filteredTasks = useMemo(() => {
     let tasksToFilter = [...tasks];
 
+    if (sortOrder === 'dueDate') {
+      tasksToFilter = tasksToFilter.filter(task => !task.completed);
+    }
+
     if (startDate && endDate) {
       const start = parseDate(startDate);
       const end = parseDate(endDate);
@@ -56,6 +60,17 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
 
     return tasksToFilter.sort((a, b) => {
       if (sortOrder !== '') {
+        if (sortOrder === 'dueDate') {
+          const firstDate = parseDate(a.endDate || a.date);
+          const secondDate = parseDate(b.endDate || b.date);
+
+          if (firstDate.getTime() !== secondDate.getTime()) {
+            return firstDate - secondDate;
+          }
+          const timeA = getMinute(a.endTime || a.time);
+          const timeB = getMinute(b.endTime || b.time);
+          return timeA - timeB;
+        }
         const priorityOrder = { High: 3, Normal: 2, Low: 1 };
         switch (sortOrder) {
           case 'priorityHigh':

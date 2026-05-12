@@ -152,6 +152,24 @@ const FilterScreen = () => {
                 />
                 <Text style={styles.checkboxLabel}>Priority: Low To High</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.checkboxRow}
+                onPress={() => setDraft({ ...draft, sortOrder: 'dueDate' })}
+              >
+                <Icon
+                  name={
+                    draft.sortOrder === 'dueDate'
+                      ? 'checkbox'
+                      : 'square-outline'
+                  }
+                  size={24}
+                  color={theme.accent}
+                />
+                <Text style={styles.checkboxLabel}>
+                  Due Date (Earliest First)
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
 
