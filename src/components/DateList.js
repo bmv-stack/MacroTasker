@@ -4,11 +4,6 @@ import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
 
 const DateList = ({ item, selectedDate, setSelectedDate }) => {
-  console.log(
-    `Card: ${item.fullDate} | selected: ${selectedDate} | match: ${
-      item.fullDate === selectedDate
-    }`,
-  );
   const { theme, isDarkMode } = useTheme();
   const screenStyles = getStyles(theme);
   const isSelected = item.fullDate.trim() === selectedDate.trim();
