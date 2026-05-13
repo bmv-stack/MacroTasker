@@ -34,7 +34,7 @@ export const getStyles = theme => {
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 12,
-      backgroundColor: theme.dateCard,
+      //backgroundColor: theme.dateCard,
       marginRight: 10,
       borderWidth: 1,
       borderColor: theme.borderLight,

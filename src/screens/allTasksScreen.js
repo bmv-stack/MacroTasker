@@ -37,9 +37,8 @@ const AllTasksScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const tasks = useSelector(state => state.tasks.items);
   const filters = useSelector(state => state.filters);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0],
-  );
+  const todayDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const [selectedDate, setSelectedDate] = useState(todayDate);
   // -----FILTER TASKS States-----
   const { sortOrder, status, endDate, startDate } = filters;
 
@@ -278,6 +277,9 @@ const AllTasksScreen = ({ navigation }) => {
               extraData={selectedDate}
               keyExtractor={item => item.fullDate}
               initialScrollIndex={30}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
               showsHorizontalScrollIndicator={false}
               getItemLayout={(data, index) => ({
                 length: 55,

@@ -4,20 +4,25 @@ import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
 
 const DateList = ({ item, selectedDate, setSelectedDate }) => {
+  console.log(
+    `Card: ${item.fullDate} | selected: ${selectedDate} | match: ${
+      item.fullDate === selectedDate
+    }`,
+  );
   const { theme, isDarkMode } = useTheme();
   const screenStyles = getStyles(theme);
-  const isSelected = item.fullDate === selectedDate;
+  const isSelected = item.fullDate.trim() === selectedDate.trim();
   const [monthName, dayName] = item.dayName.split(' ');
-  let backgroundColor;
-  if (isSelected) {
-    backgroundColor = isDarkMode ? theme.white : theme.blackSecondary;
-  }
-  let textColor;
-  if (isSelected) {
-    textColor = isDarkMode ? '#000' : theme.white;
-  } else {
-    textColor = theme.textMuted;
-  }
+  const backgroundColor = isSelected
+    ? isDarkMode
+      ? theme.white
+      : theme.blackSecondary
+    : theme.surface;
+  const textColor = isSelected
+    ? isDarkMode
+      ? '#000'
+      : theme.white
+    : theme.textMuted;
   return (
     <TouchableOpacity
       onPress={() => setSelectedDate(item.fullDate)}
@@ -36,4 +41,11 @@ const DateList = ({ item, selectedDate, setSelectedDate }) => {
   );
 };
 
-export default DateList;
+export default React.memo(DateList, (prev, next) => {
+  const prevSelected = prev.item.fullDate === prev.selectedDate;
+  const nextSelected = next.item.fullDate === next.selectedDate;
+
+  return (
+    prevSelected === nextSelected && prev.selectedDate === next.selectedDate
+  );
+});

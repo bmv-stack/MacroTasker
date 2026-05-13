@@ -31,7 +31,7 @@ const commonColors = {
 export const lightTheme = {
   ...commonColors,
   background: '#F8F9FA',
-  surface: '#FFFFFF',
+  surface: '#F5F5F5',
   textPrimary: '#000000',
   textSecondary: '#333333',
   textMuted: '#8E8E93',
