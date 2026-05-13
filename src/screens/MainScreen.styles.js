@@ -81,21 +81,24 @@ export const getStyles = theme => {
       color: theme.white,
     },
     emptyTaskContainer: {
+      flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: 40,
-      paddingVertical: 10,
+      //paddingVertical: 10,
     },
     emptyTaskText: {
       fontWeight: 'bold',
       fontSize: 16,
       color: theme.textMuted,
+      textAlign: 'center',
     },
     scrollContainer: {
       paddingBottom: 20,
     },
     taskContainer: {
+      flex: 1,
       marginTop: 5,
+      minHeight: '80%',
     },
   };
 };

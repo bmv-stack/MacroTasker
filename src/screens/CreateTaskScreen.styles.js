@@ -23,7 +23,6 @@ export const getStyles = theme => {
     },
     backArrow: {
       color: theme.textPrimary,
-      fontSize: 30,
     },
     headerTitle: {
       fontSize: 20,

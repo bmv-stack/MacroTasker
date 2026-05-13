@@ -40,25 +40,14 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
 
     if (status !== '') {
       tasksToFilter = tasksToFilter.filter(t => {
+        const isEndDate = !!t.endDate;
+        const endD = isEndDate ? parseDate(t.endDate) : null;
         const isOverdue =
           !t.completed &&
-          (() => {
-            const effectiveEndDate = t.endDate
-              ? t.endDate
-              : t.endTime
-              ? t.date
-              : t.date;
-            const endDate = parseDate(effectiveEndDate);
-            if (!endDate) return false;
-            if (endDate < now) return true;
-
-            if (endDate.getTime() === now.getTime()) {
-              const effectiveEndTime = t.endTime || t.time;
-              return getMinute(effectiveEndTime) < currentMinutes;
-            }
-            return false;
-          })();
-
+          isEndDate &&
+          (endD < now ||
+            (endD.getTime() === now.getTime() &&
+              getMinute(t.endTime) < currentMinutes));
         if (status === 'Completed') return t.completed;
         if (status === 'Overdue') return isOverdue;
         if (status === 'Ongoing') {

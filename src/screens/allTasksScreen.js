@@ -415,7 +415,7 @@ const AllTasksScreen = ({ navigation }) => {
       {/* UNDO Modal */}
       {undoVisible && (
         <View style={screenStyles.undoMessage}>
-          <Text style={screenStyles.undoText}>Task Deleted</Text>
+          <Text style={screenStyles.undoText}>Task deleted</Text>
           <TouchableOpacity onPress={handleUndo}>
             <Text style={screenStyles.undoBtn}>UNDO</Text>
           </TouchableOpacity>

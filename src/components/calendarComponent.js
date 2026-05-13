@@ -13,7 +13,7 @@ const CalendarComponent = ({
   allowPastDates = false,
   useModal = true,
 }) => {
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const styles = getStyles(theme);
 
   const today = todayDate();
@@ -48,7 +48,9 @@ const CalendarComponent = ({
         markedDates={{
           [tempSelectedDate]: {
             selected: true,
-            selectedColor: theme.black,
+            selectedColor: isDarkMode
+              ? theme.blackSecondary
+              : theme.textPrimary,
             selectedTextColor: theme.white,
           },
         }}

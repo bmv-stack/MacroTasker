@@ -88,8 +88,8 @@ const CreateTaskScreen = () => {
     form.title.length > 0 &&
     form.date.length > 0 &&
     form.time.length > 0 &&
-    isTimeValid();
-  //&& isStartValid();
+    isTimeValid() &&
+    isStartValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -112,7 +112,7 @@ const CreateTaskScreen = () => {
       navigation.goBack();
     }, 1500);
   };
-  // TODO: Move getInitialDate() into a separate utility file
+
   const todayDate = (date = new Date()) => {
     return date.toISOString().split('T')[0];
   };
@@ -136,7 +136,7 @@ const CreateTaskScreen = () => {
         >
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Text style={styles.backArrow}>←</Text>
+              <Icon name="arrow-back" size={30} color={theme.textPrimary} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create Task</Text>
             <TouchableOpacity

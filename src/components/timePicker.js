@@ -40,7 +40,7 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
     };
     return (
       <DateTimePicker
-        value={new Date()}
+        value={initialTime instanceof Date ? initialTime : new Date()}
         mode="time"
         is24Hour={false}
         display="default"
@@ -50,18 +50,27 @@ const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
   }
 
   useEffect(() => {
-    if (
-      visible &&
-      typeof initialTime === 'string' &&
-      initialTime.includes(':')
-    ) {
-      const [hour24, m, s] = initialTime.split(':');
-      let hourValue = parseInt(hour24, 10);
+    if (visible) {
+      let dateToParse = new Date();
+      if (initialTime instanceof Date) {
+        dateToParse = initialTime;
+      } else if (typeof initialTime === 'string' && initialTime.includes(':')) {
+        const [hour24, m, s] = initialTime.split(':');
+        dateToParse = new Date();
+        dateToParse.setHours(
+          parseInt(hour24, 10),
+          parseInt(m, 10),
+          parseInt(s, 10),
+        );
+      }
+      let h = dateToParse.getHours();
+      let m = dateToParse.getMinutes().toString().padStart(2, '0');
+      let s = dateToParse.getSeconds().toString().padStart(2, '0');
 
-      const meridiem = hourValue >= 12 ? 'PM' : 'AM';
-      hourValue = hourValue % 12 || 12;
+      const meridiem = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
 
-      setSelectedHours(hourValue.toString().padStart(2, '0'));
+      setSelectedHours(h.toString().padStart(2, '0'));
       setSelectedMinutes(m);
       setSelectedSeconds(s);
       setSelectedMeridiem(meridiem);

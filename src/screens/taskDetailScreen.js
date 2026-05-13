@@ -1,12 +1,5 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
 import React from 'react';
@@ -34,7 +27,7 @@ const TaskDetailScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backArrow}>←</Text>
+          <Icon name="arrow-back" size={30} color={theme.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Task Detail</Text>
         <TouchableOpacity
