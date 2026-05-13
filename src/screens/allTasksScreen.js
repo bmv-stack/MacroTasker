@@ -43,6 +43,8 @@ const AllTasksScreen = ({ navigation }) => {
   // -----FILTER TASKS States-----
   const { sortOrder, status, endDate, startDate } = filters;
 
+  const [chartKey, setChartKey] = useState(0);
+
   // -----UNDO States-----
   const [undoVisible, setUndoVisible] = useState(false);
 
@@ -177,12 +179,22 @@ const AllTasksScreen = ({ navigation }) => {
     }
   }, [filteredTasks.length, selectedData.label]);
 
+  useEffect(() => {
+    setSelectedData({
+      label: 'Total',
+      value: filteredTasks.length,
+      color: theme.blackSecondary,
+    });
+    setChartKey(chartKey + 1);
+  }, [selectedDate, filteredTasks.length]);
+
   const resetTotal = () => {
     setSelectedData({
       label: 'Total',
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
+    //setChartKey(chartKey + 1);
   };
 
   const handlePriorityChange = (taskId, newPriority) => {
@@ -291,6 +303,7 @@ const AllTasksScreen = ({ navigation }) => {
             startDate={startDate}
             endDate={endDate}
             resetTotal={resetTotal}
+            chartKey={chartKey}
           />
         )}
 

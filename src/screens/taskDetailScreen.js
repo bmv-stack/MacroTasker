@@ -4,8 +4,6 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Platform,
-  StatusBar,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 
@@ -67,14 +65,14 @@ const TaskDetailScreen = ({ navigation, route }) => {
             color={theme.textMuted}
           ></Icon>
           <Text style={styles.infoText}>
-            Created At: {formatDate(task.date)} at {formatTime(task.time)}
+            Assigned: {formatDate(task.date)} at {formatTime(task.time)}
           </Text>
         </View>
         <View style={styles.infoRow}>
           <Icon name="skull" size={20} color={theme.textMuted}></Icon>
           <Text style={styles.infoText}>
-            Ending At: {formatDate(task.endDate) || 'Not set'} at{' '}
-            {formatTime(task.endTime) || ''}
+            Deadline: {task.endDate ? formatDate(task.endDate) : 'Not set'}{' '}
+            {task.endTime ? `at ${formatTime(task.endTime)}` : ' '}
           </Text>
         </View>
         <View style={styles.divider}></View>

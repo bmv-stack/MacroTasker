@@ -3,7 +3,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
-import { parseDate } from '../screens/createTaskScreen';
+import { parseDate } from '../utils/parseDate';
 import { getMinute } from '../utils/getMinutes';
 import { useTheme } from '../contexts/ThemeContext';
 import { getStyles } from '../screens/AllTasksScreen.styles';

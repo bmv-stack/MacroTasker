@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
-import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setFilters,
@@ -12,11 +11,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import CalendarComponent from '../components/calendarComponent';
 import { getStyles } from './FilterScreen.styles';
 
-const FilterScreen = () => {
+const FilterScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const dispatch = useDispatch();
-  const navigation = useNavigation();
 
   const currentFilters = useSelector(state => state.filters);
 

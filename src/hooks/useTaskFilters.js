@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { parseDate } from '../screens/createTaskScreen';
+import { parseDate } from '../utils/parseDate';
 import { getMinute } from '../utils/getMinutes';
 
 export const useTaskFilters = (tasks, filters, selectedDate) => {
@@ -40,17 +40,26 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
 
     if (status !== '') {
       tasksToFilter = tasksToFilter.filter(t => {
-        const isEndDate = !!t.endDate;
-        const endD = isEndDate ? parseDate(t.endDate) : null;
-        if (status === 'Completed') return t.completed;
-
         const isOverdue =
           !t.completed &&
-          isEndDate &&
-          (endD < now ||
-            (endD.getTime() === now.getTime() &&
-              getMinute(t.endTime) < currentMinutes));
+          (() => {
+            const effectiveEndDate = t.endDate
+              ? t.endDate
+              : t.endTime
+              ? t.date
+              : t.date;
+            const endDate = parseDate(effectiveEndDate);
+            if (!endDate) return false;
+            if (endDate < now) return true;
 
+            if (endDate.getTime() === now.getTime()) {
+              const effectiveEndTime = t.endTime || t.time;
+              return getMinute(effectiveEndTime) < currentMinutes;
+            }
+            return false;
+          })();
+
+        if (status === 'Completed') return t.completed;
         if (status === 'Overdue') return isOverdue;
         if (status === 'Ongoing') {
           return !t.completed && !isOverdue && !(parseDate(t.date) > now);

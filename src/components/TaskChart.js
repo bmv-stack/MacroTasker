@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import { Text, View, TouchableOpacity } from 'react-native';
+import React from 'react';
 import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
 import { PieChart } from 'react-native-gifted-charts';
@@ -7,13 +7,13 @@ import { PieChart } from 'react-native-gifted-charts';
 const TaskChart = ({
   chartData,
   selectedData,
+  chartKey,
   resetTotal,
   startDate,
   endDate,
 }) => {
   const { theme, isDarkMode } = useTheme();
   const styles = getStyles(theme);
-  const [chartKey, setChartKey] = useState(0);
   if (!chartData || chartData.length === 0) return null;
   return (
     <View style={styles.chartContainer}>
