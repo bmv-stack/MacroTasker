@@ -1,7 +1,7 @@
-import { Platform, StatusBar } from 'react-native';
+import { StyleSheet, Platform, StatusBar } from 'react-native';
 
-export const getStyles = theme => {
-  return {
+export const getStyles = theme =>
+  StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.background,
@@ -324,5 +324,4 @@ export const getStyles = theme => {
     filterIconContainer: {
       flexDirection: 'row',
     },
-  };
-};
+  });

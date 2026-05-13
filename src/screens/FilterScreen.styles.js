@@ -1,7 +1,7 @@
-import { StatusBar, Platform } from 'react-native';
+import { StyleSheet, StatusBar, Platform } from 'react-native';
 
-export const getStyles = theme => {
-  return {
+export const getStyles = theme =>
+  StyleSheet.create({
     drawerOverlay: {
       position: 'absolute',
       top: 0,
@@ -110,5 +110,4 @@ export const getStyles = theme => {
       marginRight: 8,
       marginLeft: 8,
     },
-  };
-};
+  });

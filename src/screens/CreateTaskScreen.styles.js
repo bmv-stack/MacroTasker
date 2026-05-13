@@ -1,7 +1,7 @@
-import { StatusBar, Platform } from 'react-native';
+import { StyleSheet, StatusBar, Platform } from 'react-native';
 
-export const getStyles = theme => {
-  return {
+export const getStyles = theme =>
+  StyleSheet({
     container: {
       flex: 1,
       backgroundColor: theme.background,
@@ -125,5 +125,4 @@ export const getStyles = theme => {
       padding: 10,
       zIndex: 10,
     },
-  };
-};
+  });

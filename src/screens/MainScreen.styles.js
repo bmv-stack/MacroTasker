@@ -1,7 +1,7 @@
-import { StatusBar, Platform } from 'react-native';
+import { StatusBar, Platform, StyleSheet } from 'react-native';
 
-export const getStyles = theme => {
-  return {
+export const getStyles = theme =>
+  StyleSheet.create({
     safeArea: {
       flex: 1,
       backgroundColor: theme.background,
@@ -100,5 +100,4 @@ export const getStyles = theme => {
       marginTop: 5,
       minHeight: '80%',
     },
-  };
-};
+  });
