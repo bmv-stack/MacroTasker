@@ -3,11 +3,6 @@ import React, { useMemo } from 'react';
 import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
 const DateList = ({ item, selectedDate, setSelectedDate }) => {
-  console.log(
-    `Card: ${item.fullDate} || Selected: ${selectedDate} || Matches: ${
-      item.fullDate === selectedDate
-    }`,
-  );
   const { theme, isDarkMode } = useTheme();
   const screenStyles = useMemo(() => getStyles(theme), [theme]);
   const isSelected = item.fullDate.trim() === selectedDate.trim();

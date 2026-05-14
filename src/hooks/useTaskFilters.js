@@ -56,7 +56,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
         if (status === 'Completed') return t.completed;
         if (status === 'Overdue') return isOverdueTask;
         if (status === 'Ongoing') {
-          return !t.completed && !isOverdue && !(parseDate(t.date) > now);
+          return !t.completed && !isOverdueTask && !(parseDate(t.date) > now);
         }
         return true;
       });

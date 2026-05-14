@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from 'react';
 import {
   View,
   Text,
@@ -72,7 +78,31 @@ const AllTasksScreen = ({ navigation }) => {
     visible: false,
     taskId: null,
   });
+  const handleEdit = useCallback(item => {
+    navigation.navigate('CreateTask', { existingTask: item }, [navigation]);
+  });
 
+  const handleDelete = useCallback(item => {
+    setDeleteModal(
+      {
+        visible: true,
+        taskId: item.id,
+        taskTitle: item.title,
+      },
+      [],
+    );
+
+    const handleComplete = useCallback(
+      id => {
+        dispatch(completeTask(id));
+      },
+      [dispatch],
+    );
+  });
+
+  const handlePriority = useCallback(id => {
+    setPriorityModal({ visible: true, taskId: id }, []);
+  });
   // ----- Chart Data -----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
@@ -327,20 +357,10 @@ const AllTasksScreen = ({ navigation }) => {
               <TaskCard
                 task={item}
                 navigation={navigation}
-                onEdit={() =>
-                  navigation.navigate('CreateTask', { existingTask: item })
-                }
-                onDelete={() =>
-                  setDeleteModal({
-                    visible: true,
-                    taskId: item.id,
-                    taskTitle: item.title,
-                  })
-                }
-                onComplete={() => dispatch(completeTask(item.id))}
-                onPriority={() =>
-                  setPriorityModal({ visible: true, taskId: item.id })
-                }
+                onEdit={handleEdit(item)}
+                onDelete={handleDelete(item)}
+                onComplete={handleComplete(item.id)}
+                onPriority={handlePriority(item.id)}
               />
             )}
             ListEmptyComponent={() => (
