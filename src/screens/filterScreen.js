@@ -1,5 +1,5 @@
 import { Text, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -13,7 +13,7 @@ import { getStyles } from './FilterScreen.styles';
 
 const FilterScreen = ({ navigation }) => {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const dispatch = useDispatch();
 
   const currentFilters = useSelector(state => state.filters);

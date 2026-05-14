@@ -50,7 +50,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
       }
     }
 
-    if (status !== '') {
+    if (status !== 'All') {
       tasksToFilter = tasksToFilter.filter(t => {
         const isOverdueTask = isOverdue(t);
         if (status === 'Completed') return t.completed;
@@ -63,7 +63,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
     }
 
     return tasksToFilter.sort((a, b) => {
-      if (sortOrder !== '') {
+      if (sortOrder !== 'asc') {
         if (sortOrder === 'dueDate') {
           const firstDate = parseDate(a.endDate || a.date);
           const secondDate = parseDate(b.endDate || b.date);

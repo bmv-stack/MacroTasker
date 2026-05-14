@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Entypo';
 import { useTheme } from '../contexts/ThemeContext';
@@ -14,7 +14,7 @@ const CalendarComponent = ({
   useModal = true,
 }) => {
   const { theme, isDarkMode } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
   const today = todayDate();
 

@@ -6,14 +6,14 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../contexts/ThemeContext';
 
 const TimePicker = ({ visible, onClose, onSelect, initialTime }) => {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const [selectedHours, setSelectedHours] = useState('12');
   const [selectedMinutes, setSelectedMinutes] = useState('00');
   const [selectedSeconds, setSelectedSeconds] = useState('00');

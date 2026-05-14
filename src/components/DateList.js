@@ -1,11 +1,15 @@
 import { Text, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
-
 const DateList = ({ item, selectedDate, setSelectedDate }) => {
+  console.log(
+    `Card: ${item.fullDate} || Selected: ${selectedDate} || Matches: ${
+      item.fullDate === selectedDate
+    }`,
+  );
   const { theme, isDarkMode } = useTheme();
-  const screenStyles = getStyles(theme);
+  const screenStyles = useMemo(() => getStyles(theme), [theme]);
   const isSelected = item.fullDate.trim() === selectedDate.trim();
   const [monthName, dayName] = item.dayName.split(' ');
   const backgroundColor = isSelected
@@ -40,7 +44,9 @@ export default React.memo(DateList, (prev, next) => {
   const prevSelected = prev.item.fullDate === prev.selectedDate;
   const nextSelected = next.item.fullDate === next.selectedDate;
 
-  return (
-    prevSelected === nextSelected && prev.selectedDate === next.selectedDate
-  );
+  const itemChanged = prev.item.fullDate !== next.item.fullDate;
+  const selectionChanged = prevSelected !== nextSelected;
+
+  // Return true if props are EQUAL (no re-render), false if different (re-render)
+  return !itemChanged && !selectionChanged;
 });

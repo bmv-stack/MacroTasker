@@ -30,7 +30,7 @@ import DateList from '../components/DateList';
 const AllTasksScreen = ({ navigation }) => {
   // -----THEME-----
   const { theme } = useTheme();
-  const screenStyles = getStyles(theme);
+  const screenStyles = useMemo(() => getStyles(theme), [theme]);
   // --------------------------------------------------
   const dateListRef = useRef(null);
   // --------------------------------------------------
@@ -277,9 +277,9 @@ const AllTasksScreen = ({ navigation }) => {
               extraData={selectedDate}
               keyExtractor={item => item.fullDate}
               initialScrollIndex={30}
-              // removeClippedSubviews={true}
-              // maxToRenderPerBatch={10}
-              // windowSize={5}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
               showsHorizontalScrollIndicator={false}
               getItemLayout={(data, index) => ({
                 length: 55,

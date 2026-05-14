@@ -1,5 +1,5 @@
 import { Text, View, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useTheme } from '../contexts/ThemeContext';
 import { PieChart } from 'react-native-gifted-charts';
@@ -13,7 +13,7 @@ const TaskChart = ({
   endDate,
 }) => {
   const { theme, isDarkMode } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   if (!chartData || chartData.length === 0) return null;
   return (
     <View style={styles.chartContainer}>

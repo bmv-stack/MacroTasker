@@ -2,14 +2,14 @@ import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../contexts/ThemeContext';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { formatDate } from '../utils/formatDate';
 import { formatTime } from '../utils/formatTime';
 import { getStyles } from './TaskDetailScreen.styles';
 
 const TaskDetailScreen = ({ navigation, route }) => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
   const { task: initialTask } = route.params;
   const task = useSelector(state =>

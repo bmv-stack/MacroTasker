@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import AppBar from '../components/appBar';
 import SwitchTabs from '../components/tabPills';
@@ -9,7 +9,7 @@ import { getStyles } from './MainScreen.styles';
 
 const MainScreen = ({ navigation, route }) => {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const tasks = useSelector(state => state.tasks.items);
   const [activeTab, setActiveTab] = useState(
     route.params?.openScreen || 'Focus',

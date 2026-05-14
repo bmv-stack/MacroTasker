@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -25,7 +25,7 @@ import { parseDate } from '../utils/parseDate';
 
 const CreateTaskScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const scrollRef = useRef(null);
   const navigation = useNavigation();
   const route = useRoute();

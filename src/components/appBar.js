@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import logo from '../../assets/final_logo.png';
@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 
 const AppBar = ({ title = 'APP NAME', onIconPress }) => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
   const handleToggleTheme = () => {
     toggleTheme();

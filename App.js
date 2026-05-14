@@ -142,7 +142,8 @@ const RootStackScreen = () => (
       name="FilterScreen"
       component={FilterScreen}
       options={{
-        animation: Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_left',
+        animation:
+          Platform.OS === 'ios' ? 'ios_from_right' : 'slide_from_right',
       }}
     />
   </RootStack.Navigator>

@@ -8,11 +8,12 @@ import { getMinute } from '../utils/getMinutes';
 import { useTheme } from '../contexts/ThemeContext';
 import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useNavigation } from '@react-navigation/native';
+import { useMemo } from 'react';
 
 const TaskCard = ({ task, onEdit, onDelete, onComplete, onPriority }) => {
   const navigation = useNavigation();
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   now.setHours(0, 0, 0, 0);

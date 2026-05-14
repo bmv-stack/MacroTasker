@@ -1,11 +1,11 @@
 import { StyleSheet, View, Image } from 'react-native';
-import React from 'react';
+import React, { useMemo } from 'react';
 import logo from '../../assets/final_logo.png';
 import { useTheme } from '../contexts/ThemeContext';
 
 const SplashScreen = () => {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   return (
     <View style={styles.container}>
       <Image source={logo} style={styles.logo} resizeMode="cover"></Image>

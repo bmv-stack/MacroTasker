@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -12,7 +12,7 @@ const FormInput = ({
   ...props
 }) => {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles = useMemo(() => getStyles(theme), [theme]);
   return (
     <View style={styles.container}>
       <View style={styles.labelContainer}>
