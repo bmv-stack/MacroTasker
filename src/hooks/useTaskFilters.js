@@ -22,7 +22,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
       if (start && end) {
         tasksToFilter = tasksToFilter.filter(task => {
           const taskDate = parseDate(task.date);
-          const actualEndDate = start > end ? start : end;
+          const actualEndDate = start > end ? start : end; // If start > end, take startDate as endDate
           return taskDate && taskDate >= start && taskDate <= actualEndDate;
         });
       }
@@ -133,7 +133,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
       pendingCount,
       isFuture,
     };
-  }, [filteredTasks]);
+  }, [filteredTasks, selectedDate]);
 
   return { filteredTasks, groupedSections, chartData };
 };

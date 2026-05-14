@@ -69,6 +69,7 @@ const CreateTaskScreen = () => {
   };
 
   const isStartValid = () => {
+    if (existingTask) return true;
     if (!form.date || !form.time) return true;
     const selectedDate = parseDate(form.date);
     const today = new Date();

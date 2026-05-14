@@ -84,7 +84,6 @@ export const getStyles = theme =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      //paddingVertical: 10,
     },
     emptyTaskText: {
       fontWeight: 'bold',

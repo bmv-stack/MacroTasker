@@ -1,7 +1,7 @@
 import { StyleSheet, StatusBar, Platform } from 'react-native';
 
 export const getStyles = theme =>
-  StyleSheet({
+  StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.background,
