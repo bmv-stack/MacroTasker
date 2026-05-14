@@ -211,7 +211,7 @@ const AllTasksScreen = ({ navigation }) => {
       clearTimeout(undoTimer.current);
     }
   };
-  const isFiltered = sortOrder !== '' || status !== '' || !!startDate;
+  const isFiltered = sortOrder !== 'asc' || status !== 'All' || !!startDate;
 
   function handleReset() {
     dispatch(resetFilters());

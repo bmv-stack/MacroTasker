@@ -86,11 +86,10 @@ const CreateTaskScreen = () => {
   };
   // ----- Form Validation -----
   const isFormValid =
-    form.title.length > 0 &&
-    form.date.length > 0 &&
-    form.time.length > 0 &&
-    isTimeValid() &&
-    isStartValid();
+    form.title.length > 0 && form.date.length > 0 && form.time.length > 0;
+  // isTimeValid();
+  // &&
+  // isStartValid();
 
   const handleInputChange = (field, value) => {
     setForm({ ...form, [field]: value });

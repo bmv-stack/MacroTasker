@@ -33,15 +33,14 @@ const FilterScreen = ({ navigation }) => {
   const activeFilterCount = () => {
     let count = 0;
 
-    if (draft.sortOrder !== '') count++;
+    if (draft.sortOrder !== 'asc') count++;
 
-    if (draft.status !== '') count++;
+    if (draft.status !== 'All') count++;
 
     if (draft.startDate || draft.endDate) count++;
 
     return count;
   };
-  // TODO, if the user doesn't choose endDate in Date Filtering, set today's date as endDate
   const activeCount = activeFilterCount();
 
   return (
@@ -59,8 +58,8 @@ const FilterScreen = ({ navigation }) => {
         <View style={styles.drawerSideBar}>
           {['Sort', 'Type', 'Date'].map(tab => {
             const activeFilter =
-              (tab === 'Sort' && draft.sortOrder !== '') ||
-              (tab === 'Type' && draft.status !== '') ||
+              (tab === 'Sort' && draft.sortOrder !== 'asc') ||
+              (tab === 'Type' && draft.status !== 'All') ||
               (tab === 'Date' && (draft.startDate || draft.endDate));
             return (
               <TouchableOpacity
@@ -84,18 +83,20 @@ const FilterScreen = ({ navigation }) => {
             );
           })}
         </View>
-        {/* TODO: Implement Due Date (Earliest First) sorting option */}
         <View style={styles.drawerTabContent}>
           {/* SORT */}
           {currentTab === 'Sort' && (
             <View style={styles.tabSection}>
+              <Text style={styles.dateLabel}>Sort By:</Text>
               <TouchableOpacity
                 style={styles.checkboxRow}
                 onPress={() => setDraft({ ...draft, sortOrder: 'asc' })}
               >
                 <Icon
                   name={
-                    draft.sortOrder === 'asc' ? 'checkbox' : 'square-outline'
+                    draft.sortOrder === 'asc'
+                      ? 'radio-button-on'
+                      : 'radio-button-off'
                   }
                   size={24}
                   color={theme.accent}
@@ -109,7 +110,9 @@ const FilterScreen = ({ navigation }) => {
               >
                 <Icon
                   name={
-                    draft.sortOrder === 'desc' ? 'checkbox' : 'square-outline'
+                    draft.sortOrder === 'desc'
+                      ? 'radio-button-on'
+                      : 'radio-button-off'
                   }
                   size={24}
                   color={theme.accent}
@@ -126,8 +129,8 @@ const FilterScreen = ({ navigation }) => {
                 <Icon
                   name={
                     draft.sortOrder === 'priorityHigh'
-                      ? 'checkbox'
-                      : 'square-outline'
+                      ? 'radio-button-on'
+                      : 'radio-button-off'
                   }
                   size={24}
                   color={theme.accent}
@@ -142,8 +145,8 @@ const FilterScreen = ({ navigation }) => {
                 <Icon
                   name={
                     draft.sortOrder === 'priorityLow'
-                      ? 'checkbox'
-                      : 'square-outline'
+                      ? 'radio-button-on'
+                      : 'radio-button-off'
                   }
                   size={24}
                   color={theme.accent}
@@ -158,8 +161,8 @@ const FilterScreen = ({ navigation }) => {
                 <Icon
                   name={
                     draft.sortOrder === 'dueDate'
-                      ? 'checkbox'
-                      : 'square-outline'
+                      ? 'radio-button-on'
+                      : 'radio-button-off'
                   }
                   size={24}
                   color={theme.accent}

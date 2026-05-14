@@ -8,6 +8,18 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   now.setHours(0, 0, 0, 0);
 
+  const isOverdue = task => {
+    if (task.completed || !task.endDate) return false;
+    const endD = parseDate(task.endDate);
+
+    return (
+      endD < now ||
+      (endD.getTime() === now.getTime() &&
+        task.endTime &&
+        getMinute(task.endTime) < currentMinutes)
+    );
+  };
+
   // ----- Filtering and Sorting -----
   const filteredTasks = useMemo(() => {
     let tasksToFilter = [...tasks];
@@ -40,16 +52,9 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
 
     if (status !== '') {
       tasksToFilter = tasksToFilter.filter(t => {
-        const isEndDate = !!t.endDate;
-        const endD = isEndDate ? parseDate(t.endDate) : null;
-        const isOverdue =
-          !t.completed &&
-          isEndDate &&
-          (endD < now ||
-            (endD.getTime() === now.getTime() &&
-              getMinute(t.endTime) < currentMinutes));
+        const isOverdueTask = isOverdue(t);
         if (status === 'Completed') return t.completed;
-        if (status === 'Overdue') return isOverdue;
+        if (status === 'Overdue') return isOverdueTask;
         if (status === 'Ongoing') {
           return !t.completed && !isOverdue && !(parseDate(t.date) > now);
         }
@@ -111,14 +116,7 @@ export const useTaskFilters = (tasks, filters, selectedDate) => {
   // ----- Chart Data -----
   const chartData = useMemo(() => {
     const completedCount = filteredTasks.filter(t => t.completed).length;
-    const overdueCount = filteredTasks.filter(t => {
-      if (t.completed || !t.endDate) return false;
-      const d = parseDate(t.endDate);
-      return (
-        d < now ||
-        (d.getTime() === now.getTime() && getMinute(t.endTime) < currentMinutes)
-      );
-    }).length;
+    const overdueCount = filteredTasks.filter(t => isOverdue(t)).length;
     const ongoingCount = filteredTasks.length - completedCount - overdueCount;
     const isFuture = startDate ? false : parseDate(selectedDate) > now;
     const pendingCount = filteredTasks.filter(t => {

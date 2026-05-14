@@ -33,7 +33,7 @@ const TaskCard = ({ task, onEdit, onDelete, onComplete, onPriority }) => {
     return theme.chartOngoing;
   };
   const isEndDate = !!task.endDate;
-  const endDate = isEndDate ? parseDate(task.endDate) : null;
+  const endDate = parseDate(task.endDate);
   const isOverdue =
     !task.completed &&
     isEndDate &&
