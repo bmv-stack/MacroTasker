@@ -8,7 +8,7 @@ import { getMinute } from '../utils/getMinutes';
 import { useTheme } from '../contexts/ThemeContext';
 import { getStyles } from '../screens/AllTasksScreen.styles';
 import { useNavigation } from '@react-navigation/native';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 const TaskCard = ({ task, onEdit, onDelete, onComplete, onPriority }) => {
   const navigation = useNavigation();
@@ -142,4 +142,18 @@ const TaskCard = ({ task, onEdit, onDelete, onComplete, onPriority }) => {
     </View>
   );
 };
-export default TaskCard;
+
+export default React.memo(TaskCard, (prev, next) => {
+  return (
+    prev.task.id === next.task.id &&
+    prev.task.completed === next.task.completed &&
+    prev.task.priority === next.task.priority &&
+    prev.task.title === next.task.title &&
+    prev.task.date === next.task.date &&
+    prev.task.endDate === next.task.endDate &&
+    prev.onEdit === next.onEdit &&
+    prev.onDelete === next.onDelete &&
+    prev.onComplete === next.onComplete &&
+    prev.onPriority === next.onPriority
+  );
+});

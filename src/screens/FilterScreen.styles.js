@@ -2,18 +2,10 @@ import { StyleSheet, StatusBar, Platform } from 'react-native';
 
 export const getStyles = theme =>
   StyleSheet.create({
-    drawerOverlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: theme.surface,
-    },
     drawerContent: {
       flex: 1,
       backgroundColor: theme.surface,
-      paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+      paddingTop: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
     },
     drawerHeader: {
       flexDirection: 'row',

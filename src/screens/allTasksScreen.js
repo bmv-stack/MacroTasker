@@ -34,6 +34,7 @@ import TaskChart from '../components/TaskChart';
 import DateList from '../components/DateList';
 
 const AllTasksScreen = ({ navigation }) => {
+  console.log('All Tasks Screen mounted');
   // -----THEME-----
   const { theme } = useTheme();
   const screenStyles = useMemo(() => getStyles(theme), [theme]);
@@ -78,31 +79,31 @@ const AllTasksScreen = ({ navigation }) => {
     visible: false,
     taskId: null,
   });
-  const handleEdit = useCallback(item => {
-    navigation.navigate('CreateTask', { existingTask: item }, [navigation]);
-  });
+  const handleEdit = useCallback(
+    item => {
+      navigation.navigate('CreateTask', { existingTask: item });
+    },
+    [navigation],
+  );
 
   const handleDelete = useCallback(item => {
-    setDeleteModal(
-      {
-        visible: true,
-        taskId: item.id,
-        taskTitle: item.title,
-      },
-      [],
-    );
+    setDeleteModal({
+      visible: true,
+      taskId: item.id,
+      taskTitle: item.title,
+    });
+  }, []);
 
-    const handleComplete = useCallback(
-      id => {
-        dispatch(completeTask(id));
-      },
-      [dispatch],
-    );
-  });
+  const handleComplete = useCallback(
+    id => {
+      dispatch(completeTask(id));
+    },
+    [dispatch],
+  );
 
   const handlePriority = useCallback(id => {
-    setPriorityModal({ visible: true, taskId: id }, []);
-  });
+    setPriorityModal({ visible: true, taskId: id });
+  }, []);
   // ----- Chart Data -----
   const [selectedData, setSelectedData] = useState({
     label: 'Total',
@@ -198,24 +199,15 @@ const AllTasksScreen = ({ navigation }) => {
     ];
   }, [theme, chartData]);
 
-  useEffect(() => {
-    if (selectedData.label === 'Total') {
-      setSelectedData(prev =>
-        prev.value !== filteredTasks.length
-          ? { ...prev, value: filteredTasks.length }
-          : prev,
-      );
-    }
-  }, [filteredTasks.length, selectedData.label]);
-
+  // Consolidate chart updates to single effect
   useEffect(() => {
     setSelectedData({
       label: 'Total',
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
-    setChartKey(chartKey + 1);
-  }, [selectedDate, filteredTasks.length]);
+    setChartKey(prev => prev + 1);
+  }, [selectedDate, filteredTasks.length, theme.blackSecondary]);
 
   const resetTotal = () => {
     setSelectedData({
@@ -243,26 +235,55 @@ const AllTasksScreen = ({ navigation }) => {
   };
   const isFiltered = sortOrder !== 'asc' || status !== 'All' || !!startDate;
 
-  function handleReset() {
+  const handleReset = useCallback(() => {
     dispatch(resetFilters());
-  }
+  }, [dispatch]);
+
+  const handleTabChange = useCallback(
+    value => {
+      if (value === 'Focus') {
+        navigation.replace('Main');
+      } else {
+        setActiveTab(value);
+      }
+    },
+    [navigation],
+  );
+
+  const renderDateItem = useCallback(
+    ({ item }) => (
+      <DateList
+        item={item}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
+    ),
+    [selectedDate],
+  );
+
+  const handleAddTask = useCallback(() => {
+    navigation.navigate('CreateTask');
+  }, [navigation]);
+
+  const handleNavigateToFilter = useCallback(() => {
+    navigation.navigate('FilterScreen');
+  }, [navigation]);
+
+  const renderSectionHeader = useCallback(
+    ({ section: { title, data } }) => (
+      <View style={screenStyles.sectionHeaderContainer}>
+        <Text style={screenStyles.sectionHeaderText}>
+          {formatDate(title)} ({data.length})
+        </Text>
+      </View>
+    ),
+    [screenStyles],
+  );
   return (
     <View style={screenStyles.container}>
-      <AppBar
-        title="MACROTASKER"
-        onIconPress={() => navigation.navigate('CreateTask')}
-      />
+      <AppBar title="MACROTASKER" onIconPress={handleAddTask} />
       <View style={screenStyles.content}>
-        <SwitchTabs
-          activeTab={activeTab}
-          onTabChange={value => {
-            if (value === 'Focus') {
-              navigation.replace('Main');
-            } else {
-              setActiveTab(value);
-            }
-          }}
-        />
+        <SwitchTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
         <View style={screenStyles.sectionHeader}>
           <View style={screenStyles.headerLeft}>
@@ -276,7 +297,7 @@ const AllTasksScreen = ({ navigation }) => {
 
           <View style={screenStyles.filterIconContainer}>
             <TouchableOpacity
-              onPress={() => navigation.navigate('FilterScreen')}
+              onPress={handleNavigateToFilter}
               hitSlop={{ top: 10, bottom: 10, left: 5, right: 0 }}
             >
               <Icon name="filter" size={24} color={theme.textPrimary} />
@@ -316,13 +337,7 @@ const AllTasksScreen = ({ navigation }) => {
                 offset: 55 * index,
                 index,
               })}
-              renderItem={({ item }) => (
-                <DateList
-                  item={item}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                />
-              )}
+              renderItem={renderDateItem}
             />
           </View>
         )}
@@ -346,13 +361,7 @@ const AllTasksScreen = ({ navigation }) => {
             stickySectionHeadersEnabled={true}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
-            renderSectionHeader={({ section: { title, data } }) => (
-              <View style={screenStyles.sectionHeaderContainer}>
-                <Text style={screenStyles.sectionHeaderText}>
-                  {formatDate(title)} ({data.length})
-                </Text>
-              </View>
-            )}
+            renderSectionHeader={renderSectionHeader}
             renderItem={({ item }) => (
               <TaskCard
                 task={item}
@@ -389,20 +398,10 @@ const AllTasksScreen = ({ navigation }) => {
               <TaskCard
                 task={item}
                 theme={theme}
-                onEdit={() =>
-                  navigation.navigate('CreateTask', { existingTask: item })
-                }
-                onDelete={() =>
-                  setDeleteModal({
-                    visible: true,
-                    taskId: item.id,
-                    taskTitle: item.title,
-                  })
-                }
-                onComplete={() => dispatch(completeTask(item.id))}
-                onPriority={() =>
-                  setPriorityModal({ visible: true, taskId: item.id })
-                }
+                onEdit={() => handleEdit(item)}
+                onDelete={() => handleDelete(item)}
+                onComplete={() => handleComplete(item.id)}
+                onPriority={() => handlePriority(item.id)}
               />
             )}
           />
