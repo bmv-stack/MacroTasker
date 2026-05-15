@@ -34,7 +34,6 @@ import TaskChart from '../components/TaskChart';
 import DateList from '../components/DateList';
 
 const AllTasksScreen = ({ navigation }) => {
-  console.log('All Tasks Screen mounted');
   // -----THEME-----
   const { theme } = useTheme();
   const screenStyles = useMemo(() => getStyles(theme), [theme]);
@@ -206,7 +205,6 @@ const AllTasksScreen = ({ navigation }) => {
       value: filteredTasks.length,
       color: theme.blackSecondary,
     });
-    setChartKey(prev => prev + 1);
   }, [selectedDate, filteredTasks.length, theme.blackSecondary]);
 
   const resetTotal = () => {
@@ -326,6 +324,7 @@ const AllTasksScreen = ({ navigation }) => {
               ref={dateListRef}
               data={dateList}
               extraData={selectedDate}
+              initialNumToRender={10}
               keyExtractor={item => item.fullDate}
               initialScrollIndex={30}
               removeClippedSubviews={true}
