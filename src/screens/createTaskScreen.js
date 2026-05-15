@@ -279,6 +279,8 @@ const CreateTaskScreen = () => {
               isOptional={true}
               placeholder="Add note"
               value={form.notes}
+              multiline={true}
+              numberOfLines={10}
               onChangeText={val => handleInputChange('notes', val)}
               onFocus={() => {
                 setTimeout(() => {

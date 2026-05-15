@@ -9,6 +9,8 @@ const FormInput = ({
   placeholder,
   error,
   isOptional = false,
+  multiline = false,
+  numberOfLines = 1,
   ...props
 }) => {
   const { theme } = useTheme();
@@ -27,6 +29,8 @@ const FormInput = ({
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor="#BCBCBC"
+        multiline={multiline}
+        numberOfLines={numberOfLines}
         {...props}
       ></TextInput>
     </View>

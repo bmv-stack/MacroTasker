@@ -78,7 +78,14 @@ const FilterScreen = ({ navigation }) => {
                 >
                   {tab}
                 </Text>
-                {activeFilter && <View style={styles.activeDot} />}
+                {activeFilter && (
+                  <View
+                    style={[
+                      styles.activeDot,
+                      { opacity: activeFilter ? 1 : 0 },
+                    ]}
+                  />
+                )}
               </TouchableOpacity>
             );
           })}

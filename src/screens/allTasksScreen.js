@@ -365,11 +365,11 @@ const AllTasksScreen = ({ navigation }) => {
             renderItem={({ item }) => (
               <TaskCard
                 task={item}
-                navigation={navigation}
-                onEdit={handleEdit(item)}
-                onDelete={handleDelete(item)}
-                onComplete={handleComplete(item.id)}
-                onPriority={handlePriority(item.id)}
+                theme={theme}
+                onEdit={() => handleEdit(item)}
+                onDelete={() => handleDelete(item)}
+                onComplete={() => handleComplete(item.id)}
+                onPriority={() => handlePriority(item.id)}
               />
             )}
             ListEmptyComponent={() => (
